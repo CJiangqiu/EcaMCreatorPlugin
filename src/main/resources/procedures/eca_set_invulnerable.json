@@ -1,0 +1,15 @@
+{
+  "args0": [
+    { "type": "input_value", "name": "entity", "check": "Entity" },
+    { "type": "input_value", "name": "invulnerable", "check": "Boolean" }
+  ],
+  "inputsInline": true,
+  "previousStatement": null,
+  "nextStatement": null,
+  "colour": 285,
+  "mcreator": {
+    "toolbox_id": "eca",
+    "inputs": ["entity", "invulnerable"],
+    "dependencies": []
+  }
+}

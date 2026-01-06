@@ -1,0 +1,13 @@
+{
+  "id": "eca",
+  "supportedversions": [
+    2024004
+  ],
+  "weight": 0,
+  "info": {
+    "name": "Epic Core API Plugin",
+    "version": "1.0.5",
+    "description": "Add the Epic Core API mod as a dependency, providing several entity manipulation APIs.\n",
+    "author": "CJiangqiu"
+  }
+}
