@@ -16,13 +16,24 @@ I created this plugin to provide convenient and powerful entity manipulation API
 
 This plugin integrates [Epic Core API](https://github.com/CJiangqiu/EpicCoreAPI) as a dependency and provides several entity manipulation procedure blocks that would otherwise be difficult or impossible to implement in vanilla MCreator.
 
-### Features
+### Procedure Blocks
 
-- **Force Kill Entity** - Instantly kill an entity with proper damage source handling
-- **Force Set Health** - Set entity health using multi-phase smart modification
-- **Force Revive** - Revive dead entities by clearing death state
-- **Set Invulnerable** - Toggle strong invulnerability with automatic health locking
-- **Force Remove Entity** - Completely remove entities with deep cleanup
+- **Force Kill Entity** `<Entity>` - Set health to 0, trigger die(), drop loot, grant advancements, and remove the entity (death messages are not sent)
+- **Force Set Health** `<Entity> <Health>` - Modify entity health through multi-phase process: vanilla fields, smart field scanning, and bytecode reverse tracking
+- **Force Revive** `<Entity>` - Clear the entity's death flag and reset deathTime using VarHandle
+- **Set Force Invulnerable** `<Entity> <Boolean>` - Enable/disable invulnerability with automatic health locking (locks health when enabled, unlocks when disabled)
+- **Force Remove Entity** `<Entity>` - Deep cleanup including AI, boss bars, riding relationships, and all server/client containers
+- **Lock Health** `<Entity> <Value>` - Lock health via bytecode hook (getHealth() returns locked value) and tick-based reset
+- **Unlock Health** `<Entity>` - Remove health lock, allowing getHealth() to return actual health
+- **Is Health Locked** `<Entity>` - Check if entity health is locked
+- **Get Locked Health Value** `<Entity>` - Get the locked health value, or 0 if not locked
+- **Force Get Health** `<Entity>` - Read real health directly from DATA_HEALTH_ID using VarHandle, bypassing custom implementations
+- **Is Force Invulnerable** `<Entity>` - Check ECA invulnerability state via EntityData
+- **Force Teleport** `<Entity> <X> <Y> <Z>` - Directly modify position fields using VarHandle with automatic client sync
+- **Cleanup Boss Bar** `<Entity>` - Scan entity instance fields and remove all ServerBossEvent instances
+- **Enable AllReturn** `<Entity>` ⚠️ **[DANGER]** - Requires config enabled. Transform all boolean/void methods in the entity's mod package
+- **Disable AllReturn** - Turn off AllReturn and clear all transformation targets
+- **Is AllReturn Enabled** - Check if AllReturn is active
 
 All procedure blocks are located in the **"Epic Core API"** category (purple) in the procedure editor.
 
@@ -37,7 +48,7 @@ All procedure blocks are located in the **"Epic Core API"** category (purple) in
 
 #### Step 1: Download the Dev Version
 
-Download `eca-1.20.1-forge-1.0.5-fix-dev.jar` from [Epic Core API Releases](https://github.com/CJiangqiu/EpicCoreAPI/releases/tag/v1.0.5)
+Download `eca-1.20.1-forge-1.0.6-dev.jar` from [Epic Core API Releases](https://github.com/CJiangqiu/EpicCoreAPI/releases/tag/v1.0.6)
 
 > **Important:** You must use the **Dev version** during development, otherwise you will encounter Mixin obfuscation issues when running the workspace.
 
@@ -45,7 +56,7 @@ Download `eca-1.20.1-forge-1.0.5-fix-dev.jar` from [Epic Core API Releases](http
 
 Place the dev jar file in:
 ```
-<user home>/.mcreator/lib/eca-1.20.1-forge-1.0.5-fix-dev.jar
+<user home>/.mcreator/lib/eca-1.20.1-forge-1.0.6-dev.jar
 ```
 
 **Locations:**
@@ -84,7 +95,7 @@ Create the `lib` folder if it doesn't exist.
 2. In the procedure editor, find the **"Epic Core API"** category (purple color)
 3. Drag and drop the blocks you need
 
-### For Players (End Users)
+### For Players
 
 All mods created with this plugin require [Epic Core API](https://www.curseforge.com/minecraft/mc-mods/epic-core-api) as a **mandatory dependency**.
 
@@ -112,13 +123,24 @@ MIT License - See [LICENSE](LICENSE) file for details.
 
 这个插件将 [Epic Core API](https://github.com/CJiangqiu/EpicCoreAPI) Mod 添加为依赖，并提供了一些在原版 MCreator 中难以或无法实现的实体操作流程块。
 
-### 功能特性
+### 流程块
 
-- **强制杀死实体** - 使用正确的伤害源立即杀死实体
-- **强制设置生命值** - 使用多阶段智能修改设置实体生命值
-- **强制复活实体** - 通过清除死亡状态复活实体
-- **设置无敌状态** - 切换强无敌状态并自动锁定生命值
-- **强制移除实体** - 完整清除实体并进行深度清理
+- **强制杀死实体** `<实体>` - 设置血量为0、触发die()、掉落战利品、给予成就并移除实体（不会发送死亡消息）
+- **强制设置生命值** `<实体> <血量>` - 通过多阶段修改实体血量：原版字段、智能字段扫描、字节码逆向追踪
+- **强制复活实体** `<实体>` - 使用VarHandle清除实体的死亡标志并重置deathTime
+- **设置强制无敌** `<实体> <布尔值>` - 开启/关闭无敌并自动处理血量锁定（开启时锁血，关闭时解锁）
+- **强制移除实体** `<实体>` - 深度清理包括AI、Boss血条、骑乘关系以及所有服务端/客户端容器
+- **锁定血量** `<实体> <数值>` - 通过字节码hook锁定血量（getHealth()返回锁定值）并每tick重置真实血量
+- **解锁血量** `<实体>` - 移除血量锁定，getHealth()恢复返回实际血量
+- **血量是否已锁定** `<实体>` - 检查实体血量是否已锁定
+- **获取锁定血量值** `<实体>` - 获取锁定的血量值，未锁定时返回0
+- **强制获取真实血量** `<实体>` - 使用VarHandle直接从DATA_HEALTH_ID读取真实血量，绕过自定义实现
+- **是否处于强制无敌状态** `<实体>` - 通过EntityData检查ECA无敌状态
+- **强制传送** `<实体> <X> <Y> <Z>` - 使用VarHandle直接修改位置字段并自动同步到客户端
+- **清理Boss血条** `<实体>` - 扫描实体实例字段并移除所有ServerBossEvent实例
+- **启用AllReturn** `<实体>` ⚠️ **【危险】** - 需配置文件启用。对实体所属mod包内所有boolean/void方法进行转换
+- **禁用AllReturn** - 关闭AllReturn并清空所有转换目标
+- **AllReturn是否已启用** - 检查AllReturn是否激活
 
 所有流程块位于流程编辑器中的 **"Epic Core API"** 分类（紫色）。
 
@@ -133,7 +155,7 @@ MIT License - See [LICENSE](LICENSE) file for details.
 
 #### 第 1 步：下载 Dev 版本
 
-从 [Epic Core API Releases](https://github.com/CJiangqiu/EpicCoreAPI/releases/tag/v1.0.5) 下载 `eca-1.20.1-forge-1.0.5-fix-dev.jar`
+从 [Epic Core API Releases](https://github.com/CJiangqiu/EpicCoreAPI/releases/tag/v1.0.6) 下载 `eca-1.20.1-forge-1.0.6-dev.jar`
 
 > **重要提示：** 开发时必须使用 **Dev 版本**，否则在运行工作区时会遇到 Mixin 混淆问题。
 
@@ -141,7 +163,7 @@ MIT License - See [LICENSE](LICENSE) file for details.
 
 将 dev jar 文件放置在：
 ```
-<用户目录>/.mcreator/lib/eca-1.20.1-forge-1.0.5-fix-dev.jar
+<用户目录>/.mcreator/lib/eca-1.20.1-forge-1.0.6-dev.jar
 ```
 
 **路径参考：**
@@ -180,7 +202,7 @@ MIT License - See [LICENSE](LICENSE) file for details.
 2. 在流程编辑器中，找到 **"Epic Core API"** 分类（紫色）
 3. 拖放你需要的流程块
 
-### 玩家须知（最终用户）
+### 玩家须知
 
 所有使用该插件制作的 Mod 都需要将 [Epic Core API](https://www.curseforge.com/minecraft/mc-mods/epic-core-api) 作为**必要的依赖**。
 

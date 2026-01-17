@@ -1,0 +1,13 @@
+{
+  "args0": [
+    { "type": "input_value", "name": "entity", "check": "Entity" }
+  ],
+  "inputsInline": true,
+  "output": "Number",
+  "colour": 285,
+  "mcreator": {
+    "toolbox_id": "eca",
+    "inputs": ["entity"],
+    "return_type": "number"
+  }
+}

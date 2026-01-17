@@ -7,5 +7,5 @@ forge-1.20.1:
       flatDir { dirs new File(System.getProperty("user.home"), ".mcreator/lib") }
     }
     dependencies {
-      implementation name: 'eca-1.20.1-forge-1.0.5-fix-dev'
+      implementation name: 'eca-1.20.1-forge-1.0.6-dev'
     }

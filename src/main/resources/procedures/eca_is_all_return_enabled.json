@@ -1,0 +1,11 @@
+{
+  "args0": [],
+  "inputsInline": true,
+  "output": "Boolean",
+  "colour": 285,
+  "mcreator": {
+    "toolbox_id": "eca",
+    "inputs": [],
+    "return_type": "logic"
+  }
+}
