@@ -1,7 +1,7 @@
 {
   "args0": [
-    { "type": "input_value", "name": "entity", "check": "Entity" },
-    { "type": "input_value", "name": "seconds", "check": "Number" }
+    { "type": "input_value", "name": "entity_type", "check": "MCItemEntityType" },
+    { "type": "input_value", "name": "time", "check": "Number" }
   ],
   "inputsInline": true,
   "previousStatement": null,
@@ -9,7 +9,7 @@
   "colour": 285,
   "mcreator": {
     "toolbox_id": "eca",
-    "inputs": ["entity", "seconds"],
-    "dependencies": []
+    "inputs": ["entity_type", "time"],
+    "dependencies": [{"name": "world", "type": "world"}]
   }
 }
