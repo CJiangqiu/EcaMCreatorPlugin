@@ -6,7 +6,7 @@
   "weight": 0,
   "info": {
     "name": "Epic Core API Plugin",
-    "version": "1.0.7",
+    "version": "1.0.7-fix",
     "description": "Add the Epic Core API mod as a dependency, providing several entity manipulation APIs.\n",
     "author": "CJiangqiu"
   }
