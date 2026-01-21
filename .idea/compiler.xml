@@ -8,6 +8,9 @@
       <module name="DemoPlugin.MCreator.main" target="21" />
       <module name="DemoPlugin.MCreator.test" target="21" />
       <module name="DemoPlugin.test" target="21" />
+      <module name="EcaMCreatorPlugin.MCreator" target="21" />
+      <module name="EcaMCreatorPlugin.MCreator.main" target="21" />
+      <module name="EcaMCreatorPlugin.MCreator.test" target="21" />
     </bytecodeTargetLevel>
   </component>
 </project>
