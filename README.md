@@ -35,7 +35,7 @@ This plugin integrates [Epic Core API](https://github.com/CJiangqiu/EpicCoreAPI)
 - **Disable AllReturn** - Turn off AllReturn and clear all transformation targets
 - **Is AllReturn Enabled** - Check if AllReturn is active
 - **Set Global AllReturn** `<Boolean>` ⚠️ **[DANGER]** - Requires config enabled. Perform return transformation on all loaded non-excluded classes
-- **Memory Remove Entity** `<Entity>` ⚠️ **[DANGER]** - Requires config enabled. Use LWJGL API to remove entity from memory
+- **Memory Remove Entity** `<Entity>` ⚠️ **[DANGER]** - Requires config enabled. Remove entity via LWJGL internal channel
 - **Add Health Whitelist Keyword** `<Keyword>` - Add a keyword to health whitelist. Fields containing this keyword will be modified during health changes
 - **Remove Health Whitelist Keyword** `<Keyword>` - Remove a keyword from health whitelist
 - **Add Health Blacklist Keyword** `<Keyword>` - Add a keyword to health blacklist. Fields containing this keyword will be skipped during health changes
@@ -153,7 +153,7 @@ MIT License - See [LICENSE](LICENSE) file for details.
 - **禁用AllReturn** - 关闭AllReturn并清空所有转换目标
 - **AllReturn是否已启用** - 检查AllReturn是否激活
 - **设置全局AllReturn** `<布尔值>` ⚠️ **【危险】** - 需配置文件启用。对所有已加载的非排除类执行return转换
-- **内存移除实体** `<实体>` ⚠️ **【危险】** - 需配置文件启用。使用LWJGL API从内存中移除实体
+- **内存移除实体** `<实体>` ⚠️ **【危险】** - 需配置文件启用。通过LWJGL内部通道移除实体
 - **添加血量白名单关键字** `<关键字>` - 添加血量白名单关键字，包含此关键字的字段将在血量修改时被修改
 - **移除血量白名单关键字** `<关键字>` - 从血量白名单中移除关键字
 - **添加血量黑名单关键字** `<关键字>` - 添加血量黑名单关键字，包含此关键字的字段将在血量修改时被跳过

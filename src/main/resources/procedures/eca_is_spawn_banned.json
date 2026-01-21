@@ -1,13 +1,13 @@
 {
   "args0": [
-    { "type": "input_value", "name": "entity_type", "check": "MCItemEntityType" }
+    { "type": "input_value", "name": "entity", "check": "Entity" }
   ],
   "inputsInline": true,
   "output": "Boolean",
   "colour": 285,
   "mcreator": {
     "toolbox_id": "eca",
-    "inputs": ["entity_type"],
+    "inputs": ["entity"],
     "return_type": "logic",
     "dependencies": [{"name": "world", "type": "world"}]
   }
