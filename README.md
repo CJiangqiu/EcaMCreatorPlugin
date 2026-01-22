@@ -34,6 +34,7 @@ This plugin integrates [Epic Core API](https://github.com/CJiangqiu/EpicCoreAPI)
 - **Enable AllReturn** `<Entity>` ⚠️ **[DANGER]** - Requires config enabled. Transform all boolean/void methods in the entity's mod package
 - **Disable AllReturn** - Turn off AllReturn and clear all transformation targets
 - **Is AllReturn Enabled** - Check if AllReturn is active
+- **Set Global AllReturn** `<Boolean>` ⚠️ **[DANGER]** - Requires config enabled. Enable/disable global AllReturn mode affecting ALL mods' boolean/void methods
 - **Memory Remove Entity** `<Entity>` ⚠️ **[DANGER]** - Requires config enabled. Remove entity via LWJGL internal channel
 - **Add Health Whitelist Keyword** `<Keyword>` - Add a keyword to health whitelist. Fields containing this keyword will be modified during health changes
 - **Remove Health Whitelist Keyword** `<Keyword>` - Remove a keyword from health whitelist
@@ -44,6 +45,9 @@ This plugin integrates [Epic Core API](https://github.com/CJiangqiu/EpicCoreAPI)
 - **Get Spawn Ban Time** `<EntityType>` - Get the remaining time (seconds) for an entity type's spawn ban
 - **Clear Spawn Ban** `<EntityType>` - Clear the spawn ban for a specific entity type
 - **Clear All Spawn Bans** - Clear all spawn bans in the current dimension
+- **Add Protected Package** `<PackagePrefix>` - Add a package prefix to the whitelist. Classes in protected packages will not be affected by AllReturn
+- **Remove Protected Package** `<PackagePrefix>` - Remove a package prefix from the whitelist. Built-in protections cannot be removed
+- **Is Package Protected** `<ClassName>` - Check if a class name is protected by the whitelist
 
 All procedure blocks are located in the **"Epic Core API"** category (purple) in the procedure editor.
 
@@ -58,7 +62,7 @@ All procedure blocks are located in the **"Epic Core API"** category (purple) in
 
 #### Step 1: Download the Dev Version
 
-Download `eca-1.20.1-forge-1.0.7-fix-dev.jar` from [Epic Core API Releases](https://github.com/CJiangqiu/EpicCoreAPI/releases/tag/v1.0.7-fix)
+Download `eca-1.20.1-forge-1.0.8-fix-dev.jar` from [Epic Core API Releases](https://github.com/CJiangqiu/EpicCoreAPI/releases/tag/v1.0.8-fix)
 
 > **Important:** You must use the **Dev version** during development, otherwise you will encounter Mixin obfuscation issues when running the workspace.
 
@@ -66,7 +70,7 @@ Download `eca-1.20.1-forge-1.0.7-fix-dev.jar` from [Epic Core API Releases](http
 
 Place the dev jar file in:
 ```
-<user home>/.mcreator/lib/eca-1.20.1-forge-1.0.7-fix-dev.jar
+<user home>/.mcreator/lib/eca-1.20.1-forge-1.0.8-fix-dev.jar
 ```
 
 **Locations:**
@@ -151,6 +155,7 @@ MIT License - See [LICENSE](LICENSE) file for details.
 - **启用AllReturn** `<实体>` ⚠️ **【危险】** - 需配置文件启用。对实体所属mod包内所有boolean/void方法进行转换
 - **禁用AllReturn** - 关闭AllReturn并清空所有转换目标
 - **AllReturn是否已启用** - 检查AllReturn是否激活
+- **设置全局AllReturn** `<布尔值>` ⚠️ **【危险】** - 需配置文件启用。启用/禁用全局AllReturn模式，影响所有mod的boolean/void方法
 - **内存移除实体** `<实体>` ⚠️ **【危险】** - 需配置文件启用。通过LWJGL内部通道移除实体
 - **添加血量白名单关键字** `<关键字>` - 添加血量白名单关键字，包含此关键字的字段将在血量修改时被修改
 - **移除血量白名单关键字** `<关键字>` - 从血量白名单中移除关键字
@@ -161,6 +166,9 @@ MIT License - See [LICENSE](LICENSE) file for details.
 - **获取禁生成剩余时间** `<实体类型>` - 获取实体类型禁生成的剩余时间（秒）
 - **清除禁生成** `<实体类型>` - 清除指定实体类型的禁生成
 - **清除所有禁生成** - 清除当前维度的所有禁生成
+- **添加受保护的包名** `<包名前缀>` - 将包名前缀添加到白名单，受保护包中的类不会受到AllReturn影响
+- **移除受保护的包名** `<包名前缀>` - 从白名单中移除包名前缀，内置保护无法移除
+- **是否受保护** `<类名>` - 检查类名是否在白名单保护中
 
 所有流程块位于流程编辑器中的 **"Epic Core API"** 分类（紫色）。
 
@@ -175,7 +183,7 @@ MIT License - See [LICENSE](LICENSE) file for details.
 
 #### 第 1 步：下载 Dev 版本
 
-从 [Epic Core API Releases](https://github.com/CJiangqiu/EpicCoreAPI/releases/tag/v1.0.7-fix) 下载 `eca-1.20.1-forge-1.0.7-fix-dev.jar`
+从 [Epic Core API Releases](https://github.com/CJiangqiu/EpicCoreAPI/releases/tag/v1.0.8-fix) 下载 `eca-1.20.1-forge-1.0.8-fix-dev.jar`
 
 > **重要提示：** 开发时必须使用 **Dev 版本**，否则在运行工作区时会遇到 Mixin 混淆问题。
 
@@ -183,7 +191,7 @@ MIT License - See [LICENSE](LICENSE) file for details.
 
 将 dev jar 文件放置在：
 ```
-<用户目录>/.mcreator/lib/eca-1.20.1-forge-1.0.7-fix-dev.jar
+<用户目录>/.mcreator/lib/eca-1.20.1-forge-1.0.8-fix-dev.jar
 ```
 
 **路径参考：**

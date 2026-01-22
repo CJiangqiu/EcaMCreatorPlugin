@@ -1,0 +1,13 @@
+{
+  "args0": [
+    { "type": "input_value", "name": "className", "check": "String" }
+  ],
+  "inputsInline": true,
+  "output": "Boolean",
+  "colour": 285,
+  "mcreator": {
+    "toolbox_id": "eca",
+    "inputs": ["className"],
+    "return_type": "logic"
+  }
+}
