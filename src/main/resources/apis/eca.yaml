@@ -13,5 +13,5 @@ forge-1.20.1:
     }
     dependencies {
       // 使用 dev jar（包含 MCP 映射的 refmap），无需 fg.deobf()
-      implementation "curse.maven:epic-core-api-977556:7549815"
+      implementation "curse.maven:epic-core-api-977556:7559826"
     }
