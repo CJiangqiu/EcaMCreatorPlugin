@@ -1,7 +1,7 @@
 # Epic Core API MCreator Plugin
 
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![MCreator](https://img.shields.io/badge/MCreator-2024.4-orange.svg)](https://mcreator.net/)
+[![MCreator](https://img.shields.io/badge/MCreator-2024.1+-orange.svg)](https://mcreator.net/)
 [![Minecraft](https://img.shields.io/badge/Minecraft-1.20.1-green.svg)](https://www.minecraft.net/)
 
 [English](#english) | [中文](#中文)
@@ -53,33 +53,23 @@ All procedure blocks are located in the **"Epic Core API"** category (purple) in
 
 ### Requirements
 
-- **MCreator 2024.4**
+- **MCreator 2024.1 or higher** (tested up to 2025.3)
+  - **MCreator 2024.1-2024.4**: No additional setup needed (1.20.1 Forge generator built-in)
+  - **MCreator 2025.1+**: Requires developers to manually install the 1.20.1 Forge generator plugin
 - **Minecraft Forge 1.20.1**
-- **Epic Core API Dev JAR** (for development)
 - **Epic Core API Mod** (runtime dependency for players)
 
 ### Installation for Developers
 
-#### Step 1: Download the Dev Version
+#### Step 1: Install 1.20.1 Forge Generator (MCreator 2025.1+ Only)
 
-Download `eca-1.20.1-forge-1.0.8-fix-dev.jar` from [Epic Core API Releases](https://github.com/CJiangqiu/EpicCoreAPI/releases/tag/v1.0.8-fix)
+**Skip this step if you're using MCreator 2024.1-2024.4** (1.20.1 Forge support is built-in)
 
-> **Important:** You must use the **Dev version** during development, otherwise you will encounter Mixin obfuscation issues when running the workspace.
+If you're using **MCreator 2025.1 or higher**:
 
-#### Step 2: Install the Dev JAR
+Visit the [MCreator Plugins page](https://mcreator.net/plugins) to find the **1.20.1 Forge generator plugin** for your MCreator version and install it alongside the ECA plugin.
 
-Place the dev jar file in:
-```
-<user home>/.mcreator/lib/eca-1.20.1-forge-1.0.8-fix-dev.jar
-```
-
-**Locations:**
-- **Windows**: `C:\Users\<YourName>\.mcreator\lib\`
-- **macOS/Linux**: `~/.mcreator/lib/`
-
-Create the `lib` folder if it doesn't exist.
-
-#### Step 3: Install the Plugin
+#### Step 2: Install the Plugin
 
 1. Download the plugin ZIP file from releases
 2. Place it in:
@@ -88,14 +78,14 @@ Create the `lib` folder if it doesn't exist.
    ```
 3. Restart MCreator
 
-#### Step 4: Enable Java Plugins
+#### Step 3: Enable Java Plugins
 
 1. Open MCreator preferences (File → Preferences)
 2. Go to the "Plugins" section
 3. **Enable "Java Plugins" option**
 4. Restart MCreator if prompted
 
-#### Step 5: Configure Your Workspace
+#### Step 4: Configure Your Workspace
 
 1. Open or create a workspace (Forge 1.20.1)
 2. Go to **Workspace → Workspace settings → External APIs**
@@ -103,7 +93,7 @@ Create the `lib` folder if it doesn't exist.
 4. Click **Save** and **regenerate code**
 5. Wait for Gradle to sync
 
-#### Step 6: Use the Procedure Blocks
+#### Step 5: Use the Procedure Blocks
 
 1. Create a new procedure
 2. In the procedure editor, find the **"Epic Core API"** category (purple color)
@@ -119,7 +109,6 @@ Players must download and install the Epic Core API mod from CurseForge to use a
 
 - **Epic Core API Mod**: https://www.curseforge.com/minecraft/mc-mods/epic-core-api
 - **Source Code**: https://github.com/CJiangqiu/EpicCoreAPI
-- **Dev Releases**: https://github.com/CJiangqiu/EpicCoreAPI/releases
 
 ### License
 
@@ -174,33 +163,23 @@ MIT License - See [LICENSE](LICENSE) file for details.
 
 ### 环境要求
 
-- **MCreator 2024.4**
+- **MCreator 2024.1 或更高版本**
+  - **MCreator 2024.1-2024.4**：无需额外设置（内置 1.20.1 Forge 生成器）
+  - **MCreator 2025.1 及以上**：需要开发者手动下载安装 1.20.1 Forge 生成器插件
 - **Minecraft Forge 1.20.1**
-- **Epic Core API Dev JAR**（开发时需要）
 - **Epic Core API Mod**（玩家运行时依赖）
 
 ### 开发者安装教程
 
-#### 第 1 步：下载 Dev 版本
+#### 第 1 步：安装 1.20.1 Forge 生成器（仅限 MCreator 2025.1+）
 
-从 [Epic Core API Releases](https://github.com/CJiangqiu/EpicCoreAPI/releases/tag/v1.0.8-fix) 下载 `eca-1.20.1-forge-1.0.8-fix-dev.jar`
+**如果使用 MCreator 2024.1-2024.4，请跳过此步骤**（内置 1.20.1 Forge 支持）
 
-> **重要提示：** 开发时必须使用 **Dev 版本**，否则在运行工作区时会遇到 Mixin 混淆问题。
+如果使用 **MCreator 2025.1 或更高版本**：
 
-#### 第 2 步：安装 Dev JAR
+请前往 [MCreator 插件页面](https://mcreator.net/plugins) 寻找对应 MCreator 版本的 **1.20.1 Forge 生成器插件**，并与 ECA 插件一起安装。
 
-将 dev jar 文件放置在：
-```
-<用户目录>/.mcreator/lib/eca-1.20.1-forge-1.0.8-fix-dev.jar
-```
-
-**路径参考：**
-- **Windows**: `C:\Users\<你的用户名>\.mcreator\lib\`
-- **macOS/Linux**: `~/.mcreator/lib/`
-
-如果 `lib` 文件夹不存在，请手动创建。
-
-#### 第 3 步：安装插件
+#### 第 2 步：安装插件
 
 1. 下载插件 ZIP 文件
 2. 将其放置在：
@@ -209,14 +188,14 @@ MIT License - See [LICENSE](LICENSE) file for details.
    ```
 3. 重启 MCreator
 
-#### 第 4 步：启用 Java 插件
+#### 第 3 步：启用 Java 插件
 
 1. 打开 MCreator 首选项（文件 → 首选项）
 2. 进入"插件"部分
 3. **启用"Java 插件"选项**
 4. 如果提示，重启 MCreator
 
-#### 第 5 步：配置工作区
+#### 第 4 步：配置工作区
 
 1. 打开或创建一个工作区（Forge 1.20.1）
 2. 进入 **工作区 → 工作区设置 → 外部 API**
@@ -224,7 +203,7 @@ MIT License - See [LICENSE](LICENSE) file for details.
 4. 点击**保存**并**重新生成代码**
 5. 等待 Gradle 同步完成
 
-#### 第 6 步：使用流程块
+#### 第 5 步：使用流程块
 
 1. 创建一个新流程
 2. 在流程编辑器中，找到 **"Epic Core API"** 分类（紫色）
@@ -240,7 +219,6 @@ MIT License - See [LICENSE](LICENSE) file for details.
 
 - **Epic Core API Mod**: https://www.curseforge.com/minecraft/mc-mods/epic-core-api
 - **源代码**: https://github.com/CJiangqiu/EpicCoreAPI
-- **Dev 版本发布**: https://github.com/CJiangqiu/EpicCoreAPI/releases
 
 ### 许可证
 

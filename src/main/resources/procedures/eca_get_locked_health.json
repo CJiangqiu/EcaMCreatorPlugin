@@ -4,9 +4,12 @@
   ],
   "inputsInline": true,
   "output": "Number",
-  "colour": 285,
+  "colour": 195,
   "mcreator": {
     "toolbox_id": "eca",
+    "toolbox_init": [
+      "<value name=\"entity\"><block type=\"entity_from_deps\"></block></value>"
+    ],
     "inputs": ["entity"],
     "return_type": "number"
   }

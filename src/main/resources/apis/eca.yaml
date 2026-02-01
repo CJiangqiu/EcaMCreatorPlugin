@@ -4,8 +4,14 @@ forge-1.20.1:
   required_when_enabled: true
   gradle: |
     repositories {
-      flatDir { dirs new File(System.getProperty("user.home"), ".mcreator/lib") }
+      maven {
+        url = "https://cursemaven.com"
+        content {
+          includeGroup "curse.maven"
+        }
+      }
     }
     dependencies {
-      implementation name: 'eca-1.20.1-forge-1.0.8-fix-dev'
+      // 使用 dev jar（包含 MCP 映射的 refmap），无需 fg.deobf()
+      implementation "curse.maven:epic-core-api-977556:7549815"
     }

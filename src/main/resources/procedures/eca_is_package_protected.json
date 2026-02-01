@@ -4,9 +4,12 @@
   ],
   "inputsInline": true,
   "output": "Boolean",
-  "colour": 285,
+  "colour": 160,
   "mcreator": {
     "toolbox_id": "eca",
+    "toolbox_init": [
+      "<value name=\"className\"><block type=\"text\"><field name=\"TEXT\">net.mcreator.yourmod.YourClass</field></block></value>"
+    ],
     "inputs": ["className"],
     "return_type": "logic"
   }
