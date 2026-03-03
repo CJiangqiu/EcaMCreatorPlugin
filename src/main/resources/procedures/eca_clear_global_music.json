@@ -1,0 +1,10 @@
+{
+  "inputsInline": true,
+  "previousStatement": null,
+  "nextStatement": null,
+  "colour": 35,
+  "mcreator": {
+    "toolbox_id": "eca",
+    "dependencies": [{"name": "world", "type": "world"}]
+  }
+}

@@ -1,0 +1,1 @@
+Whether the combat music should loop continuously while in combat. If disabled, the music plays once and stops.

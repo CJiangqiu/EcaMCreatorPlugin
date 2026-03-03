@@ -1,0 +1,1 @@
+Additional offset for the fill rendering position in pixels, applied on top of the automatic centering within the frame.

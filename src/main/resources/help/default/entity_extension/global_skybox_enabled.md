@@ -1,0 +1,1 @@
+Enable skybox effect for this entity. When active, a custom skybox replaces the vanilla sky in the dimension. Supports both texture-based and shader-based rendering. Only affects dimensions where this entity type exists.

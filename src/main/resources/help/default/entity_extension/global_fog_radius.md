@@ -1,0 +1,1 @@
+Local mode only. The radius (in blocks) of the fog area around the entity. Fog strength fades linearly from 1.0 at the entity to 0.0 at this distance.

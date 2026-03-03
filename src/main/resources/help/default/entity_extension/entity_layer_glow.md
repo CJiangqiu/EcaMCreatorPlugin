@@ -1,0 +1,1 @@
+When enabled, the extra layer renders at full brightness regardless of surrounding light level.

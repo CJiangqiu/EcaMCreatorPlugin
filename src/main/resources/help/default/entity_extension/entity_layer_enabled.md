@@ -1,0 +1,1 @@
+Add an extra rendering layer on the entity. Supports shader effects, glow, and hurt overlay options.

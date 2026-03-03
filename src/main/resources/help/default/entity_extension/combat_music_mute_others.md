@@ -1,0 +1,1 @@
+When enabled, mutes all other music tracks (including vanilla ambient music) during combat, ensuring only this combat music is playing.

@@ -12,6 +12,12 @@ forge-1.20.1:
       }
     }
     dependencies {
-      // 使用 dev jar（包含 MCP 映射的 refmap），无需 fg.deobf()
-      implementation "curse.maven:epic-core-api-977556:7559826"
+      def libDir = new File(System.getProperty("user.home"), ".mcreator/lib")
+      def ecaJars = fileTree(dir: libDir, include: 'eca-*-dev.jar').files
+      if (!ecaJars.isEmpty()) {
+        def latestEca = ecaJars.sort { it.name }.last()
+        implementation files(latestEca)
+      } else {
+          implementation fg.deobf("curse.maven:epic-core-api-977556:7705229")
+      }
     }

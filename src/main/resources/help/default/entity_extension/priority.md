@@ -1,0 +1,1 @@
+For "global effect" extensions (skybox, fog, combat music, etc.), the one with the highest priority among multiple entity types takes effect. If priorities are equal, a newly spawned entity will override the previous global effect.

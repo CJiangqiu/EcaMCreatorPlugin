@@ -1,0 +1,1 @@
+The shader preset applied to the skybox. Available presets: TheLastEnd, DreamSakura, Forest, Ocean, Storm, Volcano, Arcane, Aurora, Hacker, Starlight, Cosmos, BlackHole.

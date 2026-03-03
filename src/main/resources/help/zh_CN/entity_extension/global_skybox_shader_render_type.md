@@ -1,0 +1,1 @@
+应用到天空盒的着色器预设。可选：TheLastEnd、DreamSakura、Forest、Ocean、Storm、Volcano、Arcane、Aurora、Hacker、Starlight、Cosmos、BlackHole。

@@ -1,0 +1,1 @@
+The audio channel for music playback. MUSIC is recommended for background music. The source determines which volume slider in game settings controls this sound (e.g., MASTER, MUSIC, RECORDS, AMBIENT, etc.).

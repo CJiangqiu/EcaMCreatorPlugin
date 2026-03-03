@@ -1,0 +1,1 @@
+音乐播放的音频通道。推荐使用 MUSIC 作为背景音乐。声音源决定了游戏设置中哪个音量滑块控制此声音（如 MASTER、MUSIC、RECORDS、AMBIENT 等）。

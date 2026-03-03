@@ -1,0 +1,1 @@
+The sound to play as combat music. Click the edit button to browse and select from all available sounds in the workspace and Minecraft.

@@ -1,0 +1,1 @@
+When enabled, the extra layer shows a red hurt overlay when the entity takes damage.

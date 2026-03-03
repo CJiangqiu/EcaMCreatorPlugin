@@ -1,0 +1,1 @@
+Multiplier for terrain fog end distance. Applied as render distance * this value. Lower values make fog end closer (denser fog).

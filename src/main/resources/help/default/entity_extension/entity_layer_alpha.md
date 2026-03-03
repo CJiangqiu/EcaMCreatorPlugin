@@ -1,0 +1,1 @@
+The opacity of the extra layer. 0.0 = fully transparent, 1.0 = fully opaque.

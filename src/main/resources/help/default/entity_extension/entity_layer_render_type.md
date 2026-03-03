@@ -1,0 +1,1 @@
+The shader render type applied to the extra layer. Select "(None)" to use the default rendering.

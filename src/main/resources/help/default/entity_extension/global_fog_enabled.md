@@ -1,0 +1,1 @@
+Enable fog effect for this entity. Two modes available: global mode fills the entire dimension with fog; local mode creates fog centered on the entity with distance-based falloff.

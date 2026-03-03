@@ -1,0 +1,1 @@
+The color of the fog. Click the edit button to open the color picker.

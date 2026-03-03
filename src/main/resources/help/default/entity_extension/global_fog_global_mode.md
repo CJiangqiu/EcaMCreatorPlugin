@@ -1,0 +1,1 @@
+When enabled, the entire dimension is filled with fog at full strength. When disabled, fog is centered on the entity and fades with distance (controlled by radius).

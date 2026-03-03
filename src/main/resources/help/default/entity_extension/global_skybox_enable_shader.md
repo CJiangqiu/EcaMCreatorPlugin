@@ -1,0 +1,1 @@
+Enable a shader effect on the skybox. Shader presets provide animated or stylized sky effects (e.g. starfield, aurora, storm). Can be combined with texture for layered effects.

@@ -1,0 +1,1 @@
+Multiplier for sky fog start distance. Applied as render distance * this value.

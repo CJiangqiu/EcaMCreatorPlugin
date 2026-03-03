@@ -1,0 +1,1 @@
+Each entity type can only have one corresponding extension! Multiple extensions will cause errors.

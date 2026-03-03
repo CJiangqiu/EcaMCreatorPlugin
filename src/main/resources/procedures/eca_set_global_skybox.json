@@ -1,0 +1,36 @@
+{
+  "args0": [
+    {
+      "type": "field_dropdown",
+      "name": "preset",
+      "options": [
+        ["TheLastEnd", "TheLastEnd"],
+        ["DreamSakura", "DreamSakura"],
+        ["Forest", "Forest"],
+        ["Ocean", "Ocean"],
+        ["Storm", "Storm"],
+        ["Volcano", "Volcano"],
+        ["Arcane", "Arcane"],
+        ["Aurora", "Aurora"],
+        ["Hacker", "Hacker"],
+        ["Starlight", "Starlight"],
+        ["Cosmos", "Cosmos"],
+        ["BlackHole", "BlackHole"]
+      ]
+    },
+    { "type": "input_value", "name": "alpha", "check": "Number" }
+  ],
+  "inputsInline": true,
+  "previousStatement": null,
+  "nextStatement": null,
+  "colour": 35,
+  "mcreator": {
+    "toolbox_id": "eca",
+    "toolbox_init": [
+      "<value name=\"alpha\"><block type=\"math_number\"><field name=\"NUM\">0.9</field></block></value>"
+    ],
+    "fields": ["preset"],
+    "inputs": ["alpha"],
+    "dependencies": [{"name": "world", "type": "world"}]
+  }
+}

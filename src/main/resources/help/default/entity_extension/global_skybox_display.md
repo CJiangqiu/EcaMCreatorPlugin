@@ -1,0 +1,1 @@
+Configure skybox visual properties. Alpha controls opacity (0.0 = transparent, 1.0 = fully opaque, default: 0.9). Size sets the skybox dome radius in world units — larger values make the skybox appear further from the player (default: 100.0).

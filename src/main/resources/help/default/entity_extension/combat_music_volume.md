@@ -1,0 +1,1 @@
+Playback volume multiplier. 1.0 = normal volume. Values above 1.0 amplify the sound. Default: 1.0.

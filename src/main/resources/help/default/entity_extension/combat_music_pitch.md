@@ -1,0 +1,1 @@
+Playback pitch multiplier. 1.0 = normal pitch. Higher values speed up and pitch up the music, lower values slow down and pitch down. Default: 1.0.

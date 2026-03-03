@@ -1,0 +1,1 @@
+The shape of the fog volume. SPHERE creates a spherical fog area, CYLINDER creates a cylindrical fog area.

@@ -1,0 +1,1 @@
+Enable combat music override for this entity. When enabled, a custom music track will play when a player is in combat with this entity, replacing the default background music.

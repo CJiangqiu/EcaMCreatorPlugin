@@ -1,0 +1,1 @@
+The texture image used for the skybox background. Select a Screen/GUI texture from your workspace. The image will be placed under "textures/screen/" in the generated mod.

@@ -1,0 +1,1 @@
+Offset the frame rendering position in pixels. X shifts horizontally, Y shifts vertically.

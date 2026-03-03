@@ -1,0 +1,1 @@
+Multiplier for terrain fog start distance. Applied as render distance * this value. Lower values make fog start closer.

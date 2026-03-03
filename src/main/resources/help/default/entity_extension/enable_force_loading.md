@@ -1,0 +1,1 @@
+When enabled, entities of this type will be set as force-loaded. Do not use this for entities that spawn in large numbers to avoid lag.

@@ -1,0 +1,1 @@
+Override the max health value used to calculate boss bar fill ratio. Fill ratio = current health / max health.

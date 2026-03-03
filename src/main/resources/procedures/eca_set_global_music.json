@@ -1,0 +1,49 @@
+{
+  "args0": [
+    {
+      "type": "field_data_list_selector",
+      "name": "sound",
+      "datalist": "sound"
+    },
+    {
+      "type": "field_dropdown",
+      "name": "soundSource",
+      "options": [
+        ["Music", "MUSIC"],
+        ["Master", "MASTER"],
+        ["Records", "RECORDS"],
+        ["Weather", "WEATHER"],
+        ["Blocks", "BLOCKS"],
+        ["Hostile", "HOSTILE"],
+        ["Neutral", "NEUTRAL"],
+        ["Players", "PLAYERS"],
+        ["Ambient", "AMBIENT"],
+        ["Voice", "VOICE"]
+      ]
+    },
+    { "type": "input_value", "name": "volume", "check": "Number" },
+    { "type": "input_value", "name": "pitch", "check": "Number" },
+    {
+      "type": "field_dropdown",
+      "name": "loop",
+      "options": [
+        ["TRUE", "TRUE"],
+        ["FALSE", "FALSE"]
+      ]
+    }
+  ],
+  "inputsInline": true,
+  "previousStatement": null,
+  "nextStatement": null,
+  "colour": 35,
+  "mcreator": {
+    "toolbox_id": "eca",
+    "toolbox_init": [
+      "<value name=\"volume\"><block type=\"math_number\"><field name=\"NUM\">1</field></block></value>",
+      "<value name=\"pitch\"><block type=\"math_number\"><field name=\"NUM\">1</field></block></value>"
+    ],
+    "fields": ["sound", "soundSource", "loop"],
+    "inputs": ["volume", "pitch"],
+    "dependencies": [{"name": "world", "type": "world"}]
+  }
+}

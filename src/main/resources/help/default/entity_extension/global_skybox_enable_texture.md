@@ -1,0 +1,1 @@
+Enable a custom texture to be rendered on the skybox. The texture will be mapped onto the sky dome using the UV scale, tinted by the texture RGB color settings.

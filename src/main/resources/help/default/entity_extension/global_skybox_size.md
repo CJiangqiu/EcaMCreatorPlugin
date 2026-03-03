@@ -1,0 +1,1 @@
+The size of the skybox dome in world units. Larger values push the skybox further away from the player. Default: 100.0.
