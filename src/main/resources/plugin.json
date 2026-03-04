@@ -1,6 +1,8 @@
 {
   "id": "eca",
   "supportedversions": [
+    2024002,
+    2024003,
     2024004
   ],
   "weight": 0,
