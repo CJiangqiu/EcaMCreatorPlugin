@@ -289,7 +289,7 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
     private JPanel buildSkyboxTextureRow() {
         JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
         row.add(globalSkyboxEnableTexture);
-        globalSkyboxTexture.setPreferredSize(new Dimension(300, 70));
+        globalSkyboxTexture.setPreferredSize(new Dimension(300, globalSkyboxTexture.getPreferredSize().height));
         row.add(globalSkyboxTexture);
         return row;
     }
