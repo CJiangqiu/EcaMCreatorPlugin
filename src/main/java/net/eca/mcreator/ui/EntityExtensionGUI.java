@@ -11,8 +11,9 @@ import net.mcreator.ui.component.util.PanelUtils;
 import net.mcreator.ui.help.HelpUtils;
 import net.mcreator.ui.init.L10N;
 import net.mcreator.ui.minecraft.DataListComboBox;
+import net.mcreator.ui.dialogs.TypedTextureSelectorDialog;
 import net.mcreator.ui.minecraft.SoundSelector;
-import net.mcreator.ui.minecraft.TextureComboBox;
+import net.mcreator.ui.minecraft.TextureHolder;
 import net.mcreator.ui.modgui.ModElementGUI;
 import net.mcreator.ui.procedure.AbstractProcedureSelector;
 import net.mcreator.ui.procedure.NumberProcedureSelector;
@@ -32,8 +33,8 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
 
     // Boss Bar
     private final JCheckBox bossBarEnabled = new JCheckBox();
-    private TextureComboBox bossBarFrameTexture;
-    private TextureComboBox bossBarFillTexture;
+    private TextureHolder bossBarFrameTexture;
+    private TextureHolder bossBarFillTexture;
     private final JCheckBox bossBarFrameShaderEnabled = new JCheckBox();
     private final JComboBox<String> bossBarFrameRenderType = new JComboBox<>(getRenderTypeOptions());
     private final JSpinner bossBarFrameWidth = new JSpinner(new SpinnerNumberModel(182, 1, 2048, 1));
@@ -74,7 +75,7 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
     // Global Skybox
     private final JCheckBox globalSkyboxEnabled = new JCheckBox();
     private final JCheckBox globalSkyboxEnableTexture = new JCheckBox();
-    private TextureComboBox globalSkyboxTexture;
+    private TextureHolder globalSkyboxTexture;
     private final JCheckBox globalSkyboxEnableShader = new JCheckBox();
     private final JComboBox<String> globalSkyboxShaderRenderType = new JComboBox<>(getSkyboxShaderOptions());
     private final JSpinner globalSkyboxAlpha = new JSpinner(new SpinnerNumberModel(0.9, 0.0, 1.0, 0.05));
@@ -102,10 +103,10 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
 
         entityType = new DataListComboBox(mcreator,
                 ElementUtil.loadAllSpawnableEntities(mcreator.getWorkspace()));
-        bossBarFrameTexture = new TextureComboBox(mcreator, TextureType.SCREEN);
-        bossBarFillTexture = new TextureComboBox(mcreator, TextureType.SCREEN);
+        bossBarFrameTexture = new TextureHolder(new TypedTextureSelectorDialog(mcreator, TextureType.SCREEN));
+        bossBarFillTexture = new TextureHolder(new TypedTextureSelectorDialog(mcreator, TextureType.SCREEN));
         globalFogColor = new JColor(mcreator, false, false);
-        globalSkyboxTexture = new TextureComboBox(mcreator, TextureType.SCREEN);
+        globalSkyboxTexture = new TextureHolder(new TypedTextureSelectorDialog(mcreator, TextureType.SCREEN));
         combatMusicSound = new SoundSelector(mcreator);
         customHealthValue = new NumberProcedureSelector(
                 this.withEntry("entity_extension/custom_health_value"), mcreator,
@@ -288,7 +289,7 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
     private JPanel buildSkyboxTextureRow() {
         JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
         row.add(globalSkyboxEnableTexture);
-        globalSkyboxTexture.setPreferredSize(new Dimension(300, globalSkyboxTexture.getPreferredSize().height));
+        globalSkyboxTexture.setPreferredSize(new Dimension(300, 70));
         row.add(globalSkyboxTexture);
         return row;
     }
@@ -459,8 +460,8 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         element.enableForceLoading = enableForceLoading.isSelected();
 
         element.bossBarEnabled = bossBarEnabled.isSelected();
-        element.bossBarFrameTexture = bossBarFrameTexture.getTextureName();
-        element.bossBarFillTexture = bossBarFillTexture.getTextureName();
+        element.bossBarFrameTexture = bossBarFrameTexture.getID();
+        element.bossBarFillTexture = bossBarFillTexture.getID();
         element.bossBarFrameShaderEnabled = bossBarFrameShaderEnabled.isSelected();
         element.bossBarFrameRenderType = getCombo(bossBarFrameRenderType);
         element.bossBarFrameWidth = (int) bossBarFrameWidth.getValue();
@@ -497,7 +498,7 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
 
         element.globalSkyboxEnabled = globalSkyboxEnabled.isSelected();
         element.globalSkyboxEnableTexture = globalSkyboxEnableTexture.isSelected();
-        element.globalSkyboxTexture = globalSkyboxTexture.getTextureName();
+        element.globalSkyboxTexture = globalSkyboxTexture.getID();
         element.globalSkyboxEnableShader = globalSkyboxEnableShader.isSelected();
         element.globalSkyboxShaderRenderType = getCombo(globalSkyboxShaderRenderType);
         element.globalSkyboxAlpha = (double) globalSkyboxAlpha.getValue();

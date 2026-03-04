@@ -1,13 +1,7 @@
 {
   "id": "eca",
   "supportedversions": [
-    2024001,
-    2024002,
-    2024003,
-    2024004,
-    2025001,
-    2025002,
-    2025003
+    2024001
   ],
   "weight": 0,
   "javaplugin": "net.eca.mcreator.EcaPlugin",

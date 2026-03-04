@@ -7,17 +7,17 @@ plugins {
 group = 'net.eca.mcreator'
 version = new JsonSlurper().parse(file('src/main/resources/plugin.json'))['info']['version']
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    compileOnly files(mcreator_path + '/2024.4.exe')
+    compileOnly files(mcreator_path + '/mcreator.jar')
     compileOnly fileTree(dir: mcreator_path + '/lib', include: ['*.jar'])
 }
 
 tasks.jar {
-    archiveFileName.set("eca_plugin_${version}.zip")
+    archiveFileName.set("eca_plugin_${version}_2024.1.zip")
 }

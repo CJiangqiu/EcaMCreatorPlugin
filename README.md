@@ -48,8 +48,44 @@ This plugin integrates [Epic Core API](https://github.com/CJiangqiu/EpicCoreAPI)
 - **Add Protected Package** `<PackagePrefix>` - Add a package prefix to the whitelist. Classes in protected packages will not be affected by AllReturn
 - **Remove Protected Package** `<PackagePrefix>` - Remove a package prefix from the whitelist. Built-in protections cannot be removed
 - **Is Package Protected** `<ClassName>` - Check if a class name is protected by the whitelist
+- **Set Max Health** `<Entity> <Value>` - Set precise max health value
+- **Lock Max Health** `<Entity> <Value>` - Lock max health at a specific value
+- **Unlock Max Health** `<Entity>` - Unlock max health
+- **Is Max Health Locked** `<Entity>` - Check if max health is locked
+- **Get Locked Max Health** `<Entity>` - Get locked max health value
+- **Ban Healing** `<Entity> <Value>` - Ban healing for entity, locking health at value
+- **Unban Healing** `<Entity>` - Remove healing ban
+- **Is Healing Banned** `<Entity>` - Check if healing is banned
+- **Get Heal Ban Value** `<Entity>` - Get the heal ban value
+- **Lock Location** `<Entity>` - Lock entity at current position
+- **Unlock Location** `<Entity>` - Unlock entity position
+- **Is Location Locked** `<Entity>` - Check if entity position is locked
+- **Set Global Fog** `<Color> <Mode> <Radius>` - Override dimension fog
+- **Clear Global Fog** - Remove fog override
+- **Set Global Skybox** `<Preset> <Alpha>` - Override dimension skybox with shader preset
+- **Clear Global Skybox** - Remove skybox override
+- **Set Global Music** `<Sound> <Source> <Volume> <Pitch> <Loop>` - Override dimension music
+- **Clear Global Music** - Remove music override
+- **Clear All Global Effects** - Remove all global effect overrides
+- **For Each Entity in Dimension** - Iterate over all entities in the current dimension
+- **For Each Typed Entity in Dimension** `<EntityType>` - Iterate over entities of a specific type in a dimension
+- **For Each Entity on Server** - Iterate over all entities on the entire server
+- **For Each Entity in Range** `<X> <Y> <Z> <Range>` - Iterate over entities within range
 
 All procedure blocks are located in the **"Epic Core API"** category (purple) in the procedure editor.
+
+### Entity Extension (Mod Element)
+
+A new mod element type for visually enhancing specific entity types. Create an Entity Extension element to attach:
+
+- **Custom Boss Bar** — Custom frame/fill textures with optional shader effects, configurable size and offset
+- **Custom Health Display** — Override displayed health/max health values via procedures
+- **Entity Layer** — Additional render layer with glow, hurt overlay, and alpha settings
+- **Global Fog** — Custom fog color/distance, global or radius-based, with configurable shape
+- **Global Skybox** — Custom skybox with texture and/or shader (12 built-in presets: TheLastEnd, DreamSakura, Forest, Ocean, Storm, Volcano, Arcane, Aurora, Hacker, Starlight, Cosmos, BlackHole), alpha, and size
+- **Combat Music** — Custom combat music with source, volume, pitch, loop, and strict lock options
+
+When multiple extension entities exist in the same dimension, the one with highest priority controls global effects.
 
 ### Requirements
 
@@ -158,8 +194,44 @@ MIT License - See [LICENSE](LICENSE) file for details.
 - **添加受保护的包名** `<包名前缀>` - 将包名前缀添加到白名单，受保护包中的类不会受到AllReturn影响
 - **移除受保护的包名** `<包名前缀>` - 从白名单中移除包名前缀，内置保护无法移除
 - **是否受保护** `<类名>` - 检查类名是否在白名单保护中
+- **设置最大血量** `<实体> <数值>` - 精确设置实体最大血量
+- **锁定最大血量** `<实体> <数值>` - 将最大血量锁定在指定值
+- **解锁最大血量** `<实体>` - 解锁最大血量
+- **最大血量是否已锁定** `<实体>` - 检查最大血量是否锁定
+- **获取锁定最大血量值** `<实体>` - 获取锁定的最大血量值
+- **禁止治疗** `<实体> <数值>` - 禁止实体治疗，将血量锁定在指定值
+- **解禁治疗** `<实体>` - 移除治疗禁令
+- **是否被禁止治疗** `<实体>` - 检查是否被禁止治疗
+- **获取禁治疗数值** `<实体>` - 获取禁止治疗的血量值
+- **锁定位置** `<实体>` - 锁定实体在当前位置
+- **解锁位置** `<实体>` - 解锁实体位置
+- **位置是否已锁定** `<实体>` - 检查实体位置是否锁定
+- **设置全局迷雾** `<颜色> <模式> <半径>` - 覆盖维度迷雾
+- **清除全局迷雾** - 移除迷雾覆盖
+- **设置全局天空盒** `<预设> <透明度>` - 使用着色器预设覆盖维度天空盒
+- **清除全局天空盒** - 移除天空盒覆盖
+- **设置全局音乐** `<音效> <音源> <音量> <音调> <循环>` - 覆盖维度音乐
+- **清除全局音乐** - 移除音乐覆盖
+- **清除所有全局效果** - 移除所有全局效果覆盖
+- **遍历维度内所有实体** - 遍历当前维度中的所有实体
+- **按类型遍历维度内实体** `<实体类型>` - 遍历维度中指定类型的实体
+- **遍历全服实体** - 遍历整个服务器的所有实体
+- **遍历范围内实体** `<X> <Y> <Z> <范围>` - 遍历指定范围内的实体
 
 所有流程块位于流程编辑器中的 **"Epic Core API"** 分类（紫色）。
+
+### 实体拓展（模组元素）
+
+一种新的模组元素类型，可为指定实体类型添加可视化增强。创建一个实体拓展元素可附加以下功能：
+
+- **自定义Boss血条** — 自定义框架/填充纹理，可选着色器效果，可配置大小和偏移
+- **自定义血量显示** — 通过流程块覆盖显示的血量/最大血量数值
+- **实体图层** — 额外渲染图层，支持发光、受伤叠加和透明度设置
+- **全局迷雾** — 自定义迷雾颜色/距离，全局或半径模式，可配置形状
+- **全局天空盒** — 自定义天空盒纹理和/或着色器（12种内置预设：TheLastEnd、DreamSakura、Forest、Ocean、Storm、Volcano、Arcane、Aurora、Hacker、Starlight、Cosmos、BlackHole），透明度和大小
+- **战斗音乐** — 自定义战斗音乐，支持音源、音量、音调、循环和严格锁定选项
+
+当同一维度存在多个拓展实体时，优先级最高的控制全局效果。
 
 ### 环境要求
 
