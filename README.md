@@ -21,6 +21,7 @@ This plugin integrates [Epic Core API](https://github.com/CJiangqiu/EpicCoreAPI)
 - **Force Kill Entity** `<Entity>` - Set health to 0, trigger die(), drop loot, grant advancements, and remove the entity (death messages are not sent)
 - **Force Set Health** `<Entity> <Health>` - Modify entity health through multi-phase process: vanilla fields, smart field scanning, and bytecode reverse tracking
 - **Force Revive** `<Entity>` - Clear the entity's death flag and reset deathTime using VarHandle
+- **Force Revive by UUID** `<UUID>` - Revive an entity by UUID, useful when the entity has been removed from the world
 - **Set Force Invulnerable** `<Entity> <Boolean>` - Enable/disable invulnerability with automatic health locking (locks health when enabled, unlocks when disabled)
 - **Force Remove Entity** `<Entity>` - Deep cleanup including AI, boss bars, riding relationships, and all server/client containers
 - **Lock Health** `<Entity> <Value>` - Lock health via bytecode hook (getHealth() returns locked value) and tick-based reset
@@ -137,13 +138,13 @@ Visit the [MCreator Plugins page](https://mcreator.net/plugins) to find the **1.
 
 ### For Players
 
-All mods created with this plugin require [Epic Core API](https://www.curseforge.com/minecraft/mc-mods/epic-core-api) as a **mandatory dependency**.
+All mods created with this plugin require [Epic Core API](https://modrinth.com/mod/epic-core-api) as a **mandatory dependency**.
 
-Players must download and install the Epic Core API mod from CurseForge to use any mods built with this plugin.
+Players must download and install the Epic Core API mod from Modrinth to use any mods built with this plugin.
 
 ### Links
 
-- **Epic Core API Mod**: https://www.curseforge.com/minecraft/mc-mods/epic-core-api
+- **Epic Core API Mod**: https://modrinth.com/mod/epic-core-api
 - **Source Code**: https://github.com/CJiangqiu/EpicCoreAPI
 
 ### License
@@ -167,6 +168,7 @@ MIT License - See [LICENSE](LICENSE) file for details.
 - **强制杀死实体** `<实体>` - 设置血量为0、触发die()、掉落战利品、给予成就并移除实体（不会发送死亡消息）
 - **强制设置生命值** `<实体> <血量>` - 通过多阶段修改实体血量：原版字段、智能字段扫描、字节码逆向追踪
 - **强制复活实体** `<实体>` - 使用VarHandle清除实体的死亡标志并重置deathTime
+- **通过UUID强制复活实体** `<UUID>` - 通过UUID复活实体，适用于实体已被移除的情况
 - **设置强制无敌** `<实体> <布尔值>` - 开启/关闭无敌并自动处理血量锁定（开启时锁血，关闭时解锁）
 - **强制移除实体** `<实体>` - 深度清理包括AI、Boss血条、骑乘关系以及所有服务端/客户端容器
 - **锁定血量** `<实体> <数值>` - 通过字节码hook锁定血量（getHealth()返回锁定值）并每tick重置真实血量
@@ -283,13 +285,13 @@ MIT License - See [LICENSE](LICENSE) file for details.
 
 ### 玩家须知
 
-所有使用该插件制作的 Mod 都需要将 [Epic Core API](https://www.curseforge.com/minecraft/mc-mods/epic-core-api) 作为**必要的依赖**。
+所有使用该插件制作的 Mod 都需要将 [Epic Core API](https://modrinth.com/mod/epic-core-api) 作为**必要的依赖**。
 
-玩家必须从 CurseForge 下载并安装 Epic Core API mod，才能使用基于此插件构建的任何 Mod。
+玩家必须从 Modrinth 下载并安装 Epic Core API mod，才能使用基于此插件构建的任何 Mod。
 
 ### 相关链接
 
-- **Epic Core API Mod**: https://www.curseforge.com/minecraft/mc-mods/epic-core-api
+- **Epic Core API Mod**: https://modrinth.com/mod/epic-core-api
 - **源代码**: https://github.com/CJiangqiu/EpicCoreAPI
 
 ### 许可证
