@@ -19,5 +19,5 @@ dependencies {
 }
 
 tasks.jar {
-    archiveFileName.set("eca_plugin_${version}_2024.4.zip")
+    archiveFileName.set("eca_plugin_${version}_2024.2-2024.4.zip")
 }

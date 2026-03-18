@@ -153,7 +153,7 @@ public class ${name}EntityExtension extends EntityExtension {
     <#if data.bossBarFrameShaderEnabled && data.bossBarFrameRenderType?has_content>
             @Override
             public RenderType getFrameRenderType() {
-                return ${renderTypeClass(data.bossBarFrameRenderType)}.BOSS_BAR_FRAME;
+                return ${renderTypeClass(data.bossBarFrameRenderType)}.BOSS_BAR;
             }
 
             @Override public int getFrameWidth() { return ${data.bossBarFrameWidth}; }
@@ -162,7 +162,7 @@ public class ${name}EntityExtension extends EntityExtension {
     <#if data.bossBarFillShaderEnabled && data.bossBarFillRenderType?has_content>
             @Override
             public RenderType getFillRenderType() {
-                return ${renderTypeClass(data.bossBarFillRenderType)}.BOSS_BAR_FILL;
+                return ${renderTypeClass(data.bossBarFillRenderType)}.BOSS_BAR;
             }
 
             @Override public int getFillWidth() { return ${data.bossBarFillWidth}; }
