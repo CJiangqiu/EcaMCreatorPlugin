@@ -17,6 +17,8 @@ import net.mcreator.ui.minecraft.TextureHolder;
 import net.mcreator.ui.modgui.ModElementGUI;
 import net.mcreator.ui.procedure.AbstractProcedureSelector;
 import net.mcreator.ui.procedure.NumberProcedureSelector;
+import net.mcreator.ui.procedure.ProcedureSelector;
+import net.mcreator.workspace.elements.VariableTypeLoader;
 import net.mcreator.ui.validation.AggregatedValidationResult;
 import net.mcreator.ui.workspace.resources.TextureType;
 import net.mcreator.workspace.elements.ModElement;
@@ -30,6 +32,12 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
     private DataListComboBox entityType;
     private final JSpinner priority = new JSpinner(new SpinnerNumberModel(5, 0, 100, 1));
     private final JCheckBox enableForceLoading = new JCheckBox();
+
+    // Condition Procedures
+    private ProcedureSelector bossBarCondition;
+    private ProcedureSelector fogCondition;
+    private ProcedureSelector skyboxCondition;
+    private ProcedureSelector musicCondition;
 
     // Boss Bar
     private final JCheckBox bossBarEnabled = new JCheckBox();
@@ -103,11 +111,33 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
 
         entityType = new DataListComboBox(mcreator,
                 ElementUtil.loadAllSpawnableEntities(mcreator.getWorkspace()));
-        bossBarFrameTexture = new TextureHolder(new TypedTextureSelectorDialog(mcreator, TextureType.SCREEN));
-        bossBarFillTexture = new TextureHolder(new TypedTextureSelectorDialog(mcreator, TextureType.SCREEN));
+        bossBarFrameTexture = new TextureHolder(new TypedTextureSelectorDialog(mcreator, TextureType.SCREEN), 28);
+        bossBarFrameTexture.setPreferredSize(new Dimension(300, 28));
+        bossBarFillTexture = new TextureHolder(new TypedTextureSelectorDialog(mcreator, TextureType.SCREEN), 28);
+        bossBarFillTexture.setPreferredSize(new Dimension(300, 28));
         globalFogColor = new JColor(mcreator, false, false);
-        globalSkyboxTexture = new TextureHolder(new TypedTextureSelectorDialog(mcreator, TextureType.SCREEN));
+        globalSkyboxTexture = new TextureHolder(new TypedTextureSelectorDialog(mcreator, TextureType.SCREEN), 28);
         combatMusicSound = new SoundSelector(mcreator);
+        bossBarCondition = new ProcedureSelector(
+                this.withEntry("entity_extension/boss_bar_condition"), mcreator,
+                L10N.t("elementgui.entity_extension.boss_bar_condition"),
+                AbstractProcedureSelector.Side.BOTH, true,
+                VariableTypeLoader.BuiltInTypes.LOGIC, entityDeps);
+        fogCondition = new ProcedureSelector(
+                this.withEntry("entity_extension/fog_condition"), mcreator,
+                L10N.t("elementgui.entity_extension.fog_condition"),
+                AbstractProcedureSelector.Side.BOTH, true,
+                VariableTypeLoader.BuiltInTypes.LOGIC, entityDeps);
+        skyboxCondition = new ProcedureSelector(
+                this.withEntry("entity_extension/skybox_condition"), mcreator,
+                L10N.t("elementgui.entity_extension.skybox_condition"),
+                AbstractProcedureSelector.Side.BOTH, true,
+                VariableTypeLoader.BuiltInTypes.LOGIC, entityDeps);
+        musicCondition = new ProcedureSelector(
+                this.withEntry("entity_extension/music_condition"), mcreator,
+                L10N.t("elementgui.entity_extension.music_condition"),
+                AbstractProcedureSelector.Side.BOTH, true,
+                VariableTypeLoader.BuiltInTypes.LOGIC, entityDeps);
         customHealthValue = new NumberProcedureSelector(
                 this.withEntry("entity_extension/custom_health_value"), mcreator,
                 L10N.t("elementgui.entity_extension.custom_health_value"),
@@ -137,6 +167,7 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
 
         addRowWithHelp(bossBarPanel, "entity_extension/boss_bar_enabled",
                 "elementgui.entity_extension.boss_bar_enabled", bossBarEnabled, gbc);
+        addFullWidthComponent(bossBarPanel, bossBarCondition, gbc);
 
         // --- Frame section ---
         addSectionLabel(bossBarPanel, "elementgui.entity_extension.boss_bar_frame_section", gbc);
@@ -202,6 +233,7 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         gbc = defaultConstraints();
         addRowWithHelp(fogPanel, "entity_extension/global_fog_enabled",
                 "elementgui.entity_extension.global_fog_enabled", globalFogEnabled, gbc);
+        addFullWidthComponent(fogPanel, fogCondition, gbc);
         addRowWithHelp(fogPanel, "entity_extension/global_fog_global_mode",
                 "elementgui.entity_extension.global_fog_global_mode", globalFogGlobalMode, gbc);
         addRowWithHelp(fogPanel, "entity_extension/global_fog_radius",
@@ -228,6 +260,7 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         gbc = defaultConstraints();
         addRowWithHelp(skyboxPanel, "entity_extension/global_skybox_enabled",
                 "elementgui.entity_extension.global_skybox_enabled", globalSkyboxEnabled, gbc);
+        addFullWidthComponent(skyboxPanel, skyboxCondition, gbc);
         addRowWithHelp(skyboxPanel, "entity_extension/global_skybox_texture",
                 "elementgui.entity_extension.global_skybox_texture", buildSkyboxTextureRow(), gbc);
         addRowWithHelp(skyboxPanel, "entity_extension/global_skybox_shader_render_type",
@@ -241,6 +274,7 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         gbc = defaultConstraints();
         addRowWithHelp(musicPanel, "entity_extension/combat_music_enabled",
                 "elementgui.entity_extension.combat_music_enabled", combatMusicEnabled, gbc);
+        addFullWidthComponent(musicPanel, musicCondition, gbc);
         addRowWithHelp(musicPanel, "entity_extension/combat_music_sound",
                 "elementgui.entity_extension.combat_music_sound", combatMusicSound, gbc);
         addRowWithHelp(musicPanel, "entity_extension/combat_music_source",
@@ -260,8 +294,7 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         setupEnableToggle(entityLayerEnabled, entityLayerRenderType, entityLayerGlow, entityLayerHurtOverlay, entityLayerAlpha);
         setupFogToggle();
         setupSkyboxToggle();
-        setupEnableToggle(combatMusicEnabled, combatMusicSound, combatMusicSoundSource,
-                combatMusicVolume, combatMusicPitch, combatMusicLoop, combatMusicStrictLock);
+        setupMusicToggle();
     }
 
     private JPanel buildShaderRow(JCheckBox enableBox, JComboBox<String> presetCombo,
@@ -289,7 +322,7 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
     private JPanel buildSkyboxTextureRow() {
         JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
         row.add(globalSkyboxEnableTexture);
-        globalSkyboxTexture.setPreferredSize(new Dimension(300, globalSkyboxTexture.getPreferredSize().height));
+        globalSkyboxTexture.setPreferredSize(new Dimension(300, 28));
         row.add(globalSkyboxTexture);
         return row;
     }
@@ -313,6 +346,7 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
     private void setupBossBarToggle() {
         Runnable update = () -> {
             boolean bb = bossBarEnabled.isSelected();
+            bossBarCondition.setEnabled(bb);
             bossBarFrameTexture.setEnabled(bb);
             bossBarFillTexture.setEnabled(bb);
             bossBarFrameShaderEnabled.setEnabled(bb);
@@ -344,6 +378,7 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
     private void setupFogToggle() {
         Runnable update = () -> {
             boolean fg = globalFogEnabled.isSelected();
+            fogCondition.setEnabled(fg);
             globalFogGlobalMode.setEnabled(fg);
             globalFogRadius.setEnabled(fg && !globalFogGlobalMode.isSelected());
             globalFogColor.setEnabled(fg);
@@ -361,6 +396,7 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
     private void setupSkyboxToggle() {
         Runnable update = () -> {
             boolean sb = globalSkyboxEnabled.isSelected();
+            skyboxCondition.setEnabled(sb);
             globalSkyboxEnableTexture.setEnabled(sb);
             globalSkyboxEnableShader.setEnabled(sb);
             globalSkyboxAlpha.setEnabled(sb);
@@ -372,6 +408,21 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         globalSkyboxEnabled.addItemListener(e -> update.run());
         globalSkyboxEnableTexture.addItemListener(e -> update.run());
         globalSkyboxEnableShader.addItemListener(e -> update.run());
+    }
+
+    private void setupMusicToggle() {
+        Runnable update = () -> {
+            boolean mc = combatMusicEnabled.isSelected();
+            musicCondition.setEnabled(mc);
+            combatMusicSound.setEnabled(mc);
+            combatMusicSoundSource.setEnabled(mc);
+            combatMusicVolume.setEnabled(mc);
+            combatMusicPitch.setEnabled(mc);
+            combatMusicLoop.setEnabled(mc);
+            combatMusicStrictLock.setEnabled(mc);
+        };
+        update.run();
+        combatMusicEnabled.addItemListener(e -> update.run());
     }
 
     private static void setupEnableToggle(JCheckBox enableBox, JComponent... components) {
@@ -393,6 +444,15 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         entityType.setSelectedItem(element.entityType);
         priority.setValue(element.priority);
         enableForceLoading.setSelected(element.enableForceLoading);
+
+        if (element.bossBarCondition != null)
+            bossBarCondition.setSelectedProcedure(element.bossBarCondition);
+        if (element.fogCondition != null)
+            fogCondition.setSelectedProcedure(element.fogCondition);
+        if (element.skyboxCondition != null)
+            skyboxCondition.setSelectedProcedure(element.skyboxCondition);
+        if (element.musicCondition != null)
+            musicCondition.setSelectedProcedure(element.musicCondition);
 
         bossBarEnabled.setSelected(element.bossBarEnabled);
         bossBarFrameTexture.setTextureFromTextureName(nonNull(element.bossBarFrameTexture));
@@ -459,6 +519,11 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         element.priority = (int) priority.getValue();
         element.enableForceLoading = enableForceLoading.isSelected();
 
+        element.bossBarCondition = bossBarCondition.getSelectedProcedure();
+        element.fogCondition = fogCondition.getSelectedProcedure();
+        element.skyboxCondition = skyboxCondition.getSelectedProcedure();
+        element.musicCondition = musicCondition.getSelectedProcedure();
+
         element.bossBarEnabled = bossBarEnabled.isSelected();
         element.bossBarFrameTexture = bossBarFrameTexture.getID();
         element.bossBarFillTexture = bossBarFillTexture.getID();
@@ -518,6 +583,10 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
     @Override
     public void reloadDataLists() {
         super.reloadDataLists();
+        bossBarCondition.refreshListKeepSelected();
+        fogCondition.refreshListKeepSelected();
+        skyboxCondition.refreshListKeepSelected();
+        musicCondition.refreshListKeepSelected();
         customHealthValue.refreshListKeepSelected();
         customMaxHealthValue.refreshListKeepSelected();
     }

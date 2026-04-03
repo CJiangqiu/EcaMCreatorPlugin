@@ -72,6 +72,8 @@ This plugin integrates [Epic Core API](https://github.com/CJiangqiu/EpicCoreAPI)
 - **For Each Typed Entity in Dimension** `<EntityType>` - Iterate over entities of a specific type in a dimension
 - **For Each Entity on Server** - Iterate over all entities on the entire server
 - **For Each Entity in Range** `<X> <Y> <Z> <Range>` - Iterate over entities within range
+- **Set Force Loading** `<Entity> <Boolean>` - Enable/disable force chunk loading for an entity
+- **Is Force Loaded** `<Entity>` - Check if an entity is force loaded
 
 All procedure blocks are located in the **"Epic Core API"** category (purple) in the procedure editor.
 
@@ -85,6 +87,7 @@ A new mod element type for visually enhancing specific entity types. Create an E
 - **Global Fog** — Custom fog color/distance, global or radius-based, with configurable shape
 - **Global Skybox** — Custom skybox with texture and/or shader (12 built-in presets: TheLastEnd, DreamSakura, Forest, Ocean, Storm, Volcano, Arcane, Aurora, Hacker, Starlight, Cosmos, BlackHole), alpha, and size
 - **Combat Music** — Custom combat music with source, volume, pitch, loop, and strict lock options
+- **Conditional Triggers** — Each sub-module (Boss Bar, Fog, Skybox, Music) supports an optional logic procedure to dynamically control whether the effect is active per entity per tick
 
 When multiple extension entities exist in the same dimension, the one with highest priority controls global effects.
 
@@ -219,6 +222,8 @@ MIT License - See [LICENSE](LICENSE) file for details.
 - **按类型遍历维度内实体** `<实体类型>` - 遍历维度中指定类型的实体
 - **遍历全服实体** - 遍历整个服务器的所有实体
 - **遍历范围内实体** `<X> <Y> <Z> <范围>` - 遍历指定范围内的实体
+- **设置强制加载** `<实体> <布尔值>` - 启用/禁用实体的强制区块加载
+- **是否被强制加载** `<实体>` - 检查实体是否被强制加载
 
 所有流程块位于流程编辑器中的 **"Epic Core API"** 分类（紫色）。
 
@@ -232,6 +237,7 @@ MIT License - See [LICENSE](LICENSE) file for details.
 - **全局迷雾** — 自定义迷雾颜色/距离，全局或半径模式，可配置形状
 - **全局天空盒** — 自定义天空盒纹理和/或着色器（12种内置预设：TheLastEnd、DreamSakura、Forest、Ocean、Storm、Volcano、Arcane、Aurora、Hacker、Starlight、Cosmos、BlackHole），透明度和大小
 - **战斗音乐** — 自定义战斗音乐，支持音源、音量、音调、循环和严格锁定选项
+- **条件触发** — 每个子模块（Boss血条、迷雾、天空盒、战斗音乐）支持可选的逻辑过程块，可按实体每tick动态控制效果是否激活
 
 当同一维度存在多个拓展实体时，优先级最高的控制全局效果。
 
