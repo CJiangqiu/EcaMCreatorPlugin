@@ -3,6 +3,7 @@ package net.eca.mcreator.element;
 import net.mcreator.element.GeneratableElement;
 import net.mcreator.element.parts.EntityEntry;
 import net.mcreator.element.parts.procedure.NumberProcedure;
+import net.mcreator.element.parts.procedure.Procedure;
 import net.mcreator.workspace.elements.ModElement;
 
 public class EntityExtensionElement extends GeneratableElement {
@@ -10,6 +11,12 @@ public class EntityExtensionElement extends GeneratableElement {
     public EntityEntry entityType;
     public int priority;
     public boolean enableForceLoading;
+
+    // Condition Procedures
+    public Procedure bossBarCondition;
+    public Procedure fogCondition;
+    public Procedure skyboxCondition;
+    public Procedure musicCondition;
 
     // Boss Bar
     public boolean bossBarEnabled;

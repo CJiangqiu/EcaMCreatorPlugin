@@ -1,4 +1,10 @@
 <#-- @formatter:off -->
+<#function hasProc obj>
+    <#return obj?? && obj.getName()?? && obj.getName()?has_content && obj.getName() != "null">
+</#function>
+<#macro entityDepsCall obj>
+<#list obj.getDependencies(generator.getWorkspace()) as dep><#switch dep.getName()><#case "entity">entity<#break><#case "world">entity.level()<#break><#case "x">entity.getX()<#break><#case "y">entity.getY()<#break><#case "z">entity.getZ()<#break><#default>${dep.getName()}<#break></#switch><#if dep?has_next>, </#if></#list>
+</#macro>
 package ${package}.entityextension;
 
 import net.eca.api.RegisterEntityExtension;
@@ -22,7 +28,8 @@ import net.minecraft.client.renderer.RenderType;
 <#if (data.bossBarFrameTexture?has_content || data.bossBarFillTexture?has_content || data.globalSkyboxTexture?has_content)>
 import net.minecraft.resources.ResourceLocation;
 </#if>
-<#if data.customHealthEnabled || data.customMaxHealthEnabled>
+<#assign needsLivingEntity = data.customHealthEnabled || data.customMaxHealthEnabled || (data.bossBarEnabled && data.bossBarCondition?? && hasProc(data.bossBarCondition)) || (data.globalFogEnabled && data.fogCondition?? && hasProc(data.fogCondition)) || (data.globalSkyboxEnabled && data.skyboxCondition?? && hasProc(data.skyboxCondition)) || (data.combatMusicEnabled && data.musicCondition?? && hasProc(data.musicCondition))>
+<#if needsLivingEntity>
 import net.minecraft.world.entity.LivingEntity;
 </#if>
 <#if data.customHealthEnabled && data.customHealthValue?? && data.customHealthValue.getName()?? && data.customHealthValue.getName()?has_content && data.customHealthValue.getName() != "null">
@@ -31,12 +38,18 @@ import ${package}.procedures.${data.customHealthValue.getName()}Procedure;
 <#if data.customMaxHealthEnabled && data.customMaxHealthValue?? && data.customMaxHealthValue.getName()?? && data.customMaxHealthValue.getName()?has_content && data.customMaxHealthValue.getName() != "null">
 import ${package}.procedures.${data.customMaxHealthValue.getName()}Procedure;
 </#if>
-<#function hasProc obj>
-    <#return obj?? && obj.getName()?? && obj.getName()?has_content && obj.getName() != "null">
-</#function>
-<#macro entityDepsCall obj>
-<#list obj.getDependencies(generator.getWorkspace()) as dep><#switch dep.getName()><#case "entity">entity<#break><#case "world">entity.level()<#break><#case "x">entity.getX()<#break><#case "y">entity.getY()<#break><#case "z">entity.getZ()<#break><#default>${dep.getName()}<#break></#switch><#if dep?has_next>, </#if></#list>
-</#macro>
+<#if data.bossBarCondition?? && hasProc(data.bossBarCondition)>
+import ${package}.procedures.${data.bossBarCondition.getName()}Procedure;
+</#if>
+<#if data.fogCondition?? && hasProc(data.fogCondition)>
+import ${package}.procedures.${data.fogCondition.getName()}Procedure;
+</#if>
+<#if data.skyboxCondition?? && hasProc(data.skyboxCondition)>
+import ${package}.procedures.${data.skyboxCondition.getName()}Procedure;
+</#if>
+<#if data.musicCondition?? && hasProc(data.musicCondition)>
+import ${package}.procedures.${data.musicCondition.getName()}Procedure;
+</#if>
 import net.minecraft.world.entity.EntityType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -284,6 +297,34 @@ public class ${name}EntityExtension extends EntityExtension {
             @Override public boolean loop() { return ${data.combatMusicLoop?c}; }
             @Override public boolean strictMusicLock() { return ${data.combatMusicStrictLock?c}; }
         };
+    }
+</#if>
+
+<#if data.bossBarEnabled && data.bossBarCondition?? && hasProc(data.bossBarCondition)>
+    @Override
+    public boolean shouldShowBossBar(LivingEntity entity) {
+        return ${data.bossBarCondition.getName()}Procedure.execute(<@entityDepsCall data.bossBarCondition/>);
+    }
+</#if>
+
+<#if data.globalFogEnabled && data.fogCondition?? && hasProc(data.fogCondition)>
+    @Override
+    public boolean shouldEnableFog(LivingEntity entity) {
+        return ${data.fogCondition.getName()}Procedure.execute(<@entityDepsCall data.fogCondition/>);
+    }
+</#if>
+
+<#if data.globalSkyboxEnabled && data.skyboxCondition?? && hasProc(data.skyboxCondition)>
+    @Override
+    public boolean shouldEnableSkybox(LivingEntity entity) {
+        return ${data.skyboxCondition.getName()}Procedure.execute(<@entityDepsCall data.skyboxCondition/>);
+    }
+</#if>
+
+<#if data.combatMusicEnabled && data.musicCondition?? && hasProc(data.musicCondition)>
+    @Override
+    public boolean shouldEnableMusic(LivingEntity entity) {
+        return ${data.musicCondition.getName()}Procedure.execute(<@entityDepsCall data.musicCondition/>);
     }
 </#if>
 }
