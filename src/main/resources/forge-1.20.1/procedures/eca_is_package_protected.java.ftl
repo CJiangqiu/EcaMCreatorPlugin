@@ -1,1 +1,1 @@
-net.eca.api.EcaAPI.isPackageProtected(${input$className})
+net.eca.api.EcaAPI.isAllReturnWhitelisted(${input$className})

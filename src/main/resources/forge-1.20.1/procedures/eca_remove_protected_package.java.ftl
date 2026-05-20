@@ -1,1 +1,1 @@
-net.eca.api.EcaAPI.removeProtectedPackage(${input$packagePrefix});
+net.eca.api.EcaAPI.removeAllReturnWhitelist(${input$packagePrefix});

@@ -25,7 +25,7 @@ import net.eca.util.entity_extension.CombatMusicExtension;
 <#if (data.bossBarFrameShaderEnabled && data.bossBarFrameRenderType?has_content || data.bossBarFillShaderEnabled && data.bossBarFillRenderType?has_content || data.entityLayerRenderType?has_content || data.globalSkyboxShaderRenderType?has_content)>
 import net.minecraft.client.renderer.RenderType;
 </#if>
-<#if (data.bossBarFrameTexture?has_content || data.bossBarFillTexture?has_content || data.globalSkyboxTexture?has_content)>
+<#if (data.bossBarFrameTexture?has_content || data.bossBarFillTexture?has_content || data.globalSkyboxTexture?has_content || (data.combatMusicEnabled && data.combatMusicSoundEventId?has_content))>
 import net.minecraft.resources.ResourceLocation;
 </#if>
 <#assign needsLivingEntity = data.customHealthEnabled || data.customMaxHealthEnabled || (data.bossBarEnabled && data.bossBarCondition?? && hasProc(data.bossBarCondition)) || (data.globalFogEnabled && data.fogCondition?? && hasProc(data.fogCondition)) || (data.globalSkyboxEnabled && data.skyboxCondition?? && hasProc(data.skyboxCondition)) || (data.combatMusicEnabled && data.musicCondition?? && hasProc(data.musicCondition))>
@@ -152,14 +152,14 @@ public class ${name}EntityExtension extends EntityExtension {
     <#if data.bossBarFrameTexture?has_content>
             @Override
             public ResourceLocation getFrameTexture() {
-                return texture("screen/${data.bossBarFrameTexture}");
+                return texture("screens/${data.bossBarFrameTexture}");
             }
 
     </#if>
     <#if data.bossBarFillTexture?has_content>
             @Override
             public ResourceLocation getFillTexture() {
-                return texture("screen/${data.bossBarFillTexture}");
+                return texture("screens/${data.bossBarFillTexture}");
             }
 
     </#if>
@@ -270,7 +270,7 @@ public class ${name}EntityExtension extends EntityExtension {
             @Override public boolean enabled() { return true; }
     <#if data.globalSkyboxEnableTexture && data.globalSkyboxTexture?has_content>
             @Override public boolean enableTexture() { return true; }
-            @Override public ResourceLocation texture() { return texture("${data.globalSkyboxTexture}"); }
+            @Override public ResourceLocation texture() { return ${name}EntityExtension.this.texture("screens/${data.globalSkyboxTexture}"); }
     </#if>
     <#if data.globalSkyboxEnableShader && data.globalSkyboxShaderRenderType?has_content>
             @Override public boolean enableShader() { return true; }
@@ -289,7 +289,7 @@ public class ${name}EntityExtension extends EntityExtension {
         return new CombatMusicExtension() {
             @Override public boolean enabled() { return true; }
     <#if data.combatMusicSoundEventId?has_content>
-            @Override public ResourceLocation soundEventId() { return sound("${data.combatMusicSoundEventId}"); }
+            @Override public ResourceLocation soundEventId() { return new ResourceLocation("${data.combatMusicSoundEventId?replace('CUSTOM:', modid + ':')}"); }
     </#if>
             @Override public net.minecraft.sounds.SoundSource soundSource() { return net.minecraft.sounds.SoundSource.${data.combatMusicSoundSource}; }
             @Override public float volume() { return ${data.combatMusicVolume?c}f; }

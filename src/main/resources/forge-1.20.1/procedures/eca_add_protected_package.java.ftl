@@ -1,1 +1,1 @@
-net.eca.api.EcaAPI.addProtectedPackage(${input$packagePrefix});
+net.eca.api.EcaAPI.addAllReturnWhitelist(${input$packagePrefix});

@@ -1,0 +1,17 @@
+{
+  "args0": [
+    { "type": "input_value", "name": "packagePrefix", "check": "String" }
+  ],
+  "inputsInline": true,
+  "previousStatement": null,
+  "nextStatement": null,
+  "colour": 160,
+  "mcreator": {
+    "toolbox_id": "eca",
+    "toolbox_init": [
+      "<value name=\"packagePrefix\"><block type=\"text\"><field name=\"TEXT\">net.mcreator.yourmod.</field></block></value>"
+    ],
+    "inputs": ["packagePrefix"],
+    "dependencies": []
+  }
+}
