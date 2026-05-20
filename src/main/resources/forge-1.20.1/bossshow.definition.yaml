@@ -1,0 +1,3 @@
+templates:
+  - template: bossshow/bossshow.java.ftl
+    name: "@SRCROOT/@BASEPACKAGEPATH/bossshow/@NAMEBossShow.java"

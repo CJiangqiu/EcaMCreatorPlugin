@@ -1,6 +1,6 @@
 package net.eca.mcreator.ui;
 
-import net.eca.mcreator.element.BossShowEventElement;
+import net.eca.mcreator.element.BossShowElement;
 import net.mcreator.blockly.data.Dependency;
 import net.mcreator.element.parts.EntityEntry;
 import net.mcreator.minecraft.ElementUtil;
@@ -22,13 +22,13 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-public class BossShowEventGUI extends ModElementGUI<BossShowEventElement> {
+public class BossShowGUI extends ModElementGUI<BossShowElement> {
 
     private DataListComboBox targetEntityType;
     private final JComboBox<String> bossShowId = new SearchableComboBox<>();
     private JMarkerMappingsList markerMappings;
 
-    public BossShowEventGUI(MCreator mcreator, ModElement modElement, boolean editingMode) {
+    public BossShowGUI(MCreator mcreator, ModElement modElement, boolean editingMode) {
         super(mcreator, modElement, editingMode);
         initGUI();
         finalizeGUI();
@@ -44,20 +44,20 @@ public class BossShowEventGUI extends ModElementGUI<BossShowEventElement> {
 
         reloadBossShowList();
 
-        markerMappings = new JMarkerMappingsList(mcreator, this.withEntry("bossshowevent/marker_mappings"), markerDeps);
+        markerMappings = new JMarkerMappingsList(mcreator, this.withEntry("bossshow/marker_mappings"), markerDeps);
 
         JPanel topPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = defaultConstraints();
-        addRowWithHelp(topPanel, "bossshowevent/target_entity_type",
-                "elementgui.bossshowevent.target_entity_type", targetEntityType, gbc);
-        addRowWithHelp(topPanel, "bossshowevent/boss_show_id",
-                "elementgui.bossshowevent.boss_show_id", bossShowId, gbc);
+        addRowWithHelp(topPanel, "bossshow/target_entity_type",
+                "elementgui.bossshow.target_entity_type", targetEntityType, gbc);
+        addRowWithHelp(topPanel, "bossshow/boss_show_id",
+                "elementgui.bossshow.boss_show_id", bossShowId, gbc);
 
         JPanel content = new JPanel(new BorderLayout(0, 8));
         content.add(topPanel, BorderLayout.NORTH);
         content.add(markerMappings, BorderLayout.CENTER);
 
-        addPage(L10N.t("elementgui.bossshowevent.general"), PanelUtils.totalCenterInPanel(content), false);
+        addPage(L10N.t("elementgui.bossshow.general"), PanelUtils.totalCenterInPanel(content), false);
     }
 
     private void reloadBossShowList() {
@@ -94,7 +94,7 @@ public class BossShowEventGUI extends ModElementGUI<BossShowEventElement> {
     }
 
     @Override
-    protected void openInEditingMode(BossShowEventElement element) {
+    protected void openInEditingMode(BossShowElement element) {
         targetEntityType.setSelectedItem(element.targetEntityType);
         if (element.bossShowId != null && !element.bossShowId.isEmpty()) {
             bossShowId.setSelectedItem(element.bossShowId);
@@ -105,8 +105,8 @@ public class BossShowEventGUI extends ModElementGUI<BossShowEventElement> {
     }
 
     @Override
-    public BossShowEventElement getElementFromGUI() {
-        BossShowEventElement element = new BossShowEventElement(modElement);
+    public BossShowElement getElementFromGUI() {
+        BossShowElement element = new BossShowElement(modElement);
         element.targetEntityType = new EntityEntry(modElement.getWorkspace(),
                 targetEntityType.getSelectedItem());
         Object selected = bossShowId.getSelectedItem();

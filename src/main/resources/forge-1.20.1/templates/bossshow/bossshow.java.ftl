@@ -5,7 +5,7 @@
 <#macro markerDepsCall obj>
 <#list obj.getDependencies(generator.getWorkspace()) as dep><#switch dep.getName()><#case "entity">ctx.target()<#break><#case "world">ctx.target().level()<#break><#case "x">ctx.target().getX()<#break><#case "y">ctx.target().getY()<#break><#case "z">ctx.target().getZ()<#break><#case "sourceentity">ctx.viewer()<#break><#default>${dep.getName()}<#break></#switch><#if dep?has_next>, </#if></#list>
 </#macro>
-package ${package}.bossshowevent;
+package ${package}.bossshow;
 
 import net.eca.api.RegisterBossShow;
 import net.eca.util.bossshow.BossShow;
@@ -19,13 +19,13 @@ import ${package}.procedures.${mapping.procedure.getName()}Procedure;
 </#list>
 
 @RegisterBossShow
-public class ${name}BossShowEvent extends BossShow {
+public class ${name}BossShow extends BossShow {
 
     static {
-        BossShowManager.register(new ${name}BossShowEvent());
+        BossShowManager.register(new ${name}BossShow());
     }
 
-    public ${name}BossShowEvent() {
+    public ${name}BossShow() {
         super(new ResourceLocation("${modid}", "${data.bossShowId}"), ${data.targetEntityType.getMappedValue(1)});
     }
 

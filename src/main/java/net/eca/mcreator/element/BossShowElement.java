@@ -8,13 +8,13 @@ import net.mcreator.workspace.elements.ModElement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BossShowEventElement extends GeneratableElement {
+public class BossShowElement extends GeneratableElement {
 
     public EntityEntry targetEntityType;
     public String bossShowId;
     public List<MarkerMapping> markerMappings;
 
-    public BossShowEventElement(ModElement element) {
+    public BossShowElement(ModElement element) {
         super(element);
         this.bossShowId = "";
         this.markerMappings = new ArrayList<>();

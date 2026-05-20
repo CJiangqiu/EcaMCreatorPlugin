@@ -1,6 +1,6 @@
 package net.eca.mcreator.ui;
 
-import net.eca.mcreator.element.BossShowEventElement.MarkerMapping;
+import net.eca.mcreator.element.BossShowElement.MarkerMapping;
 import net.mcreator.blockly.data.Dependency;
 import net.mcreator.ui.MCreator;
 import net.mcreator.ui.component.entries.JSimpleEntriesList;
@@ -20,11 +20,11 @@ public class JMarkerMappingsList extends JSimpleEntriesList<JMarkerMappingEntry,
         super(mcreator, gui);
         this.deps = deps;
 
-        add.setText(L10N.t("elementgui.bossshowevent.add_marker_mapping"));
+        add.setText(L10N.t("elementgui.bossshow.add_marker_mapping"));
 
         setBorder(BorderFactory.createTitledBorder(
                 BorderFactory.createLineBorder(Theme.current().getForegroundColor(), 1),
-                L10N.t("elementgui.bossshowevent.marker_mappings"), 0, 0,
+                L10N.t("elementgui.bossshow.marker_mappings"), 0, 0,
                 getFont().deriveFont(12.0f),
                 Theme.current().getForegroundColor()));
         setPreferredSize(new Dimension(getPreferredSize().width, (int) (mcreator.getSize().height * 0.5)));

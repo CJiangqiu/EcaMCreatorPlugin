@@ -1,6 +1,6 @@
 package net.eca.mcreator.ui;
 
-import net.eca.mcreator.element.BossShowEventElement.MarkerMapping;
+import net.eca.mcreator.element.BossShowElement.MarkerMapping;
 import net.mcreator.blockly.data.Dependency;
 import net.mcreator.ui.MCreator;
 import net.mcreator.ui.component.entries.JSimpleListEntry;
@@ -23,16 +23,16 @@ public class JMarkerMappingEntry extends JSimpleListEntry<MarkerMapping> {
         super(parent, entryList);
 
         procedure = new ProcedureSelector(
-                gui.withEntry("bossshowevent/marker_procedure"),
+                gui.withEntry("bossshow/marker_procedure"),
                 mcreator,
-                L10N.t("elementgui.bossshowevent.marker_procedure"),
+                L10N.t("elementgui.bossshow.marker_procedure"),
                 AbstractProcedureSelector.Side.SERVER,
                 true,
                 null,
                 deps);
         procedure.setPreferredSize(new Dimension(360, 42));
 
-        line.add(L10N.label("elementgui.bossshowevent.event_id"));
+        line.add(L10N.label("elementgui.bossshow.event_id"));
         line.add(eventId);
         line.add(procedure);
     }
