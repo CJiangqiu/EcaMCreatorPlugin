@@ -13,7 +13,7 @@ forge-1.20.1:
     }
     dependencies {
       def libDir = new File(System.getProperty("user.home"), ".mcreator/lib")
-      def ecaJars = fileTree(dir: libDir, include: 'eca-*-dev.jar').files
+      def ecaJars = fileTree(dir: libDir, include: 'epic-core-api-*-dev.jar').files
       if (!ecaJars.isEmpty()) {
         def latestEca = ecaJars.sort { it.name }.last()
         implementation files(latestEca)

@@ -37,6 +37,8 @@ This plugin integrates [Epic Core API](https://github.com/CJiangqiu/EpicCoreAPI)
 - **Is AllReturn Enabled** - Check if AllReturn is active
 - **Set Global AllReturn** `<Boolean>` ⚠️ **[DANGER]** - Requires config enabled. Enable/disable global AllReturn mode affecting ALL mods' boolean/void methods
 - **Memory Remove Entity** `<Entity>` ⚠️ **[DANGER]** - Requires config enabled. Remove entity via LWJGL internal channel
+- **Restore Entity's Lifecycle Methods** `<Entity>` ⚠️ **[DANGER]** - Requires config enabled. Restore an entity's critical lifecycle methods (getHealth/setHealth/hurt/die/isAlive/etc.) to vanilla implementation, defeating custom health storage and anti-modification logic
+- **Unrestore Entity's Lifecycle Methods** `<Entity>` - Cancel the lifecycle method restore, returning the entity to its custom implementation
 - **Add Health Whitelist Keyword** `<Keyword>` - Add a keyword to health whitelist. Fields containing this keyword will be modified during health changes
 - **Remove Health Whitelist Keyword** `<Keyword>` - Remove a keyword from health whitelist
 - **Add Health Blacklist Keyword** `<Keyword>` - Add a keyword to health blacklist. Fields containing this keyword will be skipped during health changes
@@ -46,9 +48,11 @@ This plugin integrates [Epic Core API](https://github.com/CJiangqiu/EpicCoreAPI)
 - **Get Spawn Ban Time** `<EntityType>` - Get the remaining time (seconds) for an entity type's spawn ban
 - **Clear Spawn Ban** `<EntityType>` - Clear the spawn ban for a specific entity type
 - **Clear All Spawn Bans** - Clear all spawn bans in the current dimension
-- **Add Protected Package** `<PackagePrefix>` - Add a package prefix to the whitelist. Classes in protected packages will not be affected by AllReturn
-- **Remove Protected Package** `<PackagePrefix>` - Remove a package prefix from the whitelist. Built-in protections cannot be removed
-- **Is Package Protected** `<ClassName>` - Check if a class name is protected by the whitelist
+- **Add AllReturn Whitelist** `<PackagePrefix>` - Add a package prefix to the AllReturn whitelist. Classes in this package will not be affected by ECA AllReturn transformation
+- **Remove AllReturn Whitelist** `<PackagePrefix>` - Remove a package prefix from the AllReturn whitelist. Built-in protections cannot be removed
+- **Is In AllReturn Whitelist** `<ClassName>` - Check if a class name is in the AllReturn whitelist
+- **Add Transform Whitelist** `<PackagePrefix>` - Add a package prefix to the transform whitelist. Classes in this package will not be affected by any ECA transformation
+- **Remove Transform Whitelist** `<PackagePrefix>` - Remove a package prefix from the transform whitelist. Built-in entries (JDK, Minecraft, Forge, etc.) cannot be removed
 - **Set Max Health** `<Entity> <Value>` - Set precise max health value
 - **Lock Max Health** `<Entity> <Value>` - Lock max health at a specific value
 - **Unlock Max Health** `<Entity>` - Unlock max health
@@ -74,22 +78,46 @@ This plugin integrates [Epic Core API](https://github.com/CJiangqiu/EpicCoreAPI)
 - **For Each Entity in Range** `<X> <Y> <Z> <Range>` - Iterate over entities within range
 - **Set Force Loading** `<Entity> <Boolean>` - Enable/disable force chunk loading for an entity
 - **Is Force Loaded** `<Entity>` - Check if an entity is force loaded
+- **Enable Filter** `<Player> <Filter>` - Enable a screen filter effect for a player. Filter state is per-player and synced to the client
+- **Disable Filter** `<Player> <Filter>` - Disable a screen filter effect for a player
+- **Is Filter Enabled** `<Player> <Filter>` - Check if a screen filter effect is currently enabled for a player
+- **Play BossShow** `<Player> <Target> <BossShowID>` - Start playing a BossShow cutscene for a player. Plays even if the player has seen it before
+- **Play BossShow (If Not Seen)** `<Player> <Target> <BossShowID>` - Start playing a BossShow cutscene only if the player has not seen it before
+- **Stop BossShow** `<Player>` - Stop the currently playing BossShow cutscene for a player
+- **Is BossShow Playing** `<Player>` - Check if a player currently has an active BossShow cutscene playing
+- **Trigger Custom-type BossShow** `<Name> <Player> <Target>` - Trigger the BossShow with the given name that is configured with trigger type "Custom". Starts a new playback and does not interact with any currently playing BossShow
+- **Start Resurrection Daemon** - Start the resurrection daemon thread, which continuously monitors tracked entities and auto-revives any that die or lose container registration
+- **Stop Resurrection Daemon** - Stop the resurrection daemon thread; tracked entities are no longer auto-revived
+- **Is Resurrection Daemon Running** - Check whether the resurrection daemon thread is currently running
+- **Add to Resurrection Tracking** `<Entity>` - Add an entity to resurrection tracking; while the daemon runs it is auto-revived shortly after death. Do not use on entities that spawn in large numbers
+- **Remove from Resurrection Tracking** `<Entity>` - Remove an entity from resurrection tracking so it is no longer auto-revived
 
-All procedure blocks are located in the **"Epic Core API"** category (purple) in the procedure editor.
+All procedure blocks are located in the **"Epic Core API"** category in the procedure editor.
 
 ### Entity Extension (Mod Element)
 
 A new mod element type for visually enhancing specific entity types. Create an Entity Extension element to attach:
 
+- **Force Loading** — Force-load entities of this type; do not use for entities that spawn in large numbers
 - **Custom Boss Bar** — Custom frame/fill textures with optional shader effects, configurable size and offset
-- **Custom Health Display** — Override displayed health/max health values via procedures
-- **Entity Layer** — Additional render layer with glow, hurt overlay, and alpha settings
+- **Custom Fill Ratio** — Override the health/max health values used to calculate boss bar fill ratio (fill = current / max)
+- **Entity Layer** — Additional render layer with shader preset, glow, hurt overlay, and alpha settings
 - **Global Fog** — Custom fog color/distance, global or radius-based, with configurable shape
 - **Global Skybox** — Custom skybox with texture and/or shader (12 built-in presets: TheLastEnd, DreamSakura, Forest, Ocean, Storm, Volcano, Arcane, Aurora, Hacker, Starlight, Cosmos, BlackHole), alpha, and size
 - **Combat Music** — Custom combat music with source, volume, pitch, loop, and strict lock options
 - **Conditional Triggers** — Each sub-module (Boss Bar, Fog, Skybox, Music) supports an optional logic procedure to dynamically control whether the effect is active per entity per tick
 
 When multiple extension entities exist in the same dimension, the one with highest priority controls global effects.
+
+### BossShow (Mod Element)
+
+A mod element for binding Java-side logic to an existing BossShow cutscene. Create a BossShow element to map keyframe event IDs to procedures:
+
+- **Target Entity Type** — The entity type this BossShow handler is associated with
+- **BossShow ID** — The BossShow cutscene identifier to bind to
+- **Keyframe Event Mappings** — A list of event ID → procedure pairs; each procedure fires when the matching keyframe is reached during playback
+
+Use the BossShow procedure blocks to play, stop, and query cutscenes from within other procedures.
 
 ### Requirements
 
@@ -136,7 +164,7 @@ Visit the [MCreator Plugins page](https://mcreator.net/plugins) to find the **1.
 #### Step 5: Use the Procedure Blocks
 
 1. Create a new procedure
-2. In the procedure editor, find the **"Epic Core API"** category (purple color)
+2. In the procedure editor, find the **"Epic Core API"** category
 3. Drag and drop the blocks you need
 
 ### For Players
@@ -187,6 +215,8 @@ MIT License - See [LICENSE](LICENSE) file for details.
 - **AllReturn是否已启用** - 检查AllReturn是否激活
 - **设置全局AllReturn** `<布尔值>` ⚠️ **【危险】** - 需配置文件启用。启用/禁用全局AllReturn模式，影响所有mod的boolean/void方法
 - **内存移除实体** `<实体>` ⚠️ **【危险】** - 需配置文件启用。通过LWJGL内部通道移除实体
+- **还原实体的生命周期方法** `<实体>` ⚠️ **【危险】** - 需配置文件启用。将实体的关键生命周期方法（getHealth/setHealth/hurt/die/isAlive/等）还原为原版实现
+- **取消实体的生命周期方法还原** `<实体>` - 取消生命周期方法还原，使实体恢复其自定义实现
 - **添加血量白名单关键字** `<关键字>` - 添加血量白名单关键字，包含此关键字的字段将在血量修改时被修改
 - **移除血量白名单关键字** `<关键字>` - 从血量白名单中移除关键字
 - **添加血量黑名单关键字** `<关键字>` - 添加血量黑名单关键字，包含此关键字的字段将在血量修改时被跳过
@@ -196,9 +226,11 @@ MIT License - See [LICENSE](LICENSE) file for details.
 - **获取禁生成剩余时间** `<实体类型>` - 获取实体类型禁生成的剩余时间（秒）
 - **清除禁生成** `<实体类型>` - 清除指定实体类型的禁生成
 - **清除所有禁生成** - 清除当前维度的所有禁生成
-- **添加受保护的包名** `<包名前缀>` - 将包名前缀添加到白名单，受保护包中的类不会受到AllReturn影响
-- **移除受保护的包名** `<包名前缀>` - 从白名单中移除包名前缀，内置保护无法移除
-- **是否受保护** `<类名>` - 检查类名是否在白名单保护中
+- **添加AllReturn白名单** `<包名前缀>` - 将包名前缀加入AllReturn白名单，该包下的类不会受到ECA AllReturn转换的影响
+- **移除AllReturn白名单** `<包名前缀>` - 从AllReturn白名单中移除包名前缀，内置条目无法移除
+- **是否在AllReturn白名单中** `<类名>` - 检查类名是否在AllReturn白名单中
+- **添加转换白名单** `<包名前缀>` - 将包名前缀加入转换白名单，该包下的类不会受到ECA任何转换的影响
+- **移除转换白名单** `<包名前缀>` - 从转换白名单中移除包名前缀，内置条目（JDK、Minecraft、Forge等）无法移除
 - **设置最大血量** `<实体> <数值>` - 精确设置实体最大血量
 - **锁定最大血量** `<实体> <数值>` - 将最大血量锁定在指定值
 - **解锁最大血量** `<实体>` - 解锁最大血量
@@ -224,22 +256,46 @@ MIT License - See [LICENSE](LICENSE) file for details.
 - **遍历范围内实体** `<X> <Y> <Z> <范围>` - 遍历指定范围内的实体
 - **设置强制加载** `<实体> <布尔值>` - 启用/禁用实体的强制区块加载
 - **是否被强制加载** `<实体>` - 检查实体是否被强制加载
+- **启用滤镜** `<玩家> <滤镜>` - 为玩家启用屏幕滤镜效果，滤镜状态按玩家独立保存并同步到客户端
+- **禁用滤镜** `<玩家> <滤镜>` - 为玩家禁用屏幕滤镜效果
+- **滤镜是否已启用** `<玩家> <滤镜>` - 检查玩家当前是否启用了指定的屏幕滤镜效果
+- **播放BossShow演出** `<玩家> <目标> <演出ID>` - 为玩家播放BossShow演出，即使玩家已看过也会播放
+- **播放BossShow演出（仅首次）** `<玩家> <目标> <演出ID>` - 仅当玩家未看过时为其播放BossShow演出
+- **停止BossShow演出** `<玩家>` - 停止玩家当前正在播放的BossShow演出
+- **是否正在观看演出** `<玩家>` - 检查玩家当前是否有活跃的BossShow演出会话
+- **触发名为指定名称的自定义触发类型BossShow** `<名称> <玩家> <目标>` - 触发触发器类型为Custom且名称匹配的BossShow演出，启动一场新的播放，与当前正在播放的BossShow无关
+- **启动复活守护线程** - 启动复活守护线程，它会持续监控被追踪的实体，并自动复活任何死亡或丢失容器注册的实体
+- **停止复活守护线程** - 停止复活守护线程，被追踪的实体将不再被自动复活
+- **复活守护线程是否运行中** - 检查复活守护线程当前是否正在运行
+- **加入复活追踪** `<实体>` - 将实体加入复活追踪，守护线程运行期间该实体会在死亡后很快被自动复活。请勿用于会大量生成的实体
+- **移出复活追踪** `<实体>` - 将实体移出复活追踪，使其不再被自动复活
 
-所有流程块位于流程编辑器中的 **"Epic Core API"** 分类（紫色）。
+所有流程块位于流程编辑器中的 **"Epic Core API"** 分类。
 
 ### 实体拓展（模组元素）
 
 一种新的模组元素类型，可为指定实体类型添加可视化增强。创建一个实体拓展元素可附加以下功能：
 
+- **强制加载** — 将该类型实体设为强加载实体，请勿用于会大量生成的实体
 - **自定义Boss血条** — 自定义框架/填充纹理，可选着色器效果，可配置大小和偏移
-- **自定义血量显示** — 通过流程块覆盖显示的血量/最大血量数值
-- **实体图层** — 额外渲染图层，支持发光、受伤叠加和透明度设置
+- **自定义填充比例** — 覆盖用于计算Boss血条填充比例的血量/最大血量值（填充比例 = 当前血量 / 最大血量）
+- **实体图层** — 额外渲染图层，支持着色器预设、发光、受伤叠加和透明度设置
 - **全局迷雾** — 自定义迷雾颜色/距离，全局或半径模式，可配置形状
 - **全局天空盒** — 自定义天空盒纹理和/或着色器（12种内置预设：TheLastEnd、DreamSakura、Forest、Ocean、Storm、Volcano、Arcane、Aurora、Hacker、Starlight、Cosmos、BlackHole），透明度和大小
 - **战斗音乐** — 自定义战斗音乐，支持音源、音量、音调、循环和严格锁定选项
 - **条件触发** — 每个子模块（Boss血条、迷雾、天空盒、战斗音乐）支持可选的逻辑过程块，可按实体每tick动态控制效果是否激活
 
 当同一维度存在多个拓展实体时，优先级最高的控制全局效果。
+
+### BossShow 演出（模组元素）
+
+一种新的模组元素类型，用于为已有的 BossShow 演出绑定 Java 处理逻辑，将关键帧事件 ID 映射到流程块：
+
+- **目标实体类型** — 该 BossShow 处理器关联的实体类型
+- **BossShow ID** — 要绑定的演出标识符
+- **关键帧事件映射** — 事件 ID → 流程的映射列表，当播放到对应关键帧时触发对应流程
+
+可在其他流程中使用 BossShow 相关流程块来播放、停止和查询演出状态。
 
 ### 环境要求
 
@@ -286,7 +342,7 @@ MIT License - See [LICENSE](LICENSE) file for details.
 #### 第 5 步：使用流程块
 
 1. 创建一个新流程
-2. 在流程编辑器中，找到 **"Epic Core API"** 分类（紫色）
+2. 在流程编辑器中，找到 **"Epic Core API"** 分类
 3. 拖放你需要的流程块
 
 ### 玩家须知

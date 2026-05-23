@@ -1,14 +1,15 @@
-{
+﻿{
   "args0": [
     { "type": "input_value", "name": "player", "check": "Entity" }
   ],
   "inputsInline": true,
   "output": "Boolean",
-  "colour": 195,
+  "colour": 175,
   "mcreator": {
     "toolbox_id": "eca",
+    "group": "eca_06_11",
     "toolbox_init": [
-      "<value name=\"player\"><block type=\"entity_from_deps\"></block></value>"
+      "<value name=\"player\"><block type=\"source_entity_from_deps\"></block></value>"
     ],
     "inputs": ["player"],
     "return_type": "logic"

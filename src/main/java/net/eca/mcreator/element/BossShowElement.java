@@ -12,19 +12,19 @@ public class BossShowElement extends GeneratableElement {
 
     public EntityEntry targetEntityType;
     public String bossShowId;
-    public List<MarkerMapping> markerMappings;
+    public List<KeyframeMapping> keyframeMappings;
 
     public BossShowElement(ModElement element) {
         super(element);
         this.bossShowId = "";
-        this.markerMappings = new ArrayList<>();
+        this.keyframeMappings = new ArrayList<>();
     }
 
-    public static class MarkerMapping {
+    public static class KeyframeMapping {
         public String eventId;
         public Procedure procedure;
 
-        public MarkerMapping() {
+        public KeyframeMapping() {
             this.eventId = "";
         }
     }

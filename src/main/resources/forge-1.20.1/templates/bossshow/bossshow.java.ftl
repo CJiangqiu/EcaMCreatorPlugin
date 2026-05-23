@@ -2,7 +2,7 @@
 <#function hasProc obj>
     <#return obj?? && obj.getName()?? && obj.getName()?has_content && obj.getName() != "null">
 </#function>
-<#macro markerDepsCall obj>
+<#macro keyframeDepsCall obj>
 <#list obj.getDependencies(generator.getWorkspace()) as dep><#switch dep.getName()><#case "entity">ctx.target()<#break><#case "world">ctx.target().level()<#break><#case "x">ctx.target().getX()<#break><#case "y">ctx.target().getY()<#break><#case "z">ctx.target().getZ()<#break><#case "sourceentity">ctx.viewer()<#break><#default>${dep.getName()}<#break></#switch><#if dep?has_next>, </#if></#list>
 </#macro>
 package ${package}.bossshow;
@@ -12,7 +12,7 @@ import net.eca.util.bossshow.BossShow;
 import net.eca.util.bossshow.BossShowContext;
 import net.eca.util.bossshow.BossShowManager;
 import net.minecraft.resources.ResourceLocation;
-<#list data.markerMappings as mapping>
+<#list data.keyframeMappings as mapping>
 <#if hasProc(mapping.procedure)>
 import ${package}.procedures.${mapping.procedure.getName()}Procedure;
 </#if>
@@ -30,11 +30,11 @@ public class ${name}BossShow extends BossShow {
     }
 
     @Override
-    public void onMarkerEvent(String eventId, BossShowContext ctx) {
+    public void onKeyframeEvent(String eventId, BossShowContext ctx) {
         switch (eventId) {
-        <#list data.markerMappings as mapping>
+        <#list data.keyframeMappings as mapping>
         <#if hasProc(mapping.procedure) && mapping.eventId?has_content>
-            case "${mapping.eventId}" -> ${mapping.procedure.getName()}Procedure.execute(<@markerDepsCall mapping.procedure/>);
+            case "${mapping.eventId}" -> ${mapping.procedure.getName()}Procedure.execute(<@keyframeDepsCall mapping.procedure/>);
         </#if>
         </#list>
             default -> {}

@@ -1,4 +1,4 @@
-{
+﻿{
   "args0": [
     { "type": "input_value", "name": "eventName", "check": "String" },
     { "type": "input_value", "name": "player", "check": "Entity" },
@@ -7,12 +7,13 @@
   "inputsInline": true,
   "previousStatement": null,
   "nextStatement": null,
-  "colour": 195,
+  "colour": 175,
   "mcreator": {
     "toolbox_id": "eca",
+    "group": "eca_06_12",
     "toolbox_init": [
-      "<value name=\"eventName\"><block type=\"text\"><field name=\"TEXT\">event_name</field></block></value>",
-      "<value name=\"player\"><block type=\"entity_from_deps\"></block></value>",
+      "<value name=\"eventName\"><block type=\"text\"><field name=\"TEXT\">modid:bossshow_name</field></block></value>",
+      "<value name=\"player\"><block type=\"source_entity_from_deps\"></block></value>",
       "<value name=\"target\"><block type=\"entity_from_deps\"></block></value>"
     ],
     "inputs": ["eventName", "player", "target"],

@@ -1,4 +1,4 @@
-{
+﻿{
   "args0": [
     { "type": "input_value", "name": "packagePrefix", "check": "String" }
   ],
@@ -8,6 +8,7 @@
   "colour": 160,
   "mcreator": {
     "toolbox_id": "eca",
+    "group": "eca_08_09",
     "toolbox_init": [
       "<value name=\"packagePrefix\"><block type=\"text\"><field name=\"TEXT\">net.mcreator.yourmod.</field></block></value>"
     ],

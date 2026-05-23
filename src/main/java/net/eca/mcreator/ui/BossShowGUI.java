@@ -26,7 +26,7 @@ public class BossShowGUI extends ModElementGUI<BossShowElement> {
 
     private DataListComboBox targetEntityType;
     private final JComboBox<String> bossShowId = new SearchableComboBox<>();
-    private JMarkerMappingsList markerMappings;
+    private JKeyframeMappingsList keyframeMappings;
 
     public BossShowGUI(MCreator mcreator, ModElement modElement, boolean editingMode) {
         super(mcreator, modElement, editingMode);
@@ -36,7 +36,7 @@ public class BossShowGUI extends ModElementGUI<BossShowElement> {
 
     @Override
     protected void initGUI() {
-        Dependency[] markerDeps = Dependency.fromString(
+        Dependency[] keyframeDeps = Dependency.fromString(
                 "x:number/y:number/z:number/world:world/entity:entity/sourceentity:entity");
 
         targetEntityType = new DataListComboBox(mcreator,
@@ -44,7 +44,7 @@ public class BossShowGUI extends ModElementGUI<BossShowElement> {
 
         reloadBossShowList();
 
-        markerMappings = new JMarkerMappingsList(mcreator, this.withEntry("bossshow/marker_mappings"), markerDeps);
+        keyframeMappings = new JKeyframeMappingsList(mcreator, this.withEntry("bossshow/keyframe_mappings"), keyframeDeps);
 
         JPanel topPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = defaultConstraints();
@@ -55,7 +55,7 @@ public class BossShowGUI extends ModElementGUI<BossShowElement> {
 
         JPanel content = new JPanel(new BorderLayout(0, 8));
         content.add(topPanel, BorderLayout.NORTH);
-        content.add(markerMappings, BorderLayout.CENTER);
+        content.add(keyframeMappings, BorderLayout.CENTER);
 
         addPage(L10N.t("elementgui.bossshow.general"), PanelUtils.totalCenterInPanel(content), false);
     }
@@ -85,7 +85,7 @@ public class BossShowGUI extends ModElementGUI<BossShowElement> {
     public void reloadDataLists() {
         super.reloadDataLists();
         reloadBossShowList();
-        markerMappings.reloadDataLists();
+        keyframeMappings.reloadDataLists();
     }
 
     @Override
@@ -99,8 +99,8 @@ public class BossShowGUI extends ModElementGUI<BossShowElement> {
         if (element.bossShowId != null && !element.bossShowId.isEmpty()) {
             bossShowId.setSelectedItem(element.bossShowId);
         }
-        if (element.markerMappings != null) {
-            markerMappings.setEntries(element.markerMappings);
+        if (element.keyframeMappings != null) {
+            keyframeMappings.setEntries(element.keyframeMappings);
         }
     }
 
@@ -111,7 +111,7 @@ public class BossShowGUI extends ModElementGUI<BossShowElement> {
                 targetEntityType.getSelectedItem());
         Object selected = bossShowId.getSelectedItem();
         element.bossShowId = selected != null ? selected.toString() : "";
-        element.markerMappings = markerMappings.getEntries();
+        element.keyframeMappings = keyframeMappings.getEntries();
         return element;
     }
 

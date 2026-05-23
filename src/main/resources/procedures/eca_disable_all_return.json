@@ -1,4 +1,4 @@
-{
+﻿{
   "args0": [],
   "inputsInline": true,
   "previousStatement": null,
@@ -6,6 +6,7 @@
   "colour": 35,
   "mcreator": {
     "toolbox_id": "eca",
+    "group": "eca_03_02",
     "inputs": [],
     "dependencies": []
   }
