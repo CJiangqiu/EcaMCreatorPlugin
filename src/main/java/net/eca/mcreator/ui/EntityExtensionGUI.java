@@ -41,7 +41,9 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
 
     // Boss Bar
     private final JCheckBox bossBarEnabled = new JCheckBox();
+    private final JCheckBox bossBarFrameEnableTexture = new JCheckBox();
     private TextureHolder bossBarFrameTexture;
+    private final JCheckBox bossBarFillEnableTexture = new JCheckBox();
     private TextureHolder bossBarFillTexture;
     private final JCheckBox bossBarFrameShaderEnabled = new JCheckBox();
     private final JComboBox<String> bossBarFrameRenderType = new JComboBox<>(getRenderTypeOptions());
@@ -173,7 +175,8 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         addSectionLabel(bossBarPanel, "elementgui.entity_extension.boss_bar_frame_section", gbc);
 
         addRowWithHelp(bossBarPanel, "entity_extension/boss_bar_frame_texture",
-                "elementgui.entity_extension.boss_bar_frame_texture", bossBarFrameTexture, gbc);
+                "elementgui.entity_extension.boss_bar_frame_texture",
+                buildTextureRow(bossBarFrameEnableTexture, bossBarFrameTexture), gbc);
 
         addRowWithHelp(bossBarPanel, "entity_extension/boss_bar_frame_shader",
                 "elementgui.entity_extension.boss_bar_frame_shader", buildShaderRow(
@@ -188,7 +191,8 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         addSectionLabel(bossBarPanel, "elementgui.entity_extension.boss_bar_fill_section", gbc);
 
         addRowWithHelp(bossBarPanel, "entity_extension/boss_bar_fill_texture",
-                "elementgui.entity_extension.boss_bar_fill_texture", bossBarFillTexture, gbc);
+                "elementgui.entity_extension.boss_bar_fill_texture",
+                buildTextureRow(bossBarFillEnableTexture, bossBarFillTexture), gbc);
 
         addRowWithHelp(bossBarPanel, "entity_extension/boss_bar_fill_shader",
                 "elementgui.entity_extension.boss_bar_fill_shader", buildShaderRow(
@@ -327,6 +331,14 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         return row;
     }
 
+    private static JPanel buildTextureRow(JCheckBox enable, TextureHolder holder) {
+        JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
+        row.add(enable);
+        holder.setPreferredSize(new Dimension(300, 28));
+        row.add(holder);
+        return row;
+    }
+
     private JPanel buildSkyboxShaderRow() {
         JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
         row.add(globalSkyboxEnableShader);
@@ -347,8 +359,10 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         Runnable update = () -> {
             boolean bb = bossBarEnabled.isSelected();
             bossBarCondition.setEnabled(bb);
-            bossBarFrameTexture.setEnabled(bb);
-            bossBarFillTexture.setEnabled(bb);
+            bossBarFrameEnableTexture.setEnabled(bb);
+            bossBarFrameTexture.setEnabled(bb && bossBarFrameEnableTexture.isSelected());
+            bossBarFillEnableTexture.setEnabled(bb);
+            bossBarFillTexture.setEnabled(bb && bossBarFillEnableTexture.isSelected());
             bossBarFrameShaderEnabled.setEnabled(bb);
             bossBarFillShaderEnabled.setEnabled(bb);
             bossBarFrameOffsetX.setEnabled(bb);
@@ -369,6 +383,8 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         };
         update.run();
         bossBarEnabled.addItemListener(e -> update.run());
+        bossBarFrameEnableTexture.addItemListener(e -> update.run());
+        bossBarFillEnableTexture.addItemListener(e -> update.run());
         bossBarFrameShaderEnabled.addItemListener(e -> update.run());
         bossBarFillShaderEnabled.addItemListener(e -> update.run());
         customHealthEnabled.addItemListener(e -> update.run());
@@ -455,7 +471,9 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
             musicCondition.setSelectedProcedure(element.musicCondition);
 
         bossBarEnabled.setSelected(element.bossBarEnabled);
+        bossBarFrameEnableTexture.setSelected(element.bossBarFrameEnableTexture);
         bossBarFrameTexture.setTextureFromTextureName(nonNull(element.bossBarFrameTexture));
+        bossBarFillEnableTexture.setSelected(element.bossBarFillEnableTexture);
         bossBarFillTexture.setTextureFromTextureName(nonNull(element.bossBarFillTexture));
         bossBarFrameShaderEnabled.setSelected(element.bossBarFrameShaderEnabled);
         setCombo(bossBarFrameRenderType, element.bossBarFrameRenderType);
@@ -525,7 +543,9 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         element.musicCondition = musicCondition.getSelectedProcedure();
 
         element.bossBarEnabled = bossBarEnabled.isSelected();
+        element.bossBarFrameEnableTexture = bossBarFrameEnableTexture.isSelected();
         element.bossBarFrameTexture = bossBarFrameTexture.getID();
+        element.bossBarFillEnableTexture = bossBarFillEnableTexture.isSelected();
         element.bossBarFillTexture = bossBarFillTexture.getID();
         element.bossBarFrameShaderEnabled = bossBarFrameShaderEnabled.isSelected();
         element.bossBarFrameRenderType = getCombo(bossBarFrameRenderType);

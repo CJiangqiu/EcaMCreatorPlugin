@@ -1,0 +1,1 @@
+The built-in ECA shader preset used for the overlay render layer (TheLastEnd, DreamSakura, Forest, Ocean, Storm, Volcano, Arcane, Aurora, Hacker, Starlight, Cosmos, BlackHole). Each preset maps to its `*RenderTypes.ITEM` render type.

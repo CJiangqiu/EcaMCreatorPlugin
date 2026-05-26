@@ -2,8 +2,10 @@ package net.eca.mcreator;
 
 import net.eca.mcreator.element.BossShowElement;
 import net.eca.mcreator.element.EntityExtensionElement;
+import net.eca.mcreator.element.EcaItemExtensionElement;
 import net.eca.mcreator.ui.BossShowGUI;
 import net.eca.mcreator.ui.EntityExtensionGUI;
+import net.eca.mcreator.ui.EcaItemExtensionGUI;
 import net.mcreator.element.ModElementType;
 import net.mcreator.element.ModElementTypeLoader;
 
@@ -11,6 +13,7 @@ public class EcaElementTypes {
 
     public static ModElementType<?> ENTITY_EXTENSION;
     public static ModElementType<?> BOSS_SHOW;
+    public static ModElementType<?> ECA_ITEM_EXTENSION;
 
     public static void load() {
         ENTITY_EXTENSION = ModElementTypeLoader.register(
@@ -19,5 +22,8 @@ public class EcaElementTypes {
         BOSS_SHOW = ModElementTypeLoader.register(
                 new ModElementType<>("bossshow", null, BossShowGUI::new,
                         BossShowElement.class));
+        ECA_ITEM_EXTENSION = ModElementTypeLoader.register(
+                new ModElementType<>("ecaitemextension", null, EcaItemExtensionGUI::new,
+                        EcaItemExtensionElement.class));
     }
 }

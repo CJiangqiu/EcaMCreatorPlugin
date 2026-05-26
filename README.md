@@ -119,6 +119,18 @@ A mod element for binding Java-side logic to an existing BossShow cutscene. Crea
 
 Use the BossShow procedure blocks to play, stop, and query cutscenes from within other procedures.
 
+### ECA Item Extension (Mod Element)
+
+A mod element for attaching an ECA shader preset render layer to an existing item. Create an ECA Item Extension element to configure:
+
+- **Target Item** — The item this extension renders on top of (one extension per item)
+- **Shader Preset** — One of the 12 built-in presets (TheLastEnd, DreamSakura, Forest, Ocean, Storm, Volcano, Arcane, Aurora, Hacker, Starlight, Cosmos, BlackHole); its `ITEM` render type is used for the overlay
+- **Enabled** — Master switch; when off, the overlay is disabled without removing the element
+- **Render Condition** — Optional logic procedure evaluated per item stack (with an `itemstack` dependency); return true to draw the overlay on that stack, leave empty to always render
+- **Color-Key Mask** — Optionally restrict the shader to pixels matching a target color within a tolerance; otherwise the shader covers the whole texture
+
+The shader is drawn as an additional overlay pass on top of normal item rendering (GUI, first/third person, dropped item, item frames).
+
 ### Requirements
 
 - **MCreator 2024.1 or higher** (tested up to 2025.3)
@@ -296,6 +308,18 @@ MIT License - See [LICENSE](LICENSE) file for details.
 - **关键帧事件映射** — 事件 ID → 流程的映射列表，当播放到对应关键帧时触发对应流程
 
 可在其他流程中使用 BossShow 相关流程块来播放、停止和查询演出状态。
+
+### ECA物品扩展（模组元素）
+
+一种模组元素类型，用于为已有物品附加一个 ECA 着色器预设渲染层。创建一个 ECA物品扩展元素可配置：
+
+- **目标物品** — 该扩展叠加渲染的物品（每个物品只能有一个扩展）
+- **着色器预设** — 12 种内置预设之一（TheLastEnd、DreamSakura、Forest、Ocean、Storm、Volcano、Arcane、Aurora、Hacker、Starlight、Cosmos、BlackHole），使用其 `ITEM` 渲染类型进行叠加
+- **启用** — 总开关；关闭时停用叠加但不删除元素
+- **渲染条件** — 可选的逻辑流程，按物品堆叠逐个求值（带 `itemstack` 依赖），返回 true 时在该堆叠上绘制叠加，留空则始终渲染
+- **Color-Key 蒙版** — 可选地仅在与目标颜色匹配（在容差内）的像素上叠加着色器；否则着色器覆盖整个贴图
+
+着色器作为额外的叠加渲染层绘制在物品正常渲染之上（GUI、第一/第三人称、掉落物、物品展示框）。
 
 ### 环境要求
 

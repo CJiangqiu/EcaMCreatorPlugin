@@ -1,0 +1,1 @@
+The item this render extension is attached to. ECA overlays the selected shader preset on top of this item's normal rendering (GUI, first/third person, dropped item, and item frames). Each item can have only one extension.

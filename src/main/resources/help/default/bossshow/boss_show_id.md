@@ -1,0 +1,1 @@
+The BossShow cutscene JSON file (scanned from `src/main/resources/data/<modid>/bossshow/`) this element binds to. Create the cutscene first using the in-game BossShow editor and export it into the mod's resources, then it will appear in this dropdown.

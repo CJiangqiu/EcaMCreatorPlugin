@@ -1,0 +1,1 @@
+Optional logic procedure evaluated per item stack every frame. Return true to draw the shader overlay on that stack, false to skip it. Leave empty to always render. The `itemstack` dependency is the stack being rendered (use it to check NBT, enchantments, custom name, durability, etc.).

@@ -20,7 +20,9 @@ public class EntityExtensionElement extends GeneratableElement {
 
     // Boss Bar
     public boolean bossBarEnabled;
+    public boolean bossBarFrameEnableTexture;
     public String bossBarFrameTexture;
+    public boolean bossBarFillEnableTexture;
     public String bossBarFillTexture;
     public boolean bossBarFrameShaderEnabled;
     public String bossBarFrameRenderType;

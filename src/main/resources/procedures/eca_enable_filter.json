@@ -8,7 +8,8 @@
       ["RAIN", "RAIN"],
       ["DESERT", "DESERT"],
       ["SNOW", "SNOW"],
-      ["TOXIC", "TOXIC"]
+      ["TOXIC", "TOXIC"],
+      ["COSMOS", "COSMOS"]
     ]}
   ],
   "inputsInline": true,

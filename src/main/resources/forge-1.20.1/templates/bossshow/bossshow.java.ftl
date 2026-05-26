@@ -13,7 +13,7 @@ import net.eca.util.bossshow.BossShowContext;
 import net.eca.util.bossshow.BossShowManager;
 import net.minecraft.resources.ResourceLocation;
 <#list data.keyframeMappings as mapping>
-<#if hasProc(mapping.procedure)>
+<#if mapping.procedure?? && hasProc(mapping.procedure)>
 import ${package}.procedures.${mapping.procedure.getName()}Procedure;
 </#if>
 </#list>
@@ -33,7 +33,7 @@ public class ${name}BossShow extends BossShow {
     public void onKeyframeEvent(String eventId, BossShowContext ctx) {
         switch (eventId) {
         <#list data.keyframeMappings as mapping>
-        <#if hasProc(mapping.procedure) && mapping.eventId?has_content>
+        <#if mapping.procedure?? && hasProc(mapping.procedure) && mapping.eventId?has_content>
             case "${mapping.eventId}" -> ${mapping.procedure.getName()}Procedure.execute(<@keyframeDepsCall mapping.procedure/>);
         </#if>
         </#list>

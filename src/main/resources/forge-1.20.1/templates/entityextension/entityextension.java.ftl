@@ -141,6 +141,11 @@ public class ${name}EntityExtension extends EntityExtension {
 </#if>
 <#if data.bossBarEnabled>
     @Override
+    public boolean enableBossBar() {
+        return true;
+    }
+
+    @Override
     @OnlyIn(Dist.CLIENT)
     public BossBarExtension bossBarExtension() {
         return new BossBarExtension() {
@@ -149,17 +154,17 @@ public class ${name}EntityExtension extends EntityExtension {
                 return true;
             }
 
-    <#if data.bossBarFrameTexture?has_content>
+    <#if data.bossBarFrameEnableTexture && data.bossBarFrameTexture?has_content>
             @Override
             public ResourceLocation getFrameTexture() {
-                return texture("screens/${data.bossBarFrameTexture}");
+                return texture("screens/${data.bossBarFrameTexture}.png");
             }
 
     </#if>
-    <#if data.bossBarFillTexture?has_content>
+    <#if data.bossBarFillEnableTexture && data.bossBarFillTexture?has_content>
             @Override
             public ResourceLocation getFillTexture() {
-                return texture("screens/${data.bossBarFillTexture}");
+                return texture("screens/${data.bossBarFillTexture}.png");
             }
 
     </#if>
@@ -270,7 +275,7 @@ public class ${name}EntityExtension extends EntityExtension {
             @Override public boolean enabled() { return true; }
     <#if data.globalSkyboxEnableTexture && data.globalSkyboxTexture?has_content>
             @Override public boolean enableTexture() { return true; }
-            @Override public ResourceLocation texture() { return ${name}EntityExtension.this.texture("screens/${data.globalSkyboxTexture}"); }
+            @Override public ResourceLocation texture() { return ${name}EntityExtension.this.texture("screens/${data.globalSkyboxTexture}.png"); }
     </#if>
     <#if data.globalSkyboxEnableShader && data.globalSkyboxShaderRenderType?has_content>
             @Override public boolean enableShader() { return true; }
