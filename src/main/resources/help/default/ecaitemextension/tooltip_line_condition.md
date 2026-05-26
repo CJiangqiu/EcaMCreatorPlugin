@@ -1,0 +1,1 @@
+Optional logic procedure evaluated per item stack when the tooltip is built. Return true to show this line on that stack, false to hide it. Leave empty to always show this line. The `itemstack` dependency is the stack being hovered.

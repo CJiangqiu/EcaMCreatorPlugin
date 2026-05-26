@@ -1,0 +1,27 @@
+﻿{
+  "args0": [
+    { "type": "input_value", "name": "player", "check": "Entity" },
+    { "type": "field_dropdown", "name": "filterType", "options": [
+      ["SKETCH", "SKETCH"],
+      ["SPOTLIGHT", "SPOTLIGHT"],
+      ["MATRIX", "MATRIX"],
+      ["RAIN", "RAIN"],
+      ["DESERT", "DESERT"],
+      ["SNOW", "SNOW"],
+      ["TOXIC", "TOXIC"],
+      ["COSMOS", "COSMOS"]
+    ]}
+  ],
+  "inputsInline": true,
+  "output": "Boolean",
+  "colour": 175,
+  "mcreator": {
+    "toolbox_id": "eca",
+    "group": "eca_07_03",
+    "toolbox_init": [
+      "<value name=\"player\"><block type=\"source_entity_from_deps\"></block></value>"
+    ],
+    "inputs": ["player"],
+    "return_type": "logic"
+  }
+}

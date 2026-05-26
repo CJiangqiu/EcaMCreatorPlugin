@@ -1,0 +1,3 @@
+templates:
+  - template: ecaitemextension/ecaitemextension.java.ftl
+    name: "@SRCROOT/@BASEPACKAGEPATH/ecaitemextension/@NAMEItemExtension.java"

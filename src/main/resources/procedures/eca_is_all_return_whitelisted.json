@@ -1,4 +1,4 @@
-{
+﻿{
   "args0": [
     { "type": "input_value", "name": "className", "check": "String" }
   ],
@@ -7,6 +7,7 @@
   "colour": 160,
   "mcreator": {
     "toolbox_id": "eca",
+    "group": "eca_08_07",
     "toolbox_init": [
       "<value name=\"className\"><block type=\"text\"><field name=\"TEXT\">net.mcreator.yourmod.YourClass</field></block></value>"
     ],

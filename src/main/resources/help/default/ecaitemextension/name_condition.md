@@ -1,0 +1,1 @@
+Optional logic procedure evaluated per item stack every frame. Return true to apply the styled name to that stack, false to keep the vanilla name. Leave empty to always apply. The `itemstack` dependency is the stack being rendered (use it to check NBT, enchantments, durability, etc.).
