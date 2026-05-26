@@ -28,7 +28,7 @@ This plugin integrates [Epic Core API](https://github.com/CJiangqiu/EpicCoreAPI)
 - **Unlock Health** `<Entity>` - Remove health lock, allowing getHealth() to return actual health
 - **Is Health Locked** `<Entity>` - Check if entity health is locked
 - **Get Locked Health Value** `<Entity>` - Get the locked health value, or 0 if not locked
-- **Force Get Health** `<Entity>` - Read real health directly from DATA_HEALTH_ID using VarHandle, bypassing custom implementations
+- **Force Get Health** `<Entity>` - Read the entity's real health value directly from DATA_HEALTH_ID using VarHandle
 - **Is Force Invulnerable** `<Entity>` - Check ECA invulnerability state via EntityData
 - **Force Teleport** `<Entity> <X> <Y> <Z>` - Directly modify position fields using VarHandle with automatic client sync
 - **Cleanup Boss Bar** `<Entity>` - Scan entity instance fields and remove all ServerBossEvent instances
@@ -37,7 +37,7 @@ This plugin integrates [Epic Core API](https://github.com/CJiangqiu/EpicCoreAPI)
 - **Is AllReturn Enabled** - Check if AllReturn is active
 - **Set Global AllReturn** `<Boolean>` ⚠️ **[DANGER]** - Requires config enabled. Enable/disable global AllReturn mode affecting ALL mods' boolean/void methods
 - **Memory Remove Entity** `<Entity>` ⚠️ **[DANGER]** - Requires config enabled. Remove entity via LWJGL internal channel
-- **Restore Entity's Lifecycle Methods** `<Entity>` ⚠️ **[DANGER]** - Requires config enabled. Restore an entity's critical lifecycle methods (getHealth/setHealth/hurt/die/isAlive/etc.) to vanilla implementation, defeating custom health storage and anti-modification logic
+- **Restore Entity's Lifecycle Methods** `<Entity>` ⚠️ **[DANGER]** - Requires config enabled. Restore an entity's critical lifecycle methods (getHealth/setHealth/hurt/die/isAlive/etc.) to the vanilla implementation
 - **Unrestore Entity's Lifecycle Methods** `<Entity>` - Cancel the lifecycle method restore, returning the entity to its custom implementation
 - **Add Health Whitelist Keyword** `<Keyword>` - Add a keyword to health whitelist. Fields containing this keyword will be modified during health changes
 - **Remove Health Whitelist Keyword** `<Keyword>` - Remove a keyword from health whitelist
@@ -121,15 +121,27 @@ Use the BossShow procedure blocks to play, stop, and query cutscenes from within
 
 ### ECA Item Extension (Mod Element)
 
-A mod element for attaching an ECA shader preset render layer to an existing item. Create an ECA Item Extension element to configure:
+A mod element for enhancing an existing item with animated/styled text and an ECA shader preset render layer. The editor is split into three pages:
 
-- **Target Item** — The item this extension renders on top of (one extension per item)
+**Name Rendering** — override the item's display name with animated styled text:
+- **Target Item** — The item this extension applies to (one extension per item)
+- **Enable Name Effect** — Master switch for the name override; player-set custom names (anvil) always take priority
+- **Name Condition** — Optional logic procedure (with an `itemstack` dependency) evaluated per stack; return true to apply the styled name, leave empty to always apply
+- **Name Text** — A fixed string or a procedure that returns text
+- **Color Effect** — NONE, GRADIENT (slides between two colors), RAINBOW (full hue cycle), or SOLID; with configurable animation period and colors
+- **Shimmer / Glitch** — Optional toggles (each with an intensity) that make random characters flash brighter or turn to obfuscated gibberish
+- **Bold / Italic / Underline / Strikethrough** — Stackable text styles
+
+**Tooltip** — a list of custom tooltip lines, each independently configured:
+- **Text** — A fixed string or a procedure that returns text
+- **Color/style effects** — The same color, shimmer, glitch and style options as the name
+- **Condition** — Optional per-line logic procedure; return true to show that line, leave empty to always show it
+
+**Render Layer** — an ECA shader preset drawn as an overlay pass on top of normal item rendering (GUI, first/third person, dropped item, item frames):
 - **Shader Preset** — One of the 12 built-in presets (TheLastEnd, DreamSakura, Forest, Ocean, Storm, Volcano, Arcane, Aurora, Hacker, Starlight, Cosmos, BlackHole); its `ITEM` render type is used for the overlay
-- **Enabled** — Master switch; when off, the overlay is disabled without removing the element
-- **Render Condition** — Optional logic procedure evaluated per item stack (with an `itemstack` dependency); return true to draw the overlay on that stack, leave empty to always render
+- **Enable Render Layer** — Master switch; when off, no shader overlay is drawn (text effects still work)
+- **Render Condition** — Optional logic procedure evaluated per stack; return true to draw the overlay, leave empty to always render
 - **Color-Key Mask** — Optionally restrict the shader to pixels matching a target color within a tolerance; otherwise the shader covers the whole texture
-
-The shader is drawn as an additional overlay pass on top of normal item rendering (GUI, first/third person, dropped item, item frames).
 
 ### Requirements
 
@@ -173,6 +185,14 @@ Visit the [MCreator Plugins page](https://mcreator.net/plugins) to find the **1.
 4. Click **Save** and **regenerate code**
 5. Wait for Gradle to sync
 
+By default the build automatically pulls the ECA dev artifact from the Modrinth Maven repository, so no manual download is needed.
+
+**(Optional) Use a local dev jar:** If you prefer not to rely on the Maven repository (e.g. offline, or to pin a specific version), download the `epic-core-api-<version>-dev.jar` from the **CurseForge** files page and place it in:
+```
+<user home>/.mcreator/lib/
+```
+The build automatically detects a local `epic-core-api-*-dev.jar` there and uses the newest one, falling back to the Modrinth Maven repository only when none is present.
+
 #### Step 5: Use the Procedure Blocks
 
 1. Create a new procedure
@@ -181,13 +201,13 @@ Visit the [MCreator Plugins page](https://mcreator.net/plugins) to find the **1.
 
 ### For Players
 
-All mods created with this plugin require [Epic Core API](https://modrinth.com/mod/epic-core-api) as a **mandatory dependency**.
+All mods created with this plugin require [Epic Core API](https://www.curseforge.com/minecraft/mc-mods/epic-core-api) as a **mandatory dependency**.
 
-Players must download and install the Epic Core API mod from Modrinth to use any mods built with this plugin.
+Players must download and install the Epic Core API mod from CurseForge to use any mods built with this plugin.
 
 ### Links
 
-- **Epic Core API Mod**: https://modrinth.com/mod/epic-core-api
+- **Epic Core API Mod (downloads, incl. dev jar)**: https://www.curseforge.com/minecraft/mc-mods/epic-core-api
 - **Source Code**: https://github.com/CJiangqiu/EpicCoreAPI
 
 ### License
@@ -218,7 +238,7 @@ MIT License - See [LICENSE](LICENSE) file for details.
 - **解锁血量** `<实体>` - 移除血量锁定，getHealth()恢复返回实际血量
 - **血量是否已锁定** `<实体>` - 检查实体血量是否已锁定
 - **获取锁定血量值** `<实体>` - 获取锁定的血量值，未锁定时返回0
-- **强制获取真实血量** `<实体>` - 使用VarHandle直接从DATA_HEALTH_ID读取真实血量，绕过自定义实现
+- **强制获取真实血量** `<实体>` - 使用VarHandle直接从DATA_HEALTH_ID读取实体的真实血量值
 - **是否处于强制无敌状态** `<实体>` - 通过EntityData检查ECA无敌状态
 - **强制传送** `<实体> <X> <Y> <Z>` - 使用VarHandle直接修改位置字段并自动同步到客户端
 - **清理Boss血条** `<实体>` - 扫描实体实例字段并移除所有ServerBossEvent实例
@@ -311,15 +331,27 @@ MIT License - See [LICENSE](LICENSE) file for details.
 
 ### ECA物品扩展（模组元素）
 
-一种模组元素类型，用于为已有物品附加一个 ECA 着色器预设渲染层。创建一个 ECA物品扩展元素可配置：
+一种模组元素类型，用于为已有物品附加动态样式文本以及 ECA 着色器预设渲染层。编辑器分为三页：
 
-- **目标物品** — 该扩展叠加渲染的物品（每个物品只能有一个扩展）
+**名字渲染** — 用动态样式文本覆盖物品的显示名：
+- **目标物品** — 该扩展作用的物品（每个物品只能有一个扩展）
+- **启用名字效果** — 名字覆盖的总开关；玩家用铁砧改的名字始终优先
+- **名字条件** — 可选的逻辑流程（带 `itemstack` 依赖），按堆叠逐个求值，返回 true 时应用样式名字，留空则始终应用
+- **名字文本** — 固定字符串或返回文本的流程
+- **颜色效果** — NONE、GRADIENT（双色滑动渐变）、RAINBOW（整段彩虹循环）或 SOLID，可配置动画周期与颜色
+- **闪烁 / 乱码** — 可选开关（各带强度），让随机字符变亮或变成混淆乱码
+- **加粗 / 斜体 / 下划线 / 删除线** — 可叠加的文字样式
+
+**Tooltip** — 一组自定义 tooltip 行，每行独立配置：
+- **文本** — 固定字符串或返回文本的流程
+- **颜色/样式效果** — 与名字相同的颜色、闪烁、乱码和样式选项
+- **条件** — 可选的逐行逻辑流程，返回 true 时显示该行，留空则始终显示
+
+**渲染层** — ECA 着色器预设，作为额外的叠加渲染层绘制在物品正常渲染之上（GUI、第一/第三人称、掉落物、物品展示框）：
 - **着色器预设** — 12 种内置预设之一（TheLastEnd、DreamSakura、Forest、Ocean、Storm、Volcano、Arcane、Aurora、Hacker、Starlight、Cosmos、BlackHole），使用其 `ITEM` 渲染类型进行叠加
-- **启用** — 总开关；关闭时停用叠加但不删除元素
-- **渲染条件** — 可选的逻辑流程，按物品堆叠逐个求值（带 `itemstack` 依赖），返回 true 时在该堆叠上绘制叠加，留空则始终渲染
+- **启用渲染层** — 总开关；关闭时不绘制着色器叠加（文本效果仍生效）
+- **渲染条件** — 可选的逻辑流程，按堆叠逐个求值，返回 true 时绘制叠加，留空则始终渲染
 - **Color-Key 蒙版** — 可选地仅在与目标颜色匹配（在容差内）的像素上叠加着色器；否则着色器覆盖整个贴图
-
-着色器作为额外的叠加渲染层绘制在物品正常渲染之上（GUI、第一/第三人称、掉落物、物品展示框）。
 
 ### 环境要求
 
@@ -363,6 +395,14 @@ MIT License - See [LICENSE](LICENSE) file for details.
 4. 点击**保存**并**重新生成代码**
 5. 等待 Gradle 同步完成
 
+默认情况下，构建会自动从 Modrinth Maven 仓库拉取 ECA dev 构件，无需手动下载。
+
+**（可选）使用本地 dev jar：** 如果你不想依赖 Maven 仓库（例如离线，或想锁定特定版本），可从 **CurseForge** 的文件页面下载 `epic-core-api-<版本>-dev.jar`，放入：
+```
+<用户目录>/.mcreator/lib/
+```
+构建会自动检测该目录下的 `epic-core-api-*-dev.jar` 并使用版本最新的那个；仅当不存在时才回退到 Modrinth Maven 仓库。
+
 #### 第 5 步：使用流程块
 
 1. 创建一个新流程
@@ -371,13 +411,13 @@ MIT License - See [LICENSE](LICENSE) file for details.
 
 ### 玩家须知
 
-所有使用该插件制作的 Mod 都需要将 [Epic Core API](https://modrinth.com/mod/epic-core-api) 作为**必要的依赖**。
+所有使用该插件制作的 Mod 都需要将 [Epic Core API](https://www.curseforge.com/minecraft/mc-mods/epic-core-api) 作为**必要的依赖**。
 
-玩家必须从 Modrinth 下载并安装 Epic Core API mod，才能使用基于此插件构建的任何 Mod。
+玩家必须从 CurseForge 下载并安装 Epic Core API mod，才能使用基于此插件构建的任何 Mod。
 
 ### 相关链接
 
-- **Epic Core API Mod**: https://modrinth.com/mod/epic-core-api
+- **Epic Core API Mod（下载，含 dev 版）**: https://www.curseforge.com/minecraft/mc-mods/epic-core-api
 - **源代码**: https://github.com/CJiangqiu/EpicCoreAPI
 
 ### 许可证
