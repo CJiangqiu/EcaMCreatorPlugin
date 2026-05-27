@@ -28,7 +28,7 @@ import net.minecraft.client.renderer.RenderType;
 <#if (data.bossBarFrameTexture?has_content || data.bossBarFillTexture?has_content || data.globalSkyboxTexture?has_content || (data.combatMusicEnabled && data.combatMusicSoundEventId?has_content))>
 import net.minecraft.resources.ResourceLocation;
 </#if>
-<#assign needsLivingEntity = data.customHealthEnabled || data.customMaxHealthEnabled || (data.bossBarEnabled && data.bossBarCondition?? && hasProc(data.bossBarCondition)) || (data.globalFogEnabled && data.fogCondition?? && hasProc(data.fogCondition)) || (data.globalSkyboxEnabled && data.skyboxCondition?? && hasProc(data.skyboxCondition)) || (data.combatMusicEnabled && data.musicCondition?? && hasProc(data.musicCondition))>
+<#assign needsLivingEntity = data.customHealthEnabled || data.customMaxHealthEnabled || (data.bossBarEnabled && data.bossBarCondition?? && hasProc(data.bossBarCondition)) || (data.entityLayerEnabled && data.entityLayerCondition?? && hasProc(data.entityLayerCondition)) || (data.globalFogEnabled && data.fogCondition?? && hasProc(data.fogCondition)) || (data.globalSkyboxEnabled && data.skyboxCondition?? && hasProc(data.skyboxCondition)) || (data.combatMusicEnabled && data.musicCondition?? && hasProc(data.musicCondition))>
 <#if needsLivingEntity>
 import net.minecraft.world.entity.LivingEntity;
 </#if>
@@ -40,6 +40,9 @@ import ${package}.procedures.${data.customMaxHealthValue.getName()}Procedure;
 </#if>
 <#if data.bossBarCondition?? && hasProc(data.bossBarCondition)>
 import ${package}.procedures.${data.bossBarCondition.getName()}Procedure;
+</#if>
+<#if data.entityLayerCondition?? && hasProc(data.entityLayerCondition)>
+import ${package}.procedures.${data.entityLayerCondition.getName()}Procedure;
 </#if>
 <#if data.fogCondition?? && hasProc(data.fogCondition)>
 import ${package}.procedures.${data.fogCondition.getName()}Procedure;
@@ -239,6 +242,13 @@ public class ${name}EntityExtension extends EntityExtension {
             public float getAlpha() {
                 return ${data.entityLayerAlpha?c}f;
             }
+    <#if data.entityLayerCondition?? && hasProc(data.entityLayerCondition)>
+
+            @Override
+            public boolean shouldRender(LivingEntity entity) {
+                return ${data.entityLayerCondition.getName()}Procedure.execute(<@entityDepsCall data.entityLayerCondition/>);
+            }
+    </#if>
         };
     }
 <#else>

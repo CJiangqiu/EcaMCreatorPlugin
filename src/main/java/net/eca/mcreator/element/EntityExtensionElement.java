@@ -14,6 +14,7 @@ public class EntityExtensionElement extends GeneratableElement {
 
     // Condition Procedures
     public Procedure bossBarCondition;
+    public Procedure entityLayerCondition;
     public Procedure fogCondition;
     public Procedure skyboxCondition;
     public Procedure musicCondition;

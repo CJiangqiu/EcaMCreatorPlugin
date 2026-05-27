@@ -35,6 +35,7 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
 
     // Condition Procedures
     private ProcedureSelector bossBarCondition;
+    private ProcedureSelector entityLayerCondition;
     private ProcedureSelector fogCondition;
     private ProcedureSelector skyboxCondition;
     private ProcedureSelector musicCondition;
@@ -123,6 +124,11 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         bossBarCondition = new ProcedureSelector(
                 this.withEntry("entity_extension/boss_bar_condition"), mcreator,
                 L10N.t("elementgui.entity_extension.boss_bar_condition"),
+                AbstractProcedureSelector.Side.BOTH, true,
+                VariableTypeLoader.BuiltInTypes.LOGIC, entityDeps);
+        entityLayerCondition = new ProcedureSelector(
+                this.withEntry("entity_extension/entity_layer_condition"), mcreator,
+                L10N.t("elementgui.entity_extension.entity_layer_condition"),
                 AbstractProcedureSelector.Side.BOTH, true,
                 VariableTypeLoader.BuiltInTypes.LOGIC, entityDeps);
         fogCondition = new ProcedureSelector(
@@ -222,6 +228,7 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         gbc = defaultConstraints();
         addRowWithHelp(layerPanel, "entity_extension/entity_layer_enabled",
                 "elementgui.entity_extension.entity_layer_enabled", entityLayerEnabled, gbc);
+        addFullWidthComponent(layerPanel, entityLayerCondition, gbc);
         addRowWithHelp(layerPanel, "entity_extension/entity_layer_render_type",
                 "elementgui.entity_extension.entity_layer_render_type", entityLayerRenderType, gbc);
         addRowWithHelp(layerPanel, "entity_extension/entity_layer_glow",
@@ -295,7 +302,7 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
 
         // Setup all enable/disable toggles
         setupBossBarToggle();
-        setupEnableToggle(entityLayerEnabled, entityLayerRenderType, entityLayerGlow, entityLayerHurtOverlay, entityLayerAlpha);
+        setupEnableToggle(entityLayerEnabled, entityLayerCondition, entityLayerRenderType, entityLayerGlow, entityLayerHurtOverlay, entityLayerAlpha);
         setupFogToggle();
         setupSkyboxToggle();
         setupMusicToggle();
@@ -463,6 +470,8 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
 
         if (element.bossBarCondition != null)
             bossBarCondition.setSelectedProcedure(element.bossBarCondition);
+        if (element.entityLayerCondition != null)
+            entityLayerCondition.setSelectedProcedure(element.entityLayerCondition);
         if (element.fogCondition != null)
             fogCondition.setSelectedProcedure(element.fogCondition);
         if (element.skyboxCondition != null)
@@ -538,6 +547,7 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         element.enableForceLoading = enableForceLoading.isSelected();
 
         element.bossBarCondition = bossBarCondition.getSelectedProcedure();
+        element.entityLayerCondition = entityLayerCondition.getSelectedProcedure();
         element.fogCondition = fogCondition.getSelectedProcedure();
         element.skyboxCondition = skyboxCondition.getSelectedProcedure();
         element.musicCondition = musicCondition.getSelectedProcedure();
@@ -604,6 +614,7 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
     public void reloadDataLists() {
         super.reloadDataLists();
         bossBarCondition.refreshListKeepSelected();
+        entityLayerCondition.refreshListKeepSelected();
         fogCondition.refreshListKeepSelected();
         skyboxCondition.refreshListKeepSelected();
         musicCondition.refreshListKeepSelected();
