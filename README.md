@@ -111,13 +111,15 @@ When multiple extension entities exist in the same dimension, the one with highe
 
 ### BossShow (Mod Element)
 
-A mod element for binding Java-side logic to an existing BossShow cutscene. Create a BossShow element to map keyframe event IDs to procedures:
+**BossShow** is ECA's cinematic system: it plays a cutscene that locks the player's camera onto a pre-recorded path around a target entity, with subtitles and server-side event callbacks. Camera paths are recorded in-game with ECA's built-in editor (`/eca bossShow edit`) and saved as JSON — you don't write keyframes by hand. Each keyframe can carry an `event_id` that fires a server-side callback when playback reaches it. For the full system (in-game editor, recording workflow, JSON format, triggers, subtitle translation), see the [Epic Core API documentation](https://github.com/CJiangqiu/EpicCoreAPI).
+
+This mod element is the MCreator-side handler: it binds procedures to an existing cutscene's keyframe events, so you can react to a cutscene from your own logic without writing Java. Configure:
 
 - **Target Entity Type** — The entity type this BossShow handler is associated with
 - **BossShow ID** — The BossShow cutscene identifier to bind to
-- **Keyframe Event Mappings** — A list of event ID → procedure pairs; each procedure fires when the matching keyframe is reached during playback
+- **Keyframe Event Mappings** — A list of event ID → procedure pairs; each procedure fires when the matching keyframe (with that `event_id`) is reached during playback
 
-Use the BossShow procedure blocks to play, stop, and query cutscenes from within other procedures.
+Use the BossShow procedure blocks (Play / Stop / Is Playing / Trigger Custom-type) to control cutscenes from within other procedures.
 
 ### ECA Item Extension (Mod Element)
 
@@ -321,13 +323,15 @@ MIT License - See [LICENSE](LICENSE) file for details.
 
 ### BossShow 演出（模组元素）
 
-一种新的模组元素类型，用于为已有的 BossShow 演出绑定 Java 处理逻辑，将关键帧事件 ID 映射到流程块：
+**BossShow** 是 ECA 的演出（过场动画）系统：播放时将玩家镜头锁定到围绕目标实体预先录制的运镜路径上，配有字幕和服务端事件回调。运镜路径通过 ECA 内置的游戏内编辑器（`/eca bossShow edit`）录制并保存为 JSON——无需手写关键帧。每个关键帧可携带一个 `event_id`，播放到该帧时触发服务端回调。完整系统（游戏内编辑器、录制流程、JSON 格式、触发器、字幕翻译）请见 [Epic Core API 文档](https://github.com/CJiangqiu/EpicCoreAPI)。
+
+本模组元素是 MCreator 侧的处理器：把流程绑定到已有演出的关键帧事件上，让你无需写 Java 就能在演出播放时响应。可配置：
 
 - **目标实体类型** — 该 BossShow 处理器关联的实体类型
 - **BossShow ID** — 要绑定的演出标识符
-- **关键帧事件映射** — 事件 ID → 流程的映射列表，当播放到对应关键帧时触发对应流程
+- **关键帧事件映射** — 事件 ID → 流程的映射列表，当播放到带有该 `event_id` 的关键帧时触发对应流程
 
-可在其他流程中使用 BossShow 相关流程块来播放、停止和查询演出状态。
+可在其他流程中使用 BossShow 相关流程块（播放 / 停止 / 是否播放中 / 触发自定义类型）来控制演出。
 
 ### ECA物品扩展（模组元素）
 
