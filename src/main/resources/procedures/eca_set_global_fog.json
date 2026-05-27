@@ -1,4 +1,4 @@
-{
+﻿{
   "args0": [
     {
       "type": "field_dropdown",
@@ -29,6 +29,7 @@
   "colour": 35,
   "mcreator": {
     "toolbox_id": "eca",
+    "group": "eca_06_01",
     "toolbox_init": [
       "<value name=\"radius\"><block type=\"math_number\"><field name=\"NUM\">32</field></block></value>"
     ],

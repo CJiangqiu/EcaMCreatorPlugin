@@ -1,4 +1,4 @@
-{
+﻿{
   "args0": [
     { "type": "input_value", "name": "keyword", "check": "String" }
   ],
@@ -8,6 +8,7 @@
   "colour": 160,
   "mcreator": {
     "toolbox_id": "eca",
+    "group": "eca_08_04",
     "toolbox_init": [
       "<value name=\"keyword\"><block type=\"text\"><field name=\"TEXT\">CUSTOM_HEALTH</field></block></value>"
     ],

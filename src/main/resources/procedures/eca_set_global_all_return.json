@@ -1,4 +1,4 @@
-{
+﻿{
   "args0": [
     { "type": "input_value", "name": "enable", "check": "Boolean" }
   ],
@@ -8,6 +8,7 @@
   "colour": 35,
   "mcreator": {
     "toolbox_id": "eca",
+    "group": "eca_03_04",
     "toolbox_init": [
       "<value name=\"enable\"><block type=\"logic_boolean\"><field name=\"BOOL\">TRUE</field></block></value>"
     ],

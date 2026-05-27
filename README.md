@@ -28,7 +28,7 @@ This plugin integrates [Epic Core API](https://github.com/CJiangqiu/EpicCoreAPI)
 - **Unlock Health** `<Entity>` - Remove health lock, allowing getHealth() to return actual health
 - **Is Health Locked** `<Entity>` - Check if entity health is locked
 - **Get Locked Health Value** `<Entity>` - Get the locked health value, or 0 if not locked
-- **Force Get Health** `<Entity>` - Read real health directly from DATA_HEALTH_ID using VarHandle, bypassing custom implementations
+- **Force Get Health** `<Entity>` - Read the entity's real health value directly from DATA_HEALTH_ID using VarHandle
 - **Is Force Invulnerable** `<Entity>` - Check ECA invulnerability state via EntityData
 - **Force Teleport** `<Entity> <X> <Y> <Z>` - Directly modify position fields using VarHandle with automatic client sync
 - **Cleanup Boss Bar** `<Entity>` - Scan entity instance fields and remove all ServerBossEvent instances
@@ -37,6 +37,8 @@ This plugin integrates [Epic Core API](https://github.com/CJiangqiu/EpicCoreAPI)
 - **Is AllReturn Enabled** - Check if AllReturn is active
 - **Set Global AllReturn** `<Boolean>` ⚠️ **[DANGER]** - Requires config enabled. Enable/disable global AllReturn mode affecting ALL mods' boolean/void methods
 - **Memory Remove Entity** `<Entity>` ⚠️ **[DANGER]** - Requires config enabled. Remove entity via LWJGL internal channel
+- **Restore Entity's Lifecycle Methods** `<Entity>` ⚠️ **[DANGER]** - Requires config enabled. Restore an entity's critical lifecycle methods (getHealth/setHealth/hurt/die/isAlive/etc.) to the vanilla implementation
+- **Unrestore Entity's Lifecycle Methods** `<Entity>` - Cancel the lifecycle method restore, returning the entity to its custom implementation
 - **Add Health Whitelist Keyword** `<Keyword>` - Add a keyword to health whitelist. Fields containing this keyword will be modified during health changes
 - **Remove Health Whitelist Keyword** `<Keyword>` - Remove a keyword from health whitelist
 - **Add Health Blacklist Keyword** `<Keyword>` - Add a keyword to health blacklist. Fields containing this keyword will be skipped during health changes
@@ -46,9 +48,11 @@ This plugin integrates [Epic Core API](https://github.com/CJiangqiu/EpicCoreAPI)
 - **Get Spawn Ban Time** `<EntityType>` - Get the remaining time (seconds) for an entity type's spawn ban
 - **Clear Spawn Ban** `<EntityType>` - Clear the spawn ban for a specific entity type
 - **Clear All Spawn Bans** - Clear all spawn bans in the current dimension
-- **Add Protected Package** `<PackagePrefix>` - Add a package prefix to the whitelist. Classes in protected packages will not be affected by AllReturn
-- **Remove Protected Package** `<PackagePrefix>` - Remove a package prefix from the whitelist. Built-in protections cannot be removed
-- **Is Package Protected** `<ClassName>` - Check if a class name is protected by the whitelist
+- **Add AllReturn Whitelist** `<PackagePrefix>` - Add a package prefix to the AllReturn whitelist. Classes in this package will not be affected by ECA AllReturn transformation
+- **Remove AllReturn Whitelist** `<PackagePrefix>` - Remove a package prefix from the AllReturn whitelist. Built-in protections cannot be removed
+- **Is In AllReturn Whitelist** `<ClassName>` - Check if a class name is in the AllReturn whitelist
+- **Add Transform Whitelist** `<PackagePrefix>` - Add a package prefix to the transform whitelist. Classes in this package will not be affected by any ECA transformation
+- **Remove Transform Whitelist** `<PackagePrefix>` - Remove a package prefix from the transform whitelist. Built-in entries (JDK, Minecraft, Forge, etc.) cannot be removed
 - **Set Max Health** `<Entity> <Value>` - Set precise max health value
 - **Lock Max Health** `<Entity> <Value>` - Lock max health at a specific value
 - **Unlock Max Health** `<Entity>` - Unlock max health
@@ -72,21 +76,74 @@ This plugin integrates [Epic Core API](https://github.com/CJiangqiu/EpicCoreAPI)
 - **For Each Typed Entity in Dimension** `<EntityType>` - Iterate over entities of a specific type in a dimension
 - **For Each Entity on Server** - Iterate over all entities on the entire server
 - **For Each Entity in Range** `<X> <Y> <Z> <Range>` - Iterate over entities within range
+- **Set Force Loading** `<Entity> <Boolean>` - Enable/disable force chunk loading for an entity
+- **Is Force Loaded** `<Entity>` - Check if an entity is force loaded
+- **Enable Filter** `<Player> <Filter>` - Enable a screen filter effect for a player. Filter state is per-player and synced to the client
+- **Disable Filter** `<Player> <Filter>` - Disable a screen filter effect for a player
+- **Is Filter Enabled** `<Player> <Filter>` - Check if a screen filter effect is currently enabled for a player
+- **Play BossShow** `<Player> <Target> <BossShowID>` - Start playing a BossShow cutscene for a player. Plays even if the player has seen it before
+- **Play BossShow (If Not Seen)** `<Player> <Target> <BossShowID>` - Start playing a BossShow cutscene only if the player has not seen it before
+- **Stop BossShow** `<Player>` - Stop the currently playing BossShow cutscene for a player
+- **Is BossShow Playing** `<Player>` - Check if a player currently has an active BossShow cutscene playing
+- **Trigger Custom-type BossShow** `<Name> <Player> <Target>` - Trigger the BossShow with the given name that is configured with trigger type "Custom". Starts a new playback and does not interact with any currently playing BossShow
+- **Start Resurrection Daemon** - Start the resurrection daemon thread, which continuously monitors tracked entities and auto-revives any that die or lose container registration
+- **Stop Resurrection Daemon** - Stop the resurrection daemon thread; tracked entities are no longer auto-revived
+- **Is Resurrection Daemon Running** - Check whether the resurrection daemon thread is currently running
+- **Add to Resurrection Tracking** `<Entity>` - Add an entity to resurrection tracking; while the daemon runs it is auto-revived shortly after death. Do not use on entities that spawn in large numbers
+- **Remove from Resurrection Tracking** `<Entity>` - Remove an entity from resurrection tracking so it is no longer auto-revived
 
-All procedure blocks are located in the **"Epic Core API"** category (purple) in the procedure editor.
+All procedure blocks are located in the **"Epic Core API"** category in the procedure editor.
 
 ### Entity Extension (Mod Element)
 
 A new mod element type for visually enhancing specific entity types. Create an Entity Extension element to attach:
 
+- **Force Loading** — Force-load entities of this type; do not use for entities that spawn in large numbers
 - **Custom Boss Bar** — Custom frame/fill textures with optional shader effects, configurable size and offset
-- **Custom Health Display** — Override displayed health/max health values via procedures
-- **Entity Layer** — Additional render layer with glow, hurt overlay, and alpha settings
+- **Custom Fill Ratio** — Override the health/max health values used to calculate boss bar fill ratio (fill = current / max)
+- **Entity Layer** — Additional render layer with shader preset, glow, hurt overlay, and alpha settings
 - **Global Fog** — Custom fog color/distance, global or radius-based, with configurable shape
 - **Global Skybox** — Custom skybox with texture and/or shader (12 built-in presets: TheLastEnd, DreamSakura, Forest, Ocean, Storm, Volcano, Arcane, Aurora, Hacker, Starlight, Cosmos, BlackHole), alpha, and size
 - **Combat Music** — Custom combat music with source, volume, pitch, loop, and strict lock options
+- **Conditional Triggers** — Each sub-module (Boss Bar, Fog, Skybox, Music) supports an optional logic procedure to dynamically control whether the effect is active per entity per tick
 
 When multiple extension entities exist in the same dimension, the one with highest priority controls global effects.
+
+### BossShow (Mod Element)
+
+**BossShow** is ECA's cinematic system: it plays a cutscene that locks the player's camera onto a pre-recorded path around a target entity, with subtitles and server-side event callbacks. Camera paths are recorded in-game with ECA's built-in editor (`/eca bossShow edit`) and saved as JSON — you don't write keyframes by hand. Each keyframe can carry an `event_id` that fires a server-side callback when playback reaches it. For the full system (in-game editor, recording workflow, JSON format, triggers, subtitle translation), see the [Epic Core API documentation](https://github.com/CJiangqiu/EpicCoreAPI).
+
+This mod element is the MCreator-side handler: it binds procedures to an existing cutscene's keyframe events, so you can react to a cutscene from your own logic without writing Java. Configure:
+
+- **Target Entity Type** — The entity type this BossShow handler is associated with
+- **BossShow ID** — The BossShow cutscene identifier to bind to
+- **Keyframe Event Mappings** — A list of event ID → procedure pairs; each procedure fires when the matching keyframe (with that `event_id`) is reached during playback
+
+Use the BossShow procedure blocks (Play / Stop / Is Playing / Trigger Custom-type) to control cutscenes from within other procedures.
+
+### ECA Item Extension (Mod Element)
+
+A mod element for enhancing an existing item with animated/styled text and an ECA shader preset render layer. The editor is split into three pages:
+
+**Name Rendering** — override the item's display name with animated styled text:
+- **Target Item** — The item this extension applies to (one extension per item)
+- **Enable Name Effect** — Master switch for the name override; player-set custom names (anvil) always take priority
+- **Name Condition** — Optional logic procedure (with an `itemstack` dependency) evaluated per stack; return true to apply the styled name, leave empty to always apply
+- **Name Text** — A fixed string or a procedure that returns text
+- **Color Effect** — NONE, GRADIENT (slides between two colors), RAINBOW (full hue cycle), or SOLID; with configurable animation period and colors
+- **Shimmer / Glitch** — Optional toggles (each with an intensity) that make random characters flash brighter or turn to obfuscated gibberish
+- **Bold / Italic / Underline / Strikethrough** — Stackable text styles
+
+**Tooltip** — a list of custom tooltip lines, each independently configured:
+- **Text** — A fixed string or a procedure that returns text
+- **Color/style effects** — The same color, shimmer, glitch and style options as the name
+- **Condition** — Optional per-line logic procedure; return true to show that line, leave empty to always show it
+
+**Render Layer** — an ECA shader preset drawn as an overlay pass on top of normal item rendering (GUI, first/third person, dropped item, item frames):
+- **Shader Preset** — One of the 12 built-in presets (TheLastEnd, DreamSakura, Forest, Ocean, Storm, Volcano, Arcane, Aurora, Hacker, Starlight, Cosmos, BlackHole); its `ITEM` render type is used for the overlay
+- **Enable Render Layer** — Master switch; when off, no shader overlay is drawn (text effects still work)
+- **Render Condition** — Optional logic procedure evaluated per stack; return true to draw the overlay, leave empty to always render
+- **Color-Key Mask** — Optionally restrict the shader to pixels matching a target color within a tolerance; otherwise the shader covers the whole texture
 
 ### Requirements
 
@@ -130,21 +187,29 @@ Visit the [MCreator Plugins page](https://mcreator.net/plugins) to find the **1.
 4. Click **Save** and **regenerate code**
 5. Wait for Gradle to sync
 
+By default the build automatically pulls the ECA dev artifact from the Modrinth Maven repository, so no manual download is needed.
+
+**(Optional) Use a local dev jar:** If you prefer not to rely on the Maven repository (e.g. offline, or to pin a specific version), download the `epic-core-api-<version>-dev.jar` from the **CurseForge** files page and place it in:
+```
+<user home>/.mcreator/lib/
+```
+The build automatically detects a local `epic-core-api-*-dev.jar` there and uses the newest one, falling back to the Modrinth Maven repository only when none is present.
+
 #### Step 5: Use the Procedure Blocks
 
 1. Create a new procedure
-2. In the procedure editor, find the **"Epic Core API"** category (purple color)
+2. In the procedure editor, find the **"Epic Core API"** category
 3. Drag and drop the blocks you need
 
 ### For Players
 
-All mods created with this plugin require [Epic Core API](https://modrinth.com/mod/epic-core-api) as a **mandatory dependency**.
+All mods created with this plugin require [Epic Core API](https://www.curseforge.com/minecraft/mc-mods/epic-core-api) as a **mandatory dependency**.
 
-Players must download and install the Epic Core API mod from Modrinth to use any mods built with this plugin.
+Players must download and install the Epic Core API mod from CurseForge to use any mods built with this plugin.
 
 ### Links
 
-- **Epic Core API Mod**: https://modrinth.com/mod/epic-core-api
+- **Epic Core API Mod (downloads, incl. dev jar)**: https://www.curseforge.com/minecraft/mc-mods/epic-core-api
 - **Source Code**: https://github.com/CJiangqiu/EpicCoreAPI
 
 ### License
@@ -175,7 +240,7 @@ MIT License - See [LICENSE](LICENSE) file for details.
 - **解锁血量** `<实体>` - 移除血量锁定，getHealth()恢复返回实际血量
 - **血量是否已锁定** `<实体>` - 检查实体血量是否已锁定
 - **获取锁定血量值** `<实体>` - 获取锁定的血量值，未锁定时返回0
-- **强制获取真实血量** `<实体>` - 使用VarHandle直接从DATA_HEALTH_ID读取真实血量，绕过自定义实现
+- **强制获取真实血量** `<实体>` - 使用VarHandle直接从DATA_HEALTH_ID读取实体的真实血量值
 - **是否处于强制无敌状态** `<实体>` - 通过EntityData检查ECA无敌状态
 - **强制传送** `<实体> <X> <Y> <Z>` - 使用VarHandle直接修改位置字段并自动同步到客户端
 - **清理Boss血条** `<实体>` - 扫描实体实例字段并移除所有ServerBossEvent实例
@@ -184,6 +249,8 @@ MIT License - See [LICENSE](LICENSE) file for details.
 - **AllReturn是否已启用** - 检查AllReturn是否激活
 - **设置全局AllReturn** `<布尔值>` ⚠️ **【危险】** - 需配置文件启用。启用/禁用全局AllReturn模式，影响所有mod的boolean/void方法
 - **内存移除实体** `<实体>` ⚠️ **【危险】** - 需配置文件启用。通过LWJGL内部通道移除实体
+- **还原实体的生命周期方法** `<实体>` ⚠️ **【危险】** - 需配置文件启用。将实体的关键生命周期方法（getHealth/setHealth/hurt/die/isAlive/等）还原为原版实现
+- **取消实体的生命周期方法还原** `<实体>` - 取消生命周期方法还原，使实体恢复其自定义实现
 - **添加血量白名单关键字** `<关键字>` - 添加血量白名单关键字，包含此关键字的字段将在血量修改时被修改
 - **移除血量白名单关键字** `<关键字>` - 从血量白名单中移除关键字
 - **添加血量黑名单关键字** `<关键字>` - 添加血量黑名单关键字，包含此关键字的字段将在血量修改时被跳过
@@ -193,9 +260,11 @@ MIT License - See [LICENSE](LICENSE) file for details.
 - **获取禁生成剩余时间** `<实体类型>` - 获取实体类型禁生成的剩余时间（秒）
 - **清除禁生成** `<实体类型>` - 清除指定实体类型的禁生成
 - **清除所有禁生成** - 清除当前维度的所有禁生成
-- **添加受保护的包名** `<包名前缀>` - 将包名前缀添加到白名单，受保护包中的类不会受到AllReturn影响
-- **移除受保护的包名** `<包名前缀>` - 从白名单中移除包名前缀，内置保护无法移除
-- **是否受保护** `<类名>` - 检查类名是否在白名单保护中
+- **添加AllReturn白名单** `<包名前缀>` - 将包名前缀加入AllReturn白名单，该包下的类不会受到ECA AllReturn转换的影响
+- **移除AllReturn白名单** `<包名前缀>` - 从AllReturn白名单中移除包名前缀，内置条目无法移除
+- **是否在AllReturn白名单中** `<类名>` - 检查类名是否在AllReturn白名单中
+- **添加转换白名单** `<包名前缀>` - 将包名前缀加入转换白名单，该包下的类不会受到ECA任何转换的影响
+- **移除转换白名单** `<包名前缀>` - 从转换白名单中移除包名前缀，内置条目（JDK、Minecraft、Forge等）无法移除
 - **设置最大血量** `<实体> <数值>` - 精确设置实体最大血量
 - **锁定最大血量** `<实体> <数值>` - 将最大血量锁定在指定值
 - **解锁最大血量** `<实体>` - 解锁最大血量
@@ -219,21 +288,74 @@ MIT License - See [LICENSE](LICENSE) file for details.
 - **按类型遍历维度内实体** `<实体类型>` - 遍历维度中指定类型的实体
 - **遍历全服实体** - 遍历整个服务器的所有实体
 - **遍历范围内实体** `<X> <Y> <Z> <范围>` - 遍历指定范围内的实体
+- **设置强制加载** `<实体> <布尔值>` - 启用/禁用实体的强制区块加载
+- **是否被强制加载** `<实体>` - 检查实体是否被强制加载
+- **启用滤镜** `<玩家> <滤镜>` - 为玩家启用屏幕滤镜效果，滤镜状态按玩家独立保存并同步到客户端
+- **禁用滤镜** `<玩家> <滤镜>` - 为玩家禁用屏幕滤镜效果
+- **滤镜是否已启用** `<玩家> <滤镜>` - 检查玩家当前是否启用了指定的屏幕滤镜效果
+- **播放BossShow演出** `<玩家> <目标> <演出ID>` - 为玩家播放BossShow演出，即使玩家已看过也会播放
+- **播放BossShow演出（仅首次）** `<玩家> <目标> <演出ID>` - 仅当玩家未看过时为其播放BossShow演出
+- **停止BossShow演出** `<玩家>` - 停止玩家当前正在播放的BossShow演出
+- **是否正在观看演出** `<玩家>` - 检查玩家当前是否有活跃的BossShow演出会话
+- **触发名为指定名称的自定义触发类型BossShow** `<名称> <玩家> <目标>` - 触发触发器类型为Custom且名称匹配的BossShow演出，启动一场新的播放，与当前正在播放的BossShow无关
+- **启动复活守护线程** - 启动复活守护线程，它会持续监控被追踪的实体，并自动复活任何死亡或丢失容器注册的实体
+- **停止复活守护线程** - 停止复活守护线程，被追踪的实体将不再被自动复活
+- **复活守护线程是否运行中** - 检查复活守护线程当前是否正在运行
+- **加入复活追踪** `<实体>` - 将实体加入复活追踪，守护线程运行期间该实体会在死亡后很快被自动复活。请勿用于会大量生成的实体
+- **移出复活追踪** `<实体>` - 将实体移出复活追踪，使其不再被自动复活
 
-所有流程块位于流程编辑器中的 **"Epic Core API"** 分类（紫色）。
+所有流程块位于流程编辑器中的 **"Epic Core API"** 分类。
 
 ### 实体拓展（模组元素）
 
 一种新的模组元素类型，可为指定实体类型添加可视化增强。创建一个实体拓展元素可附加以下功能：
 
+- **强制加载** — 将该类型实体设为强加载实体，请勿用于会大量生成的实体
 - **自定义Boss血条** — 自定义框架/填充纹理，可选着色器效果，可配置大小和偏移
-- **自定义血量显示** — 通过流程块覆盖显示的血量/最大血量数值
-- **实体图层** — 额外渲染图层，支持发光、受伤叠加和透明度设置
+- **自定义填充比例** — 覆盖用于计算Boss血条填充比例的血量/最大血量值（填充比例 = 当前血量 / 最大血量）
+- **实体图层** — 额外渲染图层，支持着色器预设、发光、受伤叠加和透明度设置
 - **全局迷雾** — 自定义迷雾颜色/距离，全局或半径模式，可配置形状
 - **全局天空盒** — 自定义天空盒纹理和/或着色器（12种内置预设：TheLastEnd、DreamSakura、Forest、Ocean、Storm、Volcano、Arcane、Aurora、Hacker、Starlight、Cosmos、BlackHole），透明度和大小
 - **战斗音乐** — 自定义战斗音乐，支持音源、音量、音调、循环和严格锁定选项
+- **条件触发** — 每个子模块（Boss血条、迷雾、天空盒、战斗音乐）支持可选的逻辑过程块，可按实体每tick动态控制效果是否激活
 
 当同一维度存在多个拓展实体时，优先级最高的控制全局效果。
+
+### BossShow 演出（模组元素）
+
+**BossShow** 是 ECA 的演出（过场动画）系统：播放时将玩家镜头锁定到围绕目标实体预先录制的运镜路径上，配有字幕和服务端事件回调。运镜路径通过 ECA 内置的游戏内编辑器（`/eca bossShow edit`）录制并保存为 JSON——无需手写关键帧。每个关键帧可携带一个 `event_id`，播放到该帧时触发服务端回调。完整系统（游戏内编辑器、录制流程、JSON 格式、触发器、字幕翻译）请见 [Epic Core API 文档](https://github.com/CJiangqiu/EpicCoreAPI)。
+
+本模组元素是 MCreator 侧的处理器：把流程绑定到已有演出的关键帧事件上，让你无需写 Java 就能在演出播放时响应。可配置：
+
+- **目标实体类型** — 该 BossShow 处理器关联的实体类型
+- **BossShow ID** — 要绑定的演出标识符
+- **关键帧事件映射** — 事件 ID → 流程的映射列表，当播放到带有该 `event_id` 的关键帧时触发对应流程
+
+可在其他流程中使用 BossShow 相关流程块（播放 / 停止 / 是否播放中 / 触发自定义类型）来控制演出。
+
+### ECA物品扩展（模组元素）
+
+一种模组元素类型，用于为已有物品附加动态样式文本以及 ECA 着色器预设渲染层。编辑器分为三页：
+
+**名字渲染** — 用动态样式文本覆盖物品的显示名：
+- **目标物品** — 该扩展作用的物品（每个物品只能有一个扩展）
+- **启用名字效果** — 名字覆盖的总开关；玩家用铁砧改的名字始终优先
+- **名字条件** — 可选的逻辑流程（带 `itemstack` 依赖），按堆叠逐个求值，返回 true 时应用样式名字，留空则始终应用
+- **名字文本** — 固定字符串或返回文本的流程
+- **颜色效果** — NONE、GRADIENT（双色滑动渐变）、RAINBOW（整段彩虹循环）或 SOLID，可配置动画周期与颜色
+- **闪烁 / 乱码** — 可选开关（各带强度），让随机字符变亮或变成混淆乱码
+- **加粗 / 斜体 / 下划线 / 删除线** — 可叠加的文字样式
+
+**Tooltip** — 一组自定义 tooltip 行，每行独立配置：
+- **文本** — 固定字符串或返回文本的流程
+- **颜色/样式效果** — 与名字相同的颜色、闪烁、乱码和样式选项
+- **条件** — 可选的逐行逻辑流程，返回 true 时显示该行，留空则始终显示
+
+**渲染层** — ECA 着色器预设，作为额外的叠加渲染层绘制在物品正常渲染之上（GUI、第一/第三人称、掉落物、物品展示框）：
+- **着色器预设** — 12 种内置预设之一（TheLastEnd、DreamSakura、Forest、Ocean、Storm、Volcano、Arcane、Aurora、Hacker、Starlight、Cosmos、BlackHole），使用其 `ITEM` 渲染类型进行叠加
+- **启用渲染层** — 总开关；关闭时不绘制着色器叠加（文本效果仍生效）
+- **渲染条件** — 可选的逻辑流程，按堆叠逐个求值，返回 true 时绘制叠加，留空则始终渲染
+- **Color-Key 蒙版** — 可选地仅在与目标颜色匹配（在容差内）的像素上叠加着色器；否则着色器覆盖整个贴图
 
 ### 环境要求
 
@@ -277,21 +399,29 @@ MIT License - See [LICENSE](LICENSE) file for details.
 4. 点击**保存**并**重新生成代码**
 5. 等待 Gradle 同步完成
 
+默认情况下，构建会自动从 Modrinth Maven 仓库拉取 ECA dev 构件，无需手动下载。
+
+**（可选）使用本地 dev jar：** 如果你不想依赖 Maven 仓库（例如离线，或想锁定特定版本），可从 **CurseForge** 的文件页面下载 `epic-core-api-<版本>-dev.jar`，放入：
+```
+<用户目录>/.mcreator/lib/
+```
+构建会自动检测该目录下的 `epic-core-api-*-dev.jar` 并使用版本最新的那个；仅当不存在时才回退到 Modrinth Maven 仓库。
+
 #### 第 5 步：使用流程块
 
 1. 创建一个新流程
-2. 在流程编辑器中，找到 **"Epic Core API"** 分类（紫色）
+2. 在流程编辑器中，找到 **"Epic Core API"** 分类
 3. 拖放你需要的流程块
 
 ### 玩家须知
 
-所有使用该插件制作的 Mod 都需要将 [Epic Core API](https://modrinth.com/mod/epic-core-api) 作为**必要的依赖**。
+所有使用该插件制作的 Mod 都需要将 [Epic Core API](https://www.curseforge.com/minecraft/mc-mods/epic-core-api) 作为**必要的依赖**。
 
-玩家必须从 Modrinth 下载并安装 Epic Core API mod，才能使用基于此插件构建的任何 Mod。
+玩家必须从 CurseForge 下载并安装 Epic Core API mod，才能使用基于此插件构建的任何 Mod。
 
 ### 相关链接
 
-- **Epic Core API Mod**: https://modrinth.com/mod/epic-core-api
+- **Epic Core API Mod（下载，含 dev 版）**: https://www.curseforge.com/minecraft/mc-mods/epic-core-api
 - **源代码**: https://github.com/CJiangqiu/EpicCoreAPI
 
 ### 许可证

@@ -1,10 +1,11 @@
-{
+﻿{
   "args0": [],
   "inputsInline": true,
   "output": "Boolean",
   "colour": 35,
   "mcreator": {
     "toolbox_id": "eca",
+    "group": "eca_03_03",
     "inputs": [],
     "return_type": "logic"
   }

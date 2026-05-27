@@ -1,4 +1,4 @@
-{
+﻿{
   "args0": [
     { "type": "input_value", "name": "uuid", "check": "String" }
   ],
@@ -8,6 +8,7 @@
   "colour": 195,
   "mcreator": {
     "toolbox_id": "eca",
+    "group": "eca_02_03",
     "toolbox_init": [
       "<value name=\"uuid\"><block type=\"text\"><field name=\"TEXT\">uuid</field></block></value>"
     ],
