@@ -1,0 +1,1 @@
+A list of entity render layers. Each entry has its own condition; the first entry whose condition is true is rendered. An entry with no condition acts as the default used when none of the conditional entries match. Use this to switch the render layer by entity state (e.g. boss phases).

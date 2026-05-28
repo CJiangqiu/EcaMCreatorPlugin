@@ -3,7 +3,6 @@ package net.eca.mcreator.ui;
 import net.eca.mcreator.element.EntityExtensionElement;
 import net.mcreator.blockly.data.Dependency;
 import net.mcreator.element.parts.EntityEntry;
-import net.mcreator.element.parts.Sound;
 import net.mcreator.minecraft.ElementUtil;
 import net.mcreator.ui.MCreator;
 import net.mcreator.ui.component.JColor;
@@ -12,7 +11,6 @@ import net.mcreator.ui.help.HelpUtils;
 import net.mcreator.ui.init.L10N;
 import net.mcreator.ui.minecraft.DataListComboBox;
 import net.mcreator.ui.dialogs.TypedTextureSelectorDialog;
-import net.mcreator.ui.minecraft.SoundSelector;
 import net.mcreator.ui.minecraft.TextureHolder;
 import net.mcreator.ui.modgui.ModElementGUI;
 import net.mcreator.ui.procedure.AbstractProcedureSelector;
@@ -35,10 +33,6 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
 
     // Condition Procedures
     private ProcedureSelector bossBarCondition;
-    private ProcedureSelector entityLayerCondition;
-    private ProcedureSelector fogCondition;
-    private ProcedureSelector skyboxCondition;
-    private ProcedureSelector musicCondition;
 
     // Boss Bar
     private final JCheckBox bossBarEnabled = new JCheckBox();
@@ -67,40 +61,19 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
 
     // Entity Layer
     private final JCheckBox entityLayerEnabled = new JCheckBox();
-    private final JComboBox<String> entityLayerRenderType = new JComboBox<>(getRenderTypeOptions());
-    private final JCheckBox entityLayerGlow = new JCheckBox();
-    private final JCheckBox entityLayerHurtOverlay = new JCheckBox();
-    private final JSpinner entityLayerAlpha = new JSpinner(new SpinnerNumberModel(0.8, 0.0, 1.0, 0.05));
+    private JEntityLayerEntriesList entityLayerEntries;
 
     // Global Fog
     private final JCheckBox globalFogEnabled = new JCheckBox();
-    private final JCheckBox globalFogGlobalMode = new JCheckBox();
-    private final JSpinner globalFogRadius = new JSpinner(new SpinnerNumberModel(32.0, 0.0, 1024.0, 1.0));
-    private JColor globalFogColor;
-    private final JSpinner globalFogTerrainStart = new JSpinner(new SpinnerNumberModel(0.25, 0.0, 10.0, 0.01));
-    private final JSpinner globalFogTerrainEnd = new JSpinner(new SpinnerNumberModel(1.0, 0.0, 10.0, 0.01));
-    private final JSpinner globalFogSkyStart = new JSpinner(new SpinnerNumberModel(0.0, 0.0, 10.0, 0.01));
-    private final JSpinner globalFogSkyEnd = new JSpinner(new SpinnerNumberModel(1.0, 0.0, 10.0, 0.01));
-    private final JComboBox<String> globalFogShape = new JComboBox<>(new String[]{"SPHERE", "CYLINDER"});
+    private JFogEntriesList fogEntries;
 
     // Global Skybox
     private final JCheckBox globalSkyboxEnabled = new JCheckBox();
-    private final JCheckBox globalSkyboxEnableTexture = new JCheckBox();
-    private TextureHolder globalSkyboxTexture;
-    private final JCheckBox globalSkyboxEnableShader = new JCheckBox();
-    private final JComboBox<String> globalSkyboxShaderRenderType = new JComboBox<>(getSkyboxShaderOptions());
-    private final JSpinner globalSkyboxAlpha = new JSpinner(new SpinnerNumberModel(0.9, 0.0, 1.0, 0.05));
-    private final JSpinner globalSkyboxSize = new JSpinner(new SpinnerNumberModel(100.0, 0.0, 10000.0, 10.0));
+    private JSkyboxEntriesList skyboxEntries;
 
     // Combat Music
     private final JCheckBox combatMusicEnabled = new JCheckBox();
-    private SoundSelector combatMusicSound;
-    private final JComboBox<String> combatMusicSoundSource = new JComboBox<>(
-            new String[]{"MUSIC", "MASTER", "RECORDS", "AMBIENT", "HOSTILE", "NEUTRAL", "PLAYERS", "BLOCKS", "VOICE", "WEATHER"});
-    private final JSpinner combatMusicVolume = new JSpinner(new SpinnerNumberModel(1.0, 0.0, 10.0, 0.1));
-    private final JSpinner combatMusicPitch = new JSpinner(new SpinnerNumberModel(1.0, 0.0, 10.0, 0.1));
-    private final JCheckBox combatMusicLoop = new JCheckBox();
-    private final JCheckBox combatMusicStrictLock = new JCheckBox();
+    private JMusicRulesList musicRules;
 
     public EntityExtensionGUI(MCreator mcreator, ModElement modElement, boolean editingMode) {
         super(mcreator, modElement, editingMode);
@@ -118,34 +91,15 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         bossBarFrameTexture.setPreferredSize(new Dimension(300, 28));
         bossBarFillTexture = new TextureHolder(new TypedTextureSelectorDialog(mcreator, TextureType.SCREEN), 28);
         bossBarFillTexture.setPreferredSize(new Dimension(300, 28));
-        globalFogColor = new JColor(mcreator, false, false);
-        globalSkyboxTexture = new TextureHolder(new TypedTextureSelectorDialog(mcreator, TextureType.SCREEN), 28);
-        combatMusicSound = new SoundSelector(mcreator);
+        musicRules = new JMusicRulesList(mcreator, this.withEntry("entity_extension/music_rules"), entityDeps);
+        fogEntries = new JFogEntriesList(mcreator, this.withEntry("entity_extension/fog_entries"), entityDeps);
+        skyboxEntries = new JSkyboxEntriesList(mcreator, this.withEntry("entity_extension/skybox_entries"), entityDeps);
         bossBarCondition = new ProcedureSelector(
                 this.withEntry("entity_extension/boss_bar_condition"), mcreator,
                 L10N.t("elementgui.entity_extension.boss_bar_condition"),
                 AbstractProcedureSelector.Side.BOTH, true,
                 VariableTypeLoader.BuiltInTypes.LOGIC, entityDeps);
-        entityLayerCondition = new ProcedureSelector(
-                this.withEntry("entity_extension/entity_layer_condition"), mcreator,
-                L10N.t("elementgui.entity_extension.entity_layer_condition"),
-                AbstractProcedureSelector.Side.BOTH, true,
-                VariableTypeLoader.BuiltInTypes.LOGIC, entityDeps);
-        fogCondition = new ProcedureSelector(
-                this.withEntry("entity_extension/fog_condition"), mcreator,
-                L10N.t("elementgui.entity_extension.fog_condition"),
-                AbstractProcedureSelector.Side.BOTH, true,
-                VariableTypeLoader.BuiltInTypes.LOGIC, entityDeps);
-        skyboxCondition = new ProcedureSelector(
-                this.withEntry("entity_extension/skybox_condition"), mcreator,
-                L10N.t("elementgui.entity_extension.skybox_condition"),
-                AbstractProcedureSelector.Side.BOTH, true,
-                VariableTypeLoader.BuiltInTypes.LOGIC, entityDeps);
-        musicCondition = new ProcedureSelector(
-                this.withEntry("entity_extension/music_condition"), mcreator,
-                L10N.t("elementgui.entity_extension.music_condition"),
-                AbstractProcedureSelector.Side.BOTH, true,
-                VariableTypeLoader.BuiltInTypes.LOGIC, entityDeps);
+        entityLayerEntries = new JEntityLayerEntriesList(mcreator, this.withEntry("entity_extension/entity_layer_entries"), entityDeps);
         customHealthValue = new NumberProcedureSelector(
                 this.withEntry("entity_extension/custom_health_value"), mcreator,
                 L10N.t("elementgui.entity_extension.custom_health_value"),
@@ -228,15 +182,7 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         gbc = defaultConstraints();
         addRowWithHelp(layerPanel, "entity_extension/entity_layer_enabled",
                 "elementgui.entity_extension.entity_layer_enabled", entityLayerEnabled, gbc);
-        addFullWidthComponent(layerPanel, entityLayerCondition, gbc);
-        addRowWithHelp(layerPanel, "entity_extension/entity_layer_render_type",
-                "elementgui.entity_extension.entity_layer_render_type", entityLayerRenderType, gbc);
-        addRowWithHelp(layerPanel, "entity_extension/entity_layer_glow",
-                "elementgui.entity_extension.entity_layer_glow", entityLayerGlow, gbc);
-        addRowWithHelp(layerPanel, "entity_extension/entity_layer_hurt_overlay",
-                "elementgui.entity_extension.entity_layer_hurt_overlay", entityLayerHurtOverlay, gbc);
-        addRowWithHelp(layerPanel, "entity_extension/entity_layer_alpha",
-                "elementgui.entity_extension.entity_layer_alpha", entityLayerAlpha, gbc);
+        addFullWidthComponent(layerPanel, entityLayerEntries, gbc);
         addPage(L10N.t("elementgui.entityextension.layer"), PanelUtils.totalCenterInPanel(layerPanel), false);
 
         // === Global Fog ===
@@ -244,26 +190,7 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         gbc = defaultConstraints();
         addRowWithHelp(fogPanel, "entity_extension/global_fog_enabled",
                 "elementgui.entity_extension.global_fog_enabled", globalFogEnabled, gbc);
-        addFullWidthComponent(fogPanel, fogCondition, gbc);
-        addRowWithHelp(fogPanel, "entity_extension/global_fog_global_mode",
-                "elementgui.entity_extension.global_fog_global_mode", globalFogGlobalMode, gbc);
-        addRowWithHelp(fogPanel, "entity_extension/global_fog_radius",
-                "elementgui.entity_extension.global_fog_radius", globalFogRadius, gbc);
-
-        addRowWithHelp(fogPanel, "entity_extension/global_fog_color",
-                "elementgui.entity_extension.global_fog_color", globalFogColor, gbc);
-
-        addSectionLabel(fogPanel, "elementgui.entity_extension.global_fog_distance_section", gbc);
-        addRowWithHelp(fogPanel, "entity_extension/global_fog_terrain_start",
-                "elementgui.entity_extension.global_fog_terrain_start", globalFogTerrainStart, gbc);
-        addRowWithHelp(fogPanel, "entity_extension/global_fog_terrain_end",
-                "elementgui.entity_extension.global_fog_terrain_end", globalFogTerrainEnd, gbc);
-        addRowWithHelp(fogPanel, "entity_extension/global_fog_sky_start",
-                "elementgui.entity_extension.global_fog_sky_start", globalFogSkyStart, gbc);
-        addRowWithHelp(fogPanel, "entity_extension/global_fog_sky_end",
-                "elementgui.entity_extension.global_fog_sky_end", globalFogSkyEnd, gbc);
-        addRowWithHelp(fogPanel, "entity_extension/global_fog_shape",
-                "elementgui.entity_extension.global_fog_shape", globalFogShape, gbc);
+        addFullWidthComponent(fogPanel, fogEntries, gbc);
         addPage(L10N.t("elementgui.entityextension.fog"), PanelUtils.totalCenterInPanel(fogPanel), false);
 
         // === Global Skybox ===
@@ -271,13 +198,7 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         gbc = defaultConstraints();
         addRowWithHelp(skyboxPanel, "entity_extension/global_skybox_enabled",
                 "elementgui.entity_extension.global_skybox_enabled", globalSkyboxEnabled, gbc);
-        addFullWidthComponent(skyboxPanel, skyboxCondition, gbc);
-        addRowWithHelp(skyboxPanel, "entity_extension/global_skybox_texture",
-                "elementgui.entity_extension.global_skybox_texture", buildSkyboxTextureRow(), gbc);
-        addRowWithHelp(skyboxPanel, "entity_extension/global_skybox_shader_render_type",
-                "elementgui.entity_extension.global_skybox_shader_render_type", buildSkyboxShaderRow(), gbc);
-        addRowWithHelp(skyboxPanel, "entity_extension/global_skybox_display",
-                "elementgui.entity_extension.global_skybox_display", buildSkyboxDisplayRow(), gbc);
+        addFullWidthComponent(skyboxPanel, skyboxEntries, gbc);
         addPage(L10N.t("elementgui.entityextension.skybox"), PanelUtils.totalCenterInPanel(skyboxPanel), false);
 
         // === Combat Music ===
@@ -285,26 +206,14 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         gbc = defaultConstraints();
         addRowWithHelp(musicPanel, "entity_extension/combat_music_enabled",
                 "elementgui.entity_extension.combat_music_enabled", combatMusicEnabled, gbc);
-        addFullWidthComponent(musicPanel, musicCondition, gbc);
-        addRowWithHelp(musicPanel, "entity_extension/combat_music_sound",
-                "elementgui.entity_extension.combat_music_sound", combatMusicSound, gbc);
-        addRowWithHelp(musicPanel, "entity_extension/combat_music_source",
-                "elementgui.entity_extension.combat_music_source", combatMusicSoundSource, gbc);
-        addRowWithHelp(musicPanel, "entity_extension/combat_music_volume",
-                "elementgui.entity_extension.combat_music_volume", combatMusicVolume, gbc);
-        addRowWithHelp(musicPanel, "entity_extension/combat_music_pitch",
-                "elementgui.entity_extension.combat_music_pitch", combatMusicPitch, gbc);
-        addRowWithHelp(musicPanel, "entity_extension/combat_music_loop",
-                "elementgui.entity_extension.combat_music_loop", combatMusicLoop, gbc);
-        addRowWithHelp(musicPanel, "entity_extension/combat_music_mute_others",
-                "elementgui.entity_extension.combat_music_mute_others", combatMusicStrictLock, gbc);
+        addFullWidthComponent(musicPanel, musicRules, gbc);
         addPage(L10N.t("elementgui.entityextension.music"), PanelUtils.totalCenterInPanel(musicPanel), false);
 
         // Setup all enable/disable toggles
         setupBossBarToggle();
-        setupEnableToggle(entityLayerEnabled, entityLayerCondition, entityLayerRenderType, entityLayerGlow, entityLayerHurtOverlay, entityLayerAlpha);
-        setupFogToggle();
-        setupSkyboxToggle();
+        setupEnableToggle(entityLayerEnabled, entityLayerEntries);
+        setupEnableToggle(globalFogEnabled, fogEntries);
+        setupEnableToggle(globalSkyboxEnabled, skyboxEntries);
         setupMusicToggle();
     }
 
@@ -330,35 +239,11 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         return row;
     }
 
-    private JPanel buildSkyboxTextureRow() {
-        JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
-        row.add(globalSkyboxEnableTexture);
-        globalSkyboxTexture.setPreferredSize(new Dimension(300, 28));
-        row.add(globalSkyboxTexture);
-        return row;
-    }
-
     private static JPanel buildTextureRow(JCheckBox enable, TextureHolder holder) {
         JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
         row.add(enable);
         holder.setPreferredSize(new Dimension(300, 28));
         row.add(holder);
-        return row;
-    }
-
-    private JPanel buildSkyboxShaderRow() {
-        JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
-        row.add(globalSkyboxEnableShader);
-        row.add(globalSkyboxShaderRenderType);
-        return row;
-    }
-
-    private JPanel buildSkyboxDisplayRow() {
-        JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
-        row.add(L10N.label("elementgui.entity_extension.global_skybox_alpha"));
-        row.add(globalSkyboxAlpha);
-        row.add(L10N.label("elementgui.entity_extension.global_skybox_size"));
-        row.add(globalSkyboxSize);
         return row;
     }
 
@@ -398,51 +283,10 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         customMaxHealthEnabled.addItemListener(e -> update.run());
     }
 
-    private void setupFogToggle() {
-        Runnable update = () -> {
-            boolean fg = globalFogEnabled.isSelected();
-            fogCondition.setEnabled(fg);
-            globalFogGlobalMode.setEnabled(fg);
-            globalFogRadius.setEnabled(fg && !globalFogGlobalMode.isSelected());
-            globalFogColor.setEnabled(fg);
-            globalFogTerrainStart.setEnabled(fg);
-            globalFogTerrainEnd.setEnabled(fg);
-            globalFogSkyStart.setEnabled(fg);
-            globalFogSkyEnd.setEnabled(fg);
-            globalFogShape.setEnabled(fg);
-        };
-        update.run();
-        globalFogEnabled.addItemListener(e -> update.run());
-        globalFogGlobalMode.addItemListener(e -> update.run());
-    }
-
-    private void setupSkyboxToggle() {
-        Runnable update = () -> {
-            boolean sb = globalSkyboxEnabled.isSelected();
-            skyboxCondition.setEnabled(sb);
-            globalSkyboxEnableTexture.setEnabled(sb);
-            globalSkyboxEnableShader.setEnabled(sb);
-            globalSkyboxAlpha.setEnabled(sb);
-            globalSkyboxSize.setEnabled(sb);
-            globalSkyboxTexture.setEnabled(sb && globalSkyboxEnableTexture.isSelected());
-            globalSkyboxShaderRenderType.setEnabled(sb && globalSkyboxEnableShader.isSelected());
-        };
-        update.run();
-        globalSkyboxEnabled.addItemListener(e -> update.run());
-        globalSkyboxEnableTexture.addItemListener(e -> update.run());
-        globalSkyboxEnableShader.addItemListener(e -> update.run());
-    }
-
     private void setupMusicToggle() {
         Runnable update = () -> {
             boolean mc = combatMusicEnabled.isSelected();
-            musicCondition.setEnabled(mc);
-            combatMusicSound.setEnabled(mc);
-            combatMusicSoundSource.setEnabled(mc);
-            combatMusicVolume.setEnabled(mc);
-            combatMusicPitch.setEnabled(mc);
-            combatMusicLoop.setEnabled(mc);
-            combatMusicStrictLock.setEnabled(mc);
+            musicRules.setEnabled(mc);
         };
         update.run();
         combatMusicEnabled.addItemListener(e -> update.run());
@@ -470,14 +314,6 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
 
         if (element.bossBarCondition != null)
             bossBarCondition.setSelectedProcedure(element.bossBarCondition);
-        if (element.entityLayerCondition != null)
-            entityLayerCondition.setSelectedProcedure(element.entityLayerCondition);
-        if (element.fogCondition != null)
-            fogCondition.setSelectedProcedure(element.fogCondition);
-        if (element.skyboxCondition != null)
-            skyboxCondition.setSelectedProcedure(element.skyboxCondition);
-        if (element.musicCondition != null)
-            musicCondition.setSelectedProcedure(element.musicCondition);
 
         bossBarEnabled.setSelected(element.bossBarEnabled);
         bossBarFrameEnableTexture.setSelected(element.bossBarFrameEnableTexture);
@@ -505,36 +341,20 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
             customMaxHealthValue.setSelectedProcedure(element.customMaxHealthValue);
 
         entityLayerEnabled.setSelected(element.entityLayerEnabled);
-        setCombo(entityLayerRenderType, element.entityLayerRenderType);
-        entityLayerGlow.setSelected(element.entityLayerGlow);
-        entityLayerHurtOverlay.setSelected(element.entityLayerHurtOverlay);
-        entityLayerAlpha.setValue(element.entityLayerAlpha);
+        if (element.entityLayerEntries != null)
+            entityLayerEntries.setEntries(element.entityLayerEntries);
 
         globalFogEnabled.setSelected(element.globalFogEnabled);
-        globalFogGlobalMode.setSelected(element.globalFogGlobalMode);
-        globalFogRadius.setValue(element.globalFogRadius);
-        globalFogColor.setColor(hexToColor(element.globalFogColor));
-        globalFogTerrainStart.setValue(element.globalFogTerrainStart);
-        globalFogTerrainEnd.setValue(element.globalFogTerrainEnd);
-        globalFogSkyStart.setValue(element.globalFogSkyStart);
-        globalFogSkyEnd.setValue(element.globalFogSkyEnd);
-        setCombo(globalFogShape, element.globalFogShape);
+        if (element.fogEntries != null)
+            fogEntries.setEntries(element.fogEntries);
 
         globalSkyboxEnabled.setSelected(element.globalSkyboxEnabled);
-        globalSkyboxEnableTexture.setSelected(element.globalSkyboxEnableTexture);
-        globalSkyboxTexture.setTextureFromTextureName(nonNull(element.globalSkyboxTexture));
-        globalSkyboxEnableShader.setSelected(element.globalSkyboxEnableShader);
-        setCombo(globalSkyboxShaderRenderType, element.globalSkyboxShaderRenderType);
-        globalSkyboxAlpha.setValue(element.globalSkyboxAlpha);
-        globalSkyboxSize.setValue(element.globalSkyboxSize);
+        if (element.skyboxEntries != null)
+            skyboxEntries.setEntries(element.skyboxEntries);
 
         combatMusicEnabled.setSelected(element.combatMusicEnabled);
-        combatMusicSound.setSound(new Sound(modElement.getWorkspace(), nonNull(element.combatMusicSoundEventId)));
-        setCombo(combatMusicSoundSource, element.combatMusicSoundSource);
-        combatMusicVolume.setValue(element.combatMusicVolume);
-        combatMusicPitch.setValue(element.combatMusicPitch);
-        combatMusicLoop.setSelected(element.combatMusicLoop);
-        combatMusicStrictLock.setSelected(element.combatMusicStrictLock);
+        if (element.musicRules != null)
+            musicRules.setEntries(element.musicRules);
     }
 
     @Override
@@ -547,10 +367,6 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         element.enableForceLoading = enableForceLoading.isSelected();
 
         element.bossBarCondition = bossBarCondition.getSelectedProcedure();
-        element.entityLayerCondition = entityLayerCondition.getSelectedProcedure();
-        element.fogCondition = fogCondition.getSelectedProcedure();
-        element.skyboxCondition = skyboxCondition.getSelectedProcedure();
-        element.musicCondition = musicCondition.getSelectedProcedure();
 
         element.bossBarEnabled = bossBarEnabled.isSelected();
         element.bossBarFrameEnableTexture = bossBarFrameEnableTexture.isSelected();
@@ -576,36 +392,16 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         element.customMaxHealthValue = customMaxHealthValue.getSelectedProcedure();
 
         element.entityLayerEnabled = entityLayerEnabled.isSelected();
-        element.entityLayerRenderType = getCombo(entityLayerRenderType);
-        element.entityLayerGlow = entityLayerGlow.isSelected();
-        element.entityLayerHurtOverlay = entityLayerHurtOverlay.isSelected();
-        element.entityLayerAlpha = (double) entityLayerAlpha.getValue();
+        element.entityLayerEntries = entityLayerEntries.getEntries();
 
         element.globalFogEnabled = globalFogEnabled.isSelected();
-        element.globalFogGlobalMode = globalFogGlobalMode.isSelected();
-        element.globalFogRadius = (double) globalFogRadius.getValue();
-        element.globalFogColor = colorToHex(globalFogColor.getColor());
-        element.globalFogTerrainStart = (double) globalFogTerrainStart.getValue();
-        element.globalFogTerrainEnd = (double) globalFogTerrainEnd.getValue();
-        element.globalFogSkyStart = (double) globalFogSkyStart.getValue();
-        element.globalFogSkyEnd = (double) globalFogSkyEnd.getValue();
-        element.globalFogShape = (String) globalFogShape.getSelectedItem();
+        element.fogEntries = fogEntries.getEntries();
 
         element.globalSkyboxEnabled = globalSkyboxEnabled.isSelected();
-        element.globalSkyboxEnableTexture = globalSkyboxEnableTexture.isSelected();
-        element.globalSkyboxTexture = globalSkyboxTexture.getID();
-        element.globalSkyboxEnableShader = globalSkyboxEnableShader.isSelected();
-        element.globalSkyboxShaderRenderType = getCombo(globalSkyboxShaderRenderType);
-        element.globalSkyboxAlpha = (double) globalSkyboxAlpha.getValue();
-        element.globalSkyboxSize = (double) globalSkyboxSize.getValue();
+        element.skyboxEntries = skyboxEntries.getEntries();
 
         element.combatMusicEnabled = combatMusicEnabled.isSelected();
-        element.combatMusicSoundEventId = combatMusicSound.getSound().getUnmappedValue();
-        element.combatMusicSoundSource = (String) combatMusicSoundSource.getSelectedItem();
-        element.combatMusicVolume = (double) combatMusicVolume.getValue();
-        element.combatMusicPitch = (double) combatMusicPitch.getValue();
-        element.combatMusicLoop = combatMusicLoop.isSelected();
-        element.combatMusicStrictLock = combatMusicStrictLock.isSelected();
+        element.musicRules = musicRules.getEntries();
 
         return element;
     }
@@ -614,10 +410,10 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
     public void reloadDataLists() {
         super.reloadDataLists();
         bossBarCondition.refreshListKeepSelected();
-        entityLayerCondition.refreshListKeepSelected();
-        fogCondition.refreshListKeepSelected();
-        skyboxCondition.refreshListKeepSelected();
-        musicCondition.refreshListKeepSelected();
+        entityLayerEntries.reloadDataLists();
+        fogEntries.reloadDataLists();
+        skyboxEntries.reloadDataLists();
+        musicRules.reloadDataLists();
         customHealthValue.refreshListKeepSelected();
         customMaxHealthValue.refreshListKeepSelected();
     }
@@ -625,13 +421,6 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
     private static String[] getRenderTypeOptions() {
         return new String[]{
                 "(None)",
-                "TheLastEnd", "DreamSakura", "Forest", "Ocean", "Storm",
-                "Volcano", "Arcane", "Aurora", "Hacker", "Starlight", "Cosmos", "BlackHole"
-        };
-    }
-
-    private static String[] getSkyboxShaderOptions() {
-        return new String[]{
                 "TheLastEnd", "DreamSakura", "Forest", "Ocean", "Storm",
                 "Volcano", "Arcane", "Aurora", "Hacker", "Starlight", "Cosmos", "BlackHole"
         };
@@ -652,20 +441,6 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
 
     private static String nonNull(String s) {
         return s != null ? s : "";
-    }
-
-    private static Color hexToColor(String hex) {
-        if (hex == null || hex.isEmpty()) return new Color(0x808080);
-        try {
-            return new Color(Integer.parseInt(hex, 16));
-        } catch (NumberFormatException e) {
-            return new Color(0x808080);
-        }
-    }
-
-    private static String colorToHex(Color color) {
-        if (color == null) return "808080";
-        return String.format("%06X", 0xFFFFFF & color.getRGB());
     }
 
     private static GridBagConstraints defaultConstraints() {

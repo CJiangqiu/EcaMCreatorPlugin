@@ -1,0 +1,1 @@
+A list of global fog entries. Each entry has its own condition; the first entry whose condition is true is applied. An entry with no condition acts as the default used when none of the conditional entries match. Use this to switch fog by entity state (e.g. boss phases).

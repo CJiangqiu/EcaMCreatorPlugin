@@ -1,0 +1,1 @@
+A list of combat music entries. Each entry has its own condition; the first entry whose condition is true is played. An entry with no condition acts as the default that plays when none of the conditional entries match. Use this to switch music by entity state (e.g. boss phases).

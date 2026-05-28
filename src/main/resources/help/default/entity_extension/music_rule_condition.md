@@ -1,0 +1,1 @@
+Optional logic procedure (with x/y/z/world/entity dependencies) that decides whether this music entry is used. Entries are checked top to bottom; the first one whose condition returns true is played. Leave empty to make this entry the unconditional default (it plays when no conditional entry above it matches).

@@ -5,6 +5,50 @@
 <#macro entityDepsCall obj>
 <#list obj.getDependencies(generator.getWorkspace()) as dep><#switch dep.getName()><#case "entity">entity<#break><#case "world">entity.level()<#break><#case "x">entity.getX()<#break><#case "y">entity.getY()<#break><#case "z">entity.getZ()<#break><#default>${dep.getName()}<#break></#switch><#if dep?has_next>, </#if></#list>
 </#macro>
+<#macro musicExtClass rule>new CombatMusicExtension() {
+                @Override public boolean enabled() { return true; }
+<#if rule.soundEventId?has_content>
+                @Override public net.minecraft.resources.ResourceLocation soundEventId() { return new net.minecraft.resources.ResourceLocation("${rule.soundEventId?replace('CUSTOM:', modid + ':')}"); }
+</#if>
+                @Override public net.minecraft.sounds.SoundSource soundSource() { return net.minecraft.sounds.SoundSource.${rule.soundSource}; }
+                @Override public float volume() { return ${rule.volume?c}f; }
+                @Override public float pitch() { return ${rule.pitch?c}f; }
+                @Override public boolean loop() { return ${rule.loop?c}; }
+                @Override public boolean strictMusicLock() { return ${rule.strictMusicLock?c}; }
+            }</#macro>
+<#macro entityLayerClass entry>new EntityLayerExtension() {
+                @Override public boolean enabled() { return true; }
+<#if entry.renderType?has_content>
+                @Override public RenderType getRenderType() { return ${renderTypeClass(entry.renderType)}.BOSS_LAYER; }
+</#if>
+                @Override public boolean isGlow() { return ${entry.glow?c}; }
+                @Override public boolean isHurtOverlay() { return ${entry.hurtOverlay?c}; }
+                @Override public float getAlpha() { return ${entry.alpha?c}f; }
+            }</#macro>
+<#macro fogClass entry>new GlobalFogExtension() {
+                @Override public boolean enabled() { return true; }
+                @Override public boolean globalMode() { return ${entry.globalMode?c}; }
+                @Override public float radius() { return ${entry.radius?c}f; }
+                @Override public int fogColor() { return 0x${entry.color}; }
+                @Override public float terrainFogStart(float rd) { return rd * ${entry.terrainStart?c}f; }
+                @Override public float terrainFogEnd(float rd) { return rd * ${entry.terrainEnd?c}f; }
+                @Override public float skyFogStart(float rd) { return rd * ${entry.skyStart?c}f; }
+                @Override public float skyFogEnd(float rd) { return rd * ${entry.skyEnd?c}f; }
+                @Override public FogShape fogShape() { return FogShape.${entry.shape}; }
+            }</#macro>
+<#macro skyboxClass entry>new GlobalSkyboxExtension() {
+                @Override public boolean enabled() { return true; }
+<#if entry.enableTexture && entry.texture?has_content>
+                @Override public boolean enableTexture() { return true; }
+                @Override public net.minecraft.resources.ResourceLocation texture() { return ${name}EntityExtension.this.texture("screens/${entry.texture}.png"); }
+</#if>
+<#if entry.enableShader && entry.shaderRenderType?has_content>
+                @Override public boolean enableShader() { return true; }
+                @Override public RenderType shaderRenderType() { return ${renderTypeClass(entry.shaderRenderType)}.SKYBOX; }
+</#if>
+                @Override public float alpha() { return ${entry.alpha?c}f; }
+                @Override public float size() { return ${entry.size?c}f; }
+            }</#macro>
 package ${package}.entityextension;
 
 import net.eca.api.RegisterEntityExtension;
@@ -22,13 +66,13 @@ import net.eca.util.entity_extension.GlobalSkyboxExtension;
 <#if data.combatMusicEnabled>
 import net.eca.util.entity_extension.CombatMusicExtension;
 </#if>
-<#if (data.bossBarFrameShaderEnabled && data.bossBarFrameRenderType?has_content || data.bossBarFillShaderEnabled && data.bossBarFillRenderType?has_content || data.entityLayerRenderType?has_content || data.globalSkyboxShaderRenderType?has_content)>
+<#if (data.bossBarFrameShaderEnabled && data.bossBarFrameRenderType?has_content || data.bossBarFillShaderEnabled && data.bossBarFillRenderType?has_content || (data.entityLayerEnabled && data.entityLayerEntries?has_content) || (data.globalSkyboxEnabled && data.skyboxEntries?has_content))>
 import net.minecraft.client.renderer.RenderType;
 </#if>
-<#if (data.bossBarFrameTexture?has_content || data.bossBarFillTexture?has_content || data.globalSkyboxTexture?has_content || (data.combatMusicEnabled && data.combatMusicSoundEventId?has_content))>
+<#if (data.bossBarFrameTexture?has_content || data.bossBarFillTexture?has_content)>
 import net.minecraft.resources.ResourceLocation;
 </#if>
-<#assign needsLivingEntity = data.customHealthEnabled || data.customMaxHealthEnabled || (data.bossBarEnabled && data.bossBarCondition?? && hasProc(data.bossBarCondition)) || (data.entityLayerEnabled && data.entityLayerCondition?? && hasProc(data.entityLayerCondition)) || (data.globalFogEnabled && data.fogCondition?? && hasProc(data.fogCondition)) || (data.globalSkyboxEnabled && data.skyboxCondition?? && hasProc(data.skyboxCondition)) || (data.combatMusicEnabled && data.musicCondition?? && hasProc(data.musicCondition))>
+<#assign needsLivingEntity = data.customHealthEnabled || data.customMaxHealthEnabled || (data.bossBarEnabled && data.bossBarCondition?? && hasProc(data.bossBarCondition)) || (data.entityLayerEnabled && data.entityLayerEntries?has_content) || (data.globalFogEnabled && data.fogEntries?has_content) || (data.globalSkyboxEnabled && data.skyboxEntries?has_content) || (data.combatMusicEnabled && data.musicRules?has_content)>
 <#if needsLivingEntity>
 import net.minecraft.world.entity.LivingEntity;
 </#if>
@@ -40,18 +84,6 @@ import ${package}.procedures.${data.customMaxHealthValue.getName()}Procedure;
 </#if>
 <#if data.bossBarCondition?? && hasProc(data.bossBarCondition)>
 import ${package}.procedures.${data.bossBarCondition.getName()}Procedure;
-</#if>
-<#if data.entityLayerCondition?? && hasProc(data.entityLayerCondition)>
-import ${package}.procedures.${data.entityLayerCondition.getName()}Procedure;
-</#if>
-<#if data.fogCondition?? && hasProc(data.fogCondition)>
-import ${package}.procedures.${data.fogCondition.getName()}Procedure;
-</#if>
-<#if data.skyboxCondition?? && hasProc(data.skyboxCondition)>
-import ${package}.procedures.${data.skyboxCondition.getName()}Procedure;
-</#if>
-<#if data.musicCondition?? && hasProc(data.musicCondition)>
-import ${package}.procedures.${data.musicCondition.getName()}Procedure;
 </#if>
 import net.minecraft.world.entity.EntityType;
 import net.minecraftforge.api.distmarker.Dist;
@@ -211,45 +243,34 @@ public class ${name}EntityExtension extends EntityExtension {
     }
 </#if>
 
-<#if data.entityLayerEnabled>
+<#if data.entityLayerEnabled && data.entityLayerEntries?has_content>
     @Override
     @OnlyIn(Dist.CLIENT)
     public EntityLayerExtension entityLayerExtension() {
-        return new EntityLayerExtension() {
-            @Override
-            public boolean enabled() {
-                return true;
-            }
+        return entityLayerExtension(null);
+    }
 
-    <#if data.entityLayerRenderType?has_content>
-            @Override
-            public RenderType getRenderType() {
-                return ${renderTypeClass(data.entityLayerRenderType)}.BOSS_LAYER;
-            }
-
-    </#if>
-            @Override
-            public boolean isGlow() {
-                return ${data.entityLayerGlow?c};
-            }
-
-            @Override
-            public boolean isHurtOverlay() {
-                return ${data.entityLayerHurtOverlay?c};
-            }
-
-            @Override
-            public float getAlpha() {
-                return ${data.entityLayerAlpha?c}f;
-            }
-    <#if data.entityLayerCondition?? && hasProc(data.entityLayerCondition)>
-
-            @Override
-            public boolean shouldRender(LivingEntity entity) {
-                return ${data.entityLayerCondition.getName()}Procedure.execute(<@entityDepsCall data.entityLayerCondition/>);
-            }
-    </#if>
-        };
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public EntityLayerExtension entityLayerExtension(LivingEntity entity) {
+<#list data.entityLayerEntries as entry>
+<#if entry.condition?? && hasProc(entry.condition)>
+        if (entity != null && ${package}.procedures.${entry.condition.getName()}Procedure.execute(<@entityDepsCall entry.condition/>)) {
+            return <@entityLayerClass entry/>;
+        }
+</#if>
+</#list>
+<#assign hasDefault = false>
+<#list data.entityLayerEntries as entry>
+<#if !(entry.condition?? && hasProc(entry.condition))>
+        return <@entityLayerClass entry/>;
+<#assign hasDefault = true>
+<#break>
+</#if>
+</#list>
+<#if !hasDefault>
+        return null;
+</#if>
     }
 <#else>
     @Override
@@ -259,59 +280,98 @@ public class ${name}EntityExtension extends EntityExtension {
     }
 </#if>
 
-<#if data.globalFogEnabled>
+<#if data.globalFogEnabled && data.fogEntries?has_content>
     @Override
     @OnlyIn(Dist.CLIENT)
     public GlobalFogExtension globalFogExtension() {
-        return new GlobalFogExtension() {
-            @Override public boolean enabled() { return true; }
-            @Override public boolean globalMode() { return ${data.globalFogGlobalMode?c}; }
-            @Override public float radius() { return ${data.globalFogRadius?c}f; }
-            @Override public int fogColor() { return 0x${data.globalFogColor}; }
-            @Override public float terrainFogStart(float rd) { return rd * ${data.globalFogTerrainStart?c}f; }
-            @Override public float terrainFogEnd(float rd) { return rd * ${data.globalFogTerrainEnd?c}f; }
-            @Override public float skyFogStart(float rd) { return rd * ${data.globalFogSkyStart?c}f; }
-            @Override public float skyFogEnd(float rd) { return rd * ${data.globalFogSkyEnd?c}f; }
-            @Override public FogShape fogShape() { return FogShape.${data.globalFogShape}; }
-        };
+        return globalFogExtension(null);
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public GlobalFogExtension globalFogExtension(LivingEntity entity) {
+<#list data.fogEntries as entry>
+<#if entry.condition?? && hasProc(entry.condition)>
+        if (entity != null && ${package}.procedures.${entry.condition.getName()}Procedure.execute(<@entityDepsCall entry.condition/>)) {
+            return <@fogClass entry/>;
+        }
+</#if>
+</#list>
+<#assign hasDefault = false>
+<#list data.fogEntries as entry>
+<#if !(entry.condition?? && hasProc(entry.condition))>
+        return <@fogClass entry/>;
+<#assign hasDefault = true>
+<#break>
+</#if>
+</#list>
+<#if !hasDefault>
+        return null;
+</#if>
     }
 </#if>
 
-<#if data.globalSkyboxEnabled>
+<#if data.globalSkyboxEnabled && data.skyboxEntries?has_content>
     @Override
     @OnlyIn(Dist.CLIENT)
     public GlobalSkyboxExtension globalSkyboxExtension() {
-        return new GlobalSkyboxExtension() {
-            @Override public boolean enabled() { return true; }
-    <#if data.globalSkyboxEnableTexture && data.globalSkyboxTexture?has_content>
-            @Override public boolean enableTexture() { return true; }
-            @Override public ResourceLocation texture() { return ${name}EntityExtension.this.texture("screens/${data.globalSkyboxTexture}.png"); }
-    </#if>
-    <#if data.globalSkyboxEnableShader && data.globalSkyboxShaderRenderType?has_content>
-            @Override public boolean enableShader() { return true; }
-            @Override public RenderType shaderRenderType() { return ${renderTypeClass(data.globalSkyboxShaderRenderType)}.SKYBOX; }
-    </#if>
-            @Override public float alpha() { return ${data.globalSkyboxAlpha?c}f; }
-            @Override public float size() { return ${data.globalSkyboxSize?c}f; }
-        };
+        return globalSkyboxExtension(null);
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public GlobalSkyboxExtension globalSkyboxExtension(LivingEntity entity) {
+<#list data.skyboxEntries as entry>
+<#if entry.condition?? && hasProc(entry.condition)>
+        if (entity != null && ${package}.procedures.${entry.condition.getName()}Procedure.execute(<@entityDepsCall entry.condition/>)) {
+            return <@skyboxClass entry/>;
+        }
+</#if>
+</#list>
+<#assign hasDefault = false>
+<#list data.skyboxEntries as entry>
+<#if !(entry.condition?? && hasProc(entry.condition))>
+        return <@skyboxClass entry/>;
+<#assign hasDefault = true>
+<#break>
+</#if>
+</#list>
+<#if !hasDefault>
+        return null;
+</#if>
     }
 </#if>
 
-<#if data.combatMusicEnabled>
+<#if data.combatMusicEnabled && data.musicRules?has_content>
     @Override
     @OnlyIn(Dist.CLIENT)
     public CombatMusicExtension combatMusicExtension() {
-        return new CombatMusicExtension() {
-            @Override public boolean enabled() { return true; }
-    <#if data.combatMusicSoundEventId?has_content>
-            @Override public ResourceLocation soundEventId() { return new ResourceLocation("${data.combatMusicSoundEventId?replace('CUSTOM:', modid + ':')}"); }
-    </#if>
-            @Override public net.minecraft.sounds.SoundSource soundSource() { return net.minecraft.sounds.SoundSource.${data.combatMusicSoundSource}; }
-            @Override public float volume() { return ${data.combatMusicVolume?c}f; }
-            @Override public float pitch() { return ${data.combatMusicPitch?c}f; }
-            @Override public boolean loop() { return ${data.combatMusicLoop?c}; }
-            @Override public boolean strictMusicLock() { return ${data.combatMusicStrictLock?c}; }
-        };
+        return combatMusicExtension(null);
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public CombatMusicExtension combatMusicExtension(LivingEntity entity) {
+<#-- 先按列表顺序判定带条件的音乐 -->
+<#list data.musicRules as rule>
+<#if rule.condition?? && hasProc(rule.condition)>
+        if (entity != null && ${package}.procedures.${rule.condition.getName()}Procedure.execute(<@entityDepsCall rule.condition/>)) {
+            return <@musicExtClass rule/>;
+        }
+</#if>
+</#list>
+<#-- 无条件的那条作为默认兜底（取首个），没有则不播放 -->
+<#assign hasDefault = false>
+<#list data.musicRules as rule>
+<#if !(rule.condition?? && hasProc(rule.condition))>
+        return <@musicExtClass rule/>;
+<#assign hasDefault = true>
+<#break>
+</#if>
+</#list>
+<#if !hasDefault>
+        return null;
+</#if>
     }
 </#if>
 
@@ -322,24 +382,5 @@ public class ${name}EntityExtension extends EntityExtension {
     }
 </#if>
 
-<#if data.globalFogEnabled && data.fogCondition?? && hasProc(data.fogCondition)>
-    @Override
-    public boolean shouldEnableFog(LivingEntity entity) {
-        return ${data.fogCondition.getName()}Procedure.execute(<@entityDepsCall data.fogCondition/>);
-    }
-</#if>
 
-<#if data.globalSkyboxEnabled && data.skyboxCondition?? && hasProc(data.skyboxCondition)>
-    @Override
-    public boolean shouldEnableSkybox(LivingEntity entity) {
-        return ${data.skyboxCondition.getName()}Procedure.execute(<@entityDepsCall data.skyboxCondition/>);
-    }
-</#if>
-
-<#if data.combatMusicEnabled && data.musicCondition?? && hasProc(data.musicCondition)>
-    @Override
-    public boolean shouldEnableMusic(LivingEntity entity) {
-        return ${data.musicCondition.getName()}Procedure.execute(<@entityDepsCall data.musicCondition/>);
-    }
-</#if>
 }
