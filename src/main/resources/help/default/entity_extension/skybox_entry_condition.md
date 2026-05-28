@@ -1,0 +1,1 @@
+Optional logic procedure (with x/y/z/world/entity dependencies) that decides whether this skybox entry is used. Entries are checked top to bottom; the first one whose condition returns true is applied. Leave empty to make this entry the unconditional default (it applies when no conditional entry above it matches).
