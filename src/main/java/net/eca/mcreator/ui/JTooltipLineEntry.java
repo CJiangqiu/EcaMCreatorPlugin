@@ -5,8 +5,8 @@ import net.mcreator.blockly.data.Dependency;
 import net.mcreator.ui.MCreator;
 import net.mcreator.ui.component.JColor;
 import net.mcreator.ui.component.entries.JSimpleListEntry;
-import net.mcreator.ui.help.IHelpContext;
 import net.mcreator.ui.init.L10N;
+import net.mcreator.ui.modgui.ModElementGUI;
 import net.mcreator.ui.procedure.AbstractProcedureSelector;
 import net.mcreator.ui.procedure.ProcedureSelector;
 import net.mcreator.ui.procedure.StringProcedureSelector;
@@ -36,18 +36,19 @@ public class JTooltipLineEntry extends JSimpleListEntry<TooltipLine> {
     private final JCheckBox strikethrough = new JCheckBox(L10N.t("elementgui.ecaitemextension.strikethrough"));
     private final ProcedureSelector condition;
 
-    public JTooltipLineEntry(MCreator mcreator, IHelpContext gui, JPanel parent,
+    //2024.4 的 HelpUtils 只对 ModElementHelpContext 挂点击事件，链式 withEntry 会丢类型，故直接拿 ModElementGUI 调
+    public JTooltipLineEntry(MCreator mcreator, ModElementGUI<?> modElementGUI, JPanel parent,
                              List<JTooltipLineEntry> entryList, Dependency[] deps) {
         super(parent, entryList);
 
         color1 = new JColor(mcreator, false, false);
         color2 = new JColor(mcreator, false, false);
         text = new StringProcedureSelector(
-                gui.withEntry("ecaitemextension/tooltip_line_text"), mcreator,
+                modElementGUI.withEntry("ecaitemextension/tooltip_line_text"), mcreator,
                 L10N.t("elementgui.ecaitemextension.tooltip_line_text"),
                 AbstractProcedureSelector.Side.CLIENT, new VTextField(16), 140, deps);
         condition = new ProcedureSelector(
-                gui.withEntry("ecaitemextension/tooltip_line_condition"), mcreator,
+                modElementGUI.withEntry("ecaitemextension/tooltip_line_condition"), mcreator,
                 L10N.t("elementgui.ecaitemextension.tooltip_line_condition"),
                 AbstractProcedureSelector.Side.CLIENT, true,
                 VariableTypeLoader.BuiltInTypes.LOGIC, deps);

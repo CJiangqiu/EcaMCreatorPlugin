@@ -83,7 +83,7 @@ public class EcaItemExtensionGUI extends ModElementGUI<EcaItemExtensionElement> 
                 L10N.t("elementgui.ecaitemextension.name_condition"),
                 AbstractProcedureSelector.Side.CLIENT, true,
                 VariableTypeLoader.BuiltInTypes.LOGIC, itemDeps);
-        tooltipLines = new JTooltipLinesList(mcreator, this.withEntry("ecaitemextension/tooltip"), itemDeps);
+        tooltipLines = new JTooltipLinesList(mcreator, this, "ecaitemextension/tooltip", itemDeps);
         shouldRenderCondition = new ProcedureSelector(
                 this.withEntry("ecaitemextension/should_render_condition"), mcreator,
                 L10N.t("elementgui.ecaitemextension.should_render_condition"),

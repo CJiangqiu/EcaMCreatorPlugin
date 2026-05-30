@@ -44,7 +44,7 @@ public class BossShowGUI extends ModElementGUI<BossShowElement> {
 
         reloadBossShowList();
 
-        keyframeMappings = new JKeyframeMappingsList(mcreator, this.withEntry("bossshow/keyframe_mappings"), keyframeDeps);
+        keyframeMappings = new JKeyframeMappingsList(mcreator, this, "bossshow/keyframe_mappings", keyframeDeps);
 
         JPanel topPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = defaultConstraints();

@@ -69,14 +69,18 @@ public class ${name}ItemExtension extends ItemExtension {
         return ${data.colorKeyTolerance?c}f;
     }
 </#if>
-<#if data.nameEffectEnabled && hasValue(data.name)>
+<#if data.nameEffectEnabled>
 
     @Override
     public net.minecraft.network.chat.MutableComponent getItemName(net.minecraft.world.item.ItemStack stack) {
-<#if hasProc(data.nameCondition)>
+<#if (data.nameCondition)?? && hasProc(data.nameCondition)>
         if (!${package}.procedures.${data.nameCondition.getName()}Procedure.execute(<@itemDepsCall data.nameCondition/>)) return null;
 </#if>
+<#if hasValue(data.name)>
 <#assign _nameTxt><@strSource data.name/></#assign>
+<#else>
+<#assign _nameTxt>stack.getItem().getDescription().getString()</#assign>
+</#if>
         return <@buildEcaText textExpr=_nameTxt?trim colorEffect=data.nameColorEffect period=data.namePeriod color1=data.nameColor1 color2=data.nameColor2 shimmer=data.nameShimmer shimmerIntensity=data.nameShimmerIntensity glitch=data.nameGlitch glitchIntensity=data.nameGlitchIntensity bold=data.nameBold italic=data.nameItalic underline=data.nameUnderline strikethrough=data.nameStrikethrough/>;
     }
 </#if>
@@ -86,7 +90,7 @@ public class ${name}ItemExtension extends ItemExtension {
     public void appendTooltip(net.minecraft.world.item.ItemStack stack, net.minecraft.world.item.TooltipFlag flag, java.util.List<net.minecraft.network.chat.Component> lines) {
 <#list data.tooltipLines as tline>
 <#assign _lineTxt><@strSource tline.text/></#assign>
-<#if hasProc(tline.condition)>
+<#if (tline.condition)?? && hasProc(tline.condition)>
         if (${package}.procedures.${tline.condition.getName()}Procedure.execute(<@itemDepsCall tline.condition/>)) {
             lines.add(<@buildEcaText textExpr=_lineTxt?trim colorEffect=tline.colorEffect period=tline.period color1=tline.color1 color2=tline.color2 shimmer=tline.shimmer shimmerIntensity=tline.shimmerIntensity glitch=tline.glitch glitchIntensity=tline.glitchIntensity bold=tline.bold italic=tline.italic underline=tline.underline strikethrough=tline.strikethrough/>);
         }

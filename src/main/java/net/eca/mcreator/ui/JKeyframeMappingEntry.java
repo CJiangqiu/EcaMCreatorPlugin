@@ -4,8 +4,8 @@ import net.eca.mcreator.element.BossShowElement.KeyframeMapping;
 import net.mcreator.blockly.data.Dependency;
 import net.mcreator.ui.MCreator;
 import net.mcreator.ui.component.entries.JSimpleListEntry;
-import net.mcreator.ui.help.IHelpContext;
 import net.mcreator.ui.init.L10N;
+import net.mcreator.ui.modgui.ModElementGUI;
 import net.mcreator.ui.procedure.AbstractProcedureSelector;
 import net.mcreator.ui.procedure.ProcedureSelector;
 
@@ -18,12 +18,13 @@ public class JKeyframeMappingEntry extends JSimpleListEntry<KeyframeMapping> {
     private final JTextField eventId = new JTextField(16);
     private final ProcedureSelector procedure;
 
-    public JKeyframeMappingEntry(MCreator mcreator, IHelpContext gui, JPanel parent,
+    //2024.4 的 HelpUtils 只对 ModElementHelpContext 挂点击事件，链式 withEntry 会丢类型，故直接拿 ModElementGUI 调
+    public JKeyframeMappingEntry(MCreator mcreator, ModElementGUI<?> modElementGUI, JPanel parent,
                                List<JKeyframeMappingEntry> entryList, Dependency[] deps) {
         super(parent, entryList);
 
         procedure = new ProcedureSelector(
-                gui.withEntry("bossshow/keyframe_procedure"),
+                modElementGUI.withEntry("bossshow/keyframe_procedure"),
                 mcreator,
                 L10N.t("elementgui.bossshow.keyframe_procedure"),
                 AbstractProcedureSelector.Side.SERVER,
