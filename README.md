@@ -121,6 +121,8 @@ This mod element is the MCreator-side handler: it binds procedures to an existin
 
 Use the BossShow procedure blocks (Play / Stop / Is Playing / Trigger Custom-type) to control cutscenes from within other procedures.
 
+**Note!** The files you record and save in-game are located at `<game run directory>/config/eca/bossshow/<modid>/<id>.json`. You need to manually copy the BossShow file for the corresponding entity into the matching location in your own mod project: `<mod project>/src/main/resources/data/<modid>/bossshow/<id>.json`.
+
 ### ECA Item Extension (Mod Element)
 
 A mod element for enhancing an existing item with animated/styled text and an ECA shader preset render layer. The editor is split into three pages:
@@ -332,6 +334,8 @@ MIT License - See [LICENSE](LICENSE) file for details.
 - **关键帧事件映射** — 事件 ID → 流程的映射列表，当播放到带有该 `event_id` 的关键帧时触发对应流程
 
 可在其他流程中使用 BossShow 相关流程块（播放 / 停止 / 是否播放中 / 触发自定义类型）来控制演出。
+
+**注意！** 您在游戏中录制和保存的文件位于 `<游戏运行目录>/config/eca/bossshow/<modid>/<id>.json`，您需要手动复制对应实体的 BossShow 文件到自己的 mod 项目文件的对应位置 `<mod 项目>/src/main/resources/data/<modid>/bossshow/<id>.json` 中。
 
 ### ECA物品扩展（模组元素）
 
