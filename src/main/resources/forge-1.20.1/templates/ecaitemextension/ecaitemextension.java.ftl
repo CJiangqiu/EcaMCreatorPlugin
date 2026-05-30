@@ -69,14 +69,18 @@ public class ${name}ItemExtension extends ItemExtension {
         return ${data.colorKeyTolerance?c}f;
     }
 </#if>
-<#if data.nameEffectEnabled && hasValue(data.name)>
+<#if data.nameEffectEnabled>
 
     @Override
     public net.minecraft.network.chat.MutableComponent getItemName(net.minecraft.world.item.ItemStack stack) {
 <#if hasProc(data.nameCondition)>
         if (!${package}.procedures.${data.nameCondition.getName()}Procedure.execute(<@itemDepsCall data.nameCondition/>)) return null;
 </#if>
+<#if hasValue(data.name)>
 <#assign _nameTxt><@strSource data.name/></#assign>
+<#else>
+<#assign _nameTxt>stack.getItem().getDescription().getString()</#assign>
+</#if>
         return <@buildEcaText textExpr=_nameTxt?trim colorEffect=data.nameColorEffect period=data.namePeriod color1=data.nameColor1 color2=data.nameColor2 shimmer=data.nameShimmer shimmerIntensity=data.nameShimmerIntensity glitch=data.nameGlitch glitchIntensity=data.nameGlitchIntensity bold=data.nameBold italic=data.nameItalic underline=data.nameUnderline strikethrough=data.nameStrikethrough/>;
     }
 </#if>
