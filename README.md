@@ -111,17 +111,27 @@ When multiple extension entities exist in the same dimension, the one with highe
 
 ### BossShow (Mod Element)
 
-**BossShow** is ECA's cinematic system: it plays a cutscene that locks the player's camera onto a pre-recorded path around a target entity, with subtitles and server-side event callbacks. Camera paths are recorded in-game with ECA's built-in editor (`/eca bossShow edit`) and saved as JSON — you don't write keyframes by hand. Each keyframe can carry an `event_id` that fires a server-side callback when playback reaches it. For the full system (in-game editor, recording workflow, JSON format, triggers, subtitle translation), see the [Epic Core API documentation](https://github.com/CJiangqiu/EpicCoreAPI).
+**BossShow** is ECA's cinematic system: it plays a cutscene that locks the player's camera onto a pre-recorded path around a target entity, with subtitles and server-side event callbacks. Camera paths are recorded in-game with ECA's built-in editor (command: */eca bossShow edit*) and saved as JSON — you don't write keyframes by hand. Each keyframe can carry an *event_id* that fires a server-side callback when playback reaches it. For the full system (in-game editor, recording workflow, JSON format, triggers, subtitle translation), see the [Epic Core API documentation](https://github.com/CJiangqiu/EpicCoreAPI).
 
 This mod element is the MCreator-side handler: it binds procedures to an existing cutscene's keyframe events, so you can react to a cutscene from your own logic without writing Java. Configure:
 
 - **Target Entity Type** — The entity type this BossShow handler is associated with
 - **BossShow ID** — The BossShow cutscene identifier to bind to
-- **Keyframe Event Mappings** — A list of event ID → procedure pairs; each procedure fires when the matching keyframe (with that `event_id`) is reached during playback
+- **Keyframe Event Mappings** — A list of event ID → procedure pairs; each procedure fires when the matching keyframe (with that *event_id*) is reached during playback
 
 Use the BossShow procedure blocks (Play / Stop / Is Playing / Trigger Custom-type) to control cutscenes from within other procedures.
 
-**Note!** The files you record and save in-game are located at `<game run directory>/config/eca/bossshow/<modid>/<id>.json`. You need to manually copy the BossShow file for the corresponding entity into the matching location in your own mod project: `<mod project>/src/main/resources/data/<modid>/bossshow/<id>.json`.
+**Note!** The files you record and save in-game are located at:
+
+```
+<game run directory>/config/eca/bossshow/<modid>/<id>.json
+```
+
+You need to manually copy the BossShow file for the corresponding entity into the matching location in your own mod project:
+
+```
+<mod project>/src/main/resources/data/<modid>/bossshow/<id>.json
+```
 
 ### ECA Item Extension (Mod Element)
 
@@ -191,11 +201,19 @@ Visit the [MCreator Plugins page](https://mcreator.net/plugins) to find the **1.
 
 By default the build automatically pulls the ECA dev artifact from the Modrinth Maven repository, so no manual download is needed.
 
-**(Optional) Use a local dev jar:** If you prefer not to rely on the Maven repository (e.g. offline, or to pin a specific version), download the `epic-core-api-<version>-dev.jar` from the **CurseForge** files page and place it in:
+**(Optional) Use a local dev jar:** If you prefer not to rely on the Maven repository (e.g. offline, or to pin a specific version), download the dev jar from the **CurseForge** files page. The file name looks like this:
+
+```
+epic-core-api-<version>-dev.jar
+```
+
+Place it in:
+
 ```
 <user home>/.mcreator/lib/
 ```
-The build automatically detects a local `epic-core-api-*-dev.jar` there and uses the newest one, falling back to the Modrinth Maven repository only when none is present.
+
+The build automatically detects any matching ECA dev jar in that folder and uses the newest one, falling back to the Modrinth Maven repository only when none is present.
 
 #### Step 5: Use the Procedure Blocks
 
@@ -325,17 +343,27 @@ MIT License - See [LICENSE](LICENSE) file for details.
 
 ### BossShow 演出（模组元素）
 
-**BossShow** 是 ECA 的演出（过场动画）系统：播放时将玩家镜头锁定到围绕目标实体预先录制的运镜路径上，配有字幕和服务端事件回调。运镜路径通过 ECA 内置的游戏内编辑器（`/eca bossShow edit`）录制并保存为 JSON——无需手写关键帧。每个关键帧可携带一个 `event_id`，播放到该帧时触发服务端回调。完整系统（游戏内编辑器、录制流程、JSON 格式、触发器、字幕翻译）请见 [Epic Core API 文档](https://github.com/CJiangqiu/EpicCoreAPI)。
+**BossShow** 是 ECA 的演出（过场动画）系统：播放时将玩家镜头锁定到围绕目标实体预先录制的运镜路径上，配有字幕和服务端事件回调。运镜路径通过 ECA 内置的游戏内编辑器（指令：*/eca bossShow edit*）录制并保存为 JSON——无需手写关键帧。每个关键帧可携带一个 *event_id*，播放到该帧时触发服务端回调。完整系统（游戏内编辑器、录制流程、JSON 格式、触发器、字幕翻译）请见 [Epic Core API 文档](https://github.com/CJiangqiu/EpicCoreAPI)。
 
 本模组元素是 MCreator 侧的处理器：把流程绑定到已有演出的关键帧事件上，让你无需写 Java 就能在演出播放时响应。可配置：
 
 - **目标实体类型** — 该 BossShow 处理器关联的实体类型
 - **BossShow ID** — 要绑定的演出标识符
-- **关键帧事件映射** — 事件 ID → 流程的映射列表，当播放到带有该 `event_id` 的关键帧时触发对应流程
+- **关键帧事件映射** — 事件 ID → 流程的映射列表，当播放到带有该 *event_id* 的关键帧时触发对应流程
 
 可在其他流程中使用 BossShow 相关流程块（播放 / 停止 / 是否播放中 / 触发自定义类型）来控制演出。
 
-**注意！** 您在游戏中录制和保存的文件位于 `<游戏运行目录>/config/eca/bossshow/<modid>/<id>.json`，您需要手动复制对应实体的 BossShow 文件到自己的 mod 项目文件的对应位置 `<mod 项目>/src/main/resources/data/<modid>/bossshow/<id>.json` 中。
+**注意！** 您在游戏中录制和保存的文件位于：
+
+```
+<游戏运行目录>/config/eca/bossshow/<modid>/<id>.json
+```
+
+您需要手动复制对应实体的 BossShow 文件到自己的 mod 项目文件的对应位置：
+
+```
+<mod 项目>/src/main/resources/data/<modid>/bossshow/<id>.json
+```
 
 ### ECA物品扩展（模组元素）
 
@@ -405,11 +433,19 @@ MIT License - See [LICENSE](LICENSE) file for details.
 
 默认情况下，构建会自动从 Modrinth Maven 仓库拉取 ECA dev 构件，无需手动下载。
 
-**（可选）使用本地 dev jar：** 如果你不想依赖 Maven 仓库（例如离线，或想锁定特定版本），可从 **CurseForge** 的文件页面下载 `epic-core-api-<版本>-dev.jar`，放入：
+**（可选）使用本地 dev jar：** 如果你不想依赖 Maven 仓库（例如离线，或想锁定特定版本），可从 **CurseForge** 的文件页面下载 dev jar。文件名形如：
+
+```
+epic-core-api-<版本>-dev.jar
+```
+
+放入：
+
 ```
 <用户目录>/.mcreator/lib/
 ```
-构建会自动检测该目录下的 `epic-core-api-*-dev.jar` 并使用版本最新的那个；仅当不存在时才回退到 Modrinth Maven 仓库。
+
+构建会自动检测该目录下匹配的 ECA dev jar 并使用版本最新的那个；仅当不存在时才回退到 Modrinth Maven 仓库。
 
 #### 第 5 步：使用流程块
 
