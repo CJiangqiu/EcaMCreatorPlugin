@@ -1,0 +1,1 @@
+Red channel multiplier for the skybox texture color (0.0 ~ 1.0). Use with G and B to tint the skybox texture. Default 1.0 (no change). Only effective when texture is enabled.

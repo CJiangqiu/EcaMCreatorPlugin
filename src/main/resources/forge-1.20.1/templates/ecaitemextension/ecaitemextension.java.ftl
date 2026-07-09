@@ -1,10 +1,13 @@
 <#-- @formatter:off -->
+<#function isBuiltin name>
+    <#return name == "TheLastEnd" || name == "DreamSakura" || name == "Forest" || name == "Ocean" || name == "Storm" || name == "Volcano" || name == "Arcane" || name == "Aurora" || name == "Hacker" || name == "Starlight" || name == "Cosmos" || name == "BlackHole">
+</#function>
 <#include "../mcitems.ftl">
 <#function hasProc obj>
     <#return obj?? && obj.getName()?? && obj.getName()?has_content && obj.getName() != "null">
 </#function>
 <#function hasValue obj>
-    <#return obj?? && (hasProc(obj) || obj.getFixedValue()?has_content)>
+    <#return obj?? && ((obj.getName())?? && obj.getName()?has_content && obj.getName() != "null" || obj.getFixedValue()?has_content)>
 </#function>
 <#macro itemDepsCall obj>
 <#list obj.getDependencies(generator.getWorkspace()) as dep><#switch dep.getName()><#case "itemstack">stack<#break><#default>${dep.getName()}<#break></#switch><#if dep?has_next>, </#if></#list>
@@ -44,10 +47,15 @@ public class ${name}ItemExtension extends ItemExtension {
     @Override
     public RenderType getRenderType() {
 <#if data.renderLayerEnabled>
-        return net.eca.client.render.${data.preset}RenderTypes.ITEM;
+        <#if isBuiltin(data.preset)>return net.eca.client.render.${data.preset}RenderTypes.ITEM;<#else>return net.eca.client.render.preset.EcaPresets.item("${modid}:${data.preset}");</#if>
 <#else>
         return null;
 </#if>
+    }
+
+    @Override
+    public float getAlpha() {
+        return ${data.alpha?c}f;
     }
 <#if data.shouldRenderCondition?? && hasProc(data.shouldRenderCondition)>
 
@@ -73,7 +81,7 @@ public class ${name}ItemExtension extends ItemExtension {
 
     @Override
     public net.minecraft.network.chat.MutableComponent getItemName(net.minecraft.world.item.ItemStack stack) {
-<#if hasProc(data.nameCondition)>
+<#if (data.nameCondition)?? && hasProc(data.nameCondition)>
         if (!${package}.procedures.${data.nameCondition.getName()}Procedure.execute(<@itemDepsCall data.nameCondition/>)) return null;
 </#if>
 <#if hasValue(data.name)>
@@ -87,17 +95,19 @@ public class ${name}ItemExtension extends ItemExtension {
 <#if data.tooltipLines?has_content>
 
     @Override
-    public void appendTooltip(net.minecraft.world.item.ItemStack stack, net.minecraft.world.item.TooltipFlag flag, java.util.List<net.minecraft.network.chat.Component> lines) {
+    public java.util.List<net.eca.util.item_extension.EcaTooltipLine> getTooltipLines(net.minecraft.world.item.ItemStack stack, net.minecraft.world.item.TooltipFlag flag) {
+        java.util.List<net.eca.util.item_extension.EcaTooltipLine> lines = new java.util.ArrayList<>();
 <#list data.tooltipLines as tline>
 <#assign _lineTxt><@strSource tline.text/></#assign>
-<#if hasProc(tline.condition)>
+<#if (tline.condition)?? && hasProc(tline.condition)>
         if (${package}.procedures.${tline.condition.getName()}Procedure.execute(<@itemDepsCall tline.condition/>)) {
-            lines.add(<@buildEcaText textExpr=_lineTxt?trim colorEffect=tline.colorEffect period=tline.period color1=tline.color1 color2=tline.color2 shimmer=tline.shimmer shimmerIntensity=tline.shimmerIntensity glitch=tline.glitch glitchIntensity=tline.glitchIntensity bold=tline.bold italic=tline.italic underline=tline.underline strikethrough=tline.strikethrough/>);
+            lines.add(net.eca.util.item_extension.EcaTooltipLine.${tline.position?lower_case}(<@buildEcaText textExpr=_lineTxt?trim colorEffect=tline.colorEffect period=tline.period color1=tline.color1 color2=tline.color2 shimmer=tline.shimmer shimmerIntensity=tline.shimmerIntensity glitch=tline.glitch glitchIntensity=tline.glitchIntensity bold=tline.bold italic=tline.italic underline=tline.underline strikethrough=tline.strikethrough/>, ${tline.order}));
         }
 <#else>
-        lines.add(<@buildEcaText textExpr=_lineTxt?trim colorEffect=tline.colorEffect period=tline.period color1=tline.color1 color2=tline.color2 shimmer=tline.shimmer shimmerIntensity=tline.shimmerIntensity glitch=tline.glitch glitchIntensity=tline.glitchIntensity bold=tline.bold italic=tline.italic underline=tline.underline strikethrough=tline.strikethrough/>);
+        lines.add(net.eca.util.item_extension.EcaTooltipLine.${tline.position?lower_case}(<@buildEcaText textExpr=_lineTxt?trim colorEffect=tline.colorEffect period=tline.period color1=tline.color1 color2=tline.color2 shimmer=tline.shimmer shimmerIntensity=tline.shimmerIntensity glitch=tline.glitch glitchIntensity=tline.glitchIntensity bold=tline.bold italic=tline.italic underline=tline.underline strikethrough=tline.strikethrough/>, ${tline.order}));
 </#if>
 </#list>
+        return lines;
     }
 </#if>
 }

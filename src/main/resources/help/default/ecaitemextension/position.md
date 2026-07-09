@@ -1,0 +1,1 @@
+Where this tooltip line appears relative to the item's standard tooltip. HEAD = above the item name, BODY = mixed in with vanilla tooltip lines, TAIL = after all other lines. Default: BODY.

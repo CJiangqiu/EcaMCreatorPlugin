@@ -1,0 +1,1 @@
+The opacity of the boss bar fill (health bar). 0 = fully transparent (invisible), 100 = fully opaque. Default: 100.

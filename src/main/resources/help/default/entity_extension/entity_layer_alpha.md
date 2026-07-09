@@ -1,1 +1,1 @@
-The opacity of the extra layer. 0.0 = fully transparent, 1.0 = fully opaque.
+The opacity of the extra layer. 0 = fully transparent (invisible), 100 = fully opaque. Default: 80.

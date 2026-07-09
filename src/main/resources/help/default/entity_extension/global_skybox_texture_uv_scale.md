@@ -1,0 +1,1 @@
+Scales the UV coordinates of the skybox texture. Higher values make the texture repeat more (tighter tiles), lower values stretch the texture. Default is 16.0. Only effective when texture is enabled.

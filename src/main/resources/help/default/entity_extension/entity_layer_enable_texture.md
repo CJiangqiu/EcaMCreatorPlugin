@@ -1,0 +1,1 @@
+When enabled, a texture overlay is applied to the entity model. Combine with a shader preset for a two-pass mixed mode (texture base + shader on top).

@@ -34,6 +34,7 @@ public class EcaItemExtensionElement extends GeneratableElement {
     //渲染层（第二页）
     public String preset;
     public boolean renderLayerEnabled;
+    public double alpha;
     public Procedure shouldRenderCondition;
     public boolean colorKeyEnabled;
     public String colorKeyColor;
@@ -50,11 +51,12 @@ public class EcaItemExtensionElement extends GeneratableElement {
         this.tooltipLines = new ArrayList<>();
         this.preset = "Starlight";
         this.renderLayerEnabled = true;
+        this.alpha = 1.0;
         this.colorKeyColor = "FFFFFF";
         this.colorKeyTolerance = 0.3;
     }
 
-    //单条 tooltip 行：文本（固定或流程）+ 独立效果 + 独立条件
+    //单条 tooltip 行：文本 + 效果 + 位置 + 排序 + 条件
     public static class TooltipLine {
         public StringProcedure text;
         public String colorEffect;
@@ -70,6 +72,8 @@ public class EcaItemExtensionElement extends GeneratableElement {
         public boolean underline;
         public boolean strikethrough;
         public Procedure condition;
+        public String position;
+        public int order;
 
         public TooltipLine() {
             this.colorEffect = "NONE";
@@ -78,6 +82,8 @@ public class EcaItemExtensionElement extends GeneratableElement {
             this.color2 = "AAAAAA";
             this.shimmerIntensity = 0.15;
             this.glitchIntensity = 0.05;
+            this.position = "BODY";
+            this.order = 0;
         }
     }
 }

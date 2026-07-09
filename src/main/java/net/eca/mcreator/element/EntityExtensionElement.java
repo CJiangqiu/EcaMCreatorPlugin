@@ -36,6 +36,8 @@ public class EntityExtensionElement extends GeneratableElement {
     public int bossBarFrameOffsetY;
     public int bossBarFillOffsetX;
     public int bossBarFillOffsetY;
+    public int bossBarFrameAlpha;
+    public int bossBarFillAlpha;
 
     // Custom Health Display
     public boolean customHealthEnabled;
@@ -67,6 +69,8 @@ public class EntityExtensionElement extends GeneratableElement {
         this.bossBarFrameHeight = 5;
         this.bossBarFillWidth = 182;
         this.bossBarFillHeight = 5;
+        this.bossBarFrameAlpha = 100;
+        this.bossBarFillAlpha = 100;
         this.customHealthValue = new NumberProcedure(null, 20);
         this.customMaxHealthValue = new NumberProcedure(null, 20);
         this.entityLayerEntries = new ArrayList<>();
@@ -76,14 +80,18 @@ public class EntityExtensionElement extends GeneratableElement {
     }
 
     // 条件实体图层：条件为真时使用本条图层，按列表顺序首个匹配生效；无条件作默认兜底
+    // 支持3种渲染模式：仅贴图(texture非空+renderType空)、仅着色器(renderType非空+texture空)、混合(两者都非空)
     public static class EntityLayerEntry {
         public Procedure condition;
+        public boolean enableTexture;
+        public String texture;
         public String renderType;
         public boolean glow;
         public boolean hurtOverlay;
         public double alpha;
 
         public EntityLayerEntry() {
+            this.texture = "";
             this.renderType = "";
             this.alpha = 0.8;
         }
@@ -98,12 +106,21 @@ public class EntityExtensionElement extends GeneratableElement {
         public String shaderRenderType;
         public double alpha;
         public double size;
+        // 贴图色彩调制（仅 enableTexture 时生效）
+        public double textureUvScale;
+        public double textureRed;
+        public double textureGreen;
+        public double textureBlue;
 
         public SkyboxEntry() {
             this.texture = "";
             this.shaderRenderType = "";
             this.alpha = 0.9;
             this.size = 100.0;
+            this.textureUvScale = 16.0;
+            this.textureRed = 1.0;
+            this.textureGreen = 1.0;
+            this.textureBlue = 1.0;
         }
     }
 
