@@ -10,7 +10,8 @@ import net.mcreator.ui.component.util.PanelUtils;
 import net.mcreator.ui.help.HelpUtils;
 import net.mcreator.ui.init.L10N;
 import net.mcreator.ui.minecraft.DataListComboBox;
-import net.mcreator.ui.minecraft.TextureComboBox;
+import net.mcreator.ui.dialogs.TypedTextureSelectorDialog;
+import net.mcreator.ui.minecraft.TextureHolder;
 import net.mcreator.ui.modgui.ModElementGUI;
 import net.mcreator.ui.procedure.AbstractProcedureSelector;
 import net.mcreator.ui.procedure.NumberProcedureSelector;
@@ -36,21 +37,23 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
     // Boss Bar
     private final JCheckBox bossBarEnabled = new JCheckBox();
     private final JCheckBox bossBarFrameEnableTexture = new JCheckBox();
-    private TextureComboBox bossBarFrameTexture;
+    private TextureHolder bossBarFrameTexture;
     private final JCheckBox bossBarFillEnableTexture = new JCheckBox();
-    private TextureComboBox bossBarFillTexture;
+    private TextureHolder bossBarFillTexture;
     private final JCheckBox bossBarFrameShaderEnabled = new JCheckBox();
-    private final JComboBox<String> bossBarFrameRenderType = new JComboBox<>(getRenderTypeOptions());
+    private final JComboBox<String> bossBarFrameRenderType = new JComboBox<>();
     private final JSpinner bossBarFrameWidth = new JSpinner(new SpinnerNumberModel(182, 1, 2048, 1));
     private final JSpinner bossBarFrameHeight = new JSpinner(new SpinnerNumberModel(5, 1, 2048, 1));
     private final JCheckBox bossBarFillShaderEnabled = new JCheckBox();
-    private final JComboBox<String> bossBarFillRenderType = new JComboBox<>(getRenderTypeOptions());
+    private final JComboBox<String> bossBarFillRenderType = new JComboBox<>();
     private final JSpinner bossBarFillWidth = new JSpinner(new SpinnerNumberModel(182, 1, 2048, 1));
     private final JSpinner bossBarFillHeight = new JSpinner(new SpinnerNumberModel(5, 1, 2048, 1));
     private final JSpinner bossBarFrameOffsetX = new JSpinner(new SpinnerNumberModel(0, -1024, 1024, 1));
     private final JSpinner bossBarFrameOffsetY = new JSpinner(new SpinnerNumberModel(0, -1024, 1024, 1));
     private final JSpinner bossBarFillOffsetX = new JSpinner(new SpinnerNumberModel(0, -1024, 1024, 1));
     private final JSpinner bossBarFillOffsetY = new JSpinner(new SpinnerNumberModel(0, -1024, 1024, 1));
+    private final JSpinner bossBarFrameAlpha = new JSpinner(new SpinnerNumberModel(100, 0, 100, 1));
+    private final JSpinner bossBarFillAlpha = new JSpinner(new SpinnerNumberModel(100, 0, 100, 1));
 
     // Custom Health Display
     private final JCheckBox customHealthEnabled = new JCheckBox();
@@ -86,12 +89,9 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
 
         entityType = new DataListComboBox(mcreator,
                 ElementUtil.loadAllSpawnableEntities(mcreator.getWorkspace()));
-        // setAddPNGExtension(false)：让 getTextureName() 返回不带 .png 的名字，与模板里 texture("screens/<名>.png") 的拼接保持一致，避免双扩展名
-        bossBarFrameTexture = new TextureComboBox(mcreator, TextureType.SCREEN);
-        bossBarFrameTexture.setAddPNGExtension(false);
+        bossBarFrameTexture = new TextureHolder(new TypedTextureSelectorDialog(mcreator, TextureType.SCREEN), 28);
         bossBarFrameTexture.setPreferredSize(new Dimension(300, 28));
-        bossBarFillTexture = new TextureComboBox(mcreator, TextureType.SCREEN);
-        bossBarFillTexture.setAddPNGExtension(false);
+        bossBarFillTexture = new TextureHolder(new TypedTextureSelectorDialog(mcreator, TextureType.SCREEN), 28);
         bossBarFillTexture.setPreferredSize(new Dimension(300, 28));
         musicRules = new JMusicRulesList(mcreator, this.withEntry("entity_extension/music_rules"), entityDeps);
         fogEntries = new JFogEntriesList(mcreator, this.withEntry("entity_extension/fog_entries"), entityDeps);
@@ -165,6 +165,11 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
                 "elementgui.entity_extension.boss_bar_fill_offset", buildOffsetRow(
                         bossBarFillOffsetX, bossBarFillOffsetY), gbc);
 
+        addRowWithHelp(bossBarPanel, "entity_extension/boss_bar_frame_alpha",
+                "elementgui.entity_extension.boss_bar_frame_alpha", bossBarFrameAlpha, gbc);
+        addRowWithHelp(bossBarPanel, "entity_extension/boss_bar_fill_alpha",
+                "elementgui.entity_extension.boss_bar_fill_alpha", bossBarFillAlpha, gbc);
+
         // --- Custom Health Display section ---
         addSectionLabel(bossBarPanel, "elementgui.entity_extension.custom_health_section", gbc);
 
@@ -212,6 +217,7 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         addPage(L10N.t("elementgui.entityextension.music"), PanelUtils.totalCenterInPanel(musicPanel), false);
 
         // Setup all enable/disable toggles
+        refreshShaderCombos();
         setupBossBarToggle();
         setupEnableToggle(entityLayerEnabled, entityLayerEntries);
         setupEnableToggle(globalFogEnabled, fogEntries);
@@ -241,7 +247,7 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         return row;
     }
 
-    private static JPanel buildTextureRow(JCheckBox enable, TextureComboBox holder) {
+    private static JPanel buildTextureRow(JCheckBox enable, TextureHolder holder) {
         JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
         row.add(enable);
         holder.setPreferredSize(new Dimension(300, 28));
@@ -263,6 +269,8 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
             bossBarFrameOffsetY.setEnabled(bb);
             bossBarFillOffsetX.setEnabled(bb);
             bossBarFillOffsetY.setEnabled(bb);
+            bossBarFrameAlpha.setEnabled(bb);
+            bossBarFillAlpha.setEnabled(bb);
             bossBarFrameRenderType.setEnabled(bb && bossBarFrameShaderEnabled.isSelected());
             bossBarFrameWidth.setEnabled(bb && bossBarFrameShaderEnabled.isSelected());
             bossBarFrameHeight.setEnabled(bb && bossBarFrameShaderEnabled.isSelected());
@@ -334,6 +342,8 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         bossBarFrameOffsetY.setValue(element.bossBarFrameOffsetY);
         bossBarFillOffsetX.setValue(element.bossBarFillOffsetX);
         bossBarFillOffsetY.setValue(element.bossBarFillOffsetY);
+        bossBarFrameAlpha.setValue(element.bossBarFrameAlpha);
+        bossBarFillAlpha.setValue(element.bossBarFillAlpha);
 
         customHealthEnabled.setSelected(element.customHealthEnabled);
         if (element.customHealthValue != null)
@@ -372,9 +382,9 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
 
         element.bossBarEnabled = bossBarEnabled.isSelected();
         element.bossBarFrameEnableTexture = bossBarFrameEnableTexture.isSelected();
-        element.bossBarFrameTexture = bossBarFrameTexture.getTextureName();
+        element.bossBarFrameTexture = bossBarFrameTexture.getID();
         element.bossBarFillEnableTexture = bossBarFillEnableTexture.isSelected();
-        element.bossBarFillTexture = bossBarFillTexture.getTextureName();
+        element.bossBarFillTexture = bossBarFillTexture.getID();
         element.bossBarFrameShaderEnabled = bossBarFrameShaderEnabled.isSelected();
         element.bossBarFrameRenderType = getCombo(bossBarFrameRenderType);
         element.bossBarFrameWidth = (int) bossBarFrameWidth.getValue();
@@ -387,6 +397,8 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         element.bossBarFrameOffsetY = (int) bossBarFrameOffsetY.getValue();
         element.bossBarFillOffsetX = (int) bossBarFillOffsetX.getValue();
         element.bossBarFillOffsetY = (int) bossBarFillOffsetY.getValue();
+        element.bossBarFrameAlpha = (int) bossBarFrameAlpha.getValue();
+        element.bossBarFillAlpha = (int) bossBarFillAlpha.getValue();
 
         element.customHealthEnabled = customHealthEnabled.isSelected();
         element.customHealthValue = customHealthValue.getSelectedProcedure();
@@ -411,6 +423,7 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
     @Override
     public void reloadDataLists() {
         super.reloadDataLists();
+        refreshShaderCombos();
         bossBarCondition.refreshListKeepSelected();
         entityLayerEntries.reloadDataLists();
         fogEntries.reloadDataLists();
@@ -420,12 +433,12 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         customMaxHealthValue.refreshListKeepSelected();
     }
 
-    private static String[] getRenderTypeOptions() {
-        return new String[]{
-                "(None)",
-                "TheLastEnd", "DreamSakura", "Forest", "Ocean", "Storm",
-                "Volcano", "Arcane", "Aurora", "Hacker", "Starlight", "Cosmos", "BlackHole"
-        };
+    private void refreshShaderCombos() {
+        String[] presets = ShaderPresetUtil.getAvailableShaderPresets(mcreator);
+        ShaderPresetUtil.populateCombo(bossBarFrameRenderType, presets,
+                (String) bossBarFrameRenderType.getSelectedItem());
+        ShaderPresetUtil.populateCombo(bossBarFillRenderType, presets,
+                (String) bossBarFillRenderType.getSelectedItem());
     }
 
     private static void setCombo(JComboBox<String> combo, String value) {

@@ -37,8 +37,6 @@ This plugin integrates [Epic Core API](https://github.com/CJiangqiu/EpicCoreAPI)
 - **Is AllReturn Enabled** - Check if AllReturn is active
 - **Set Global AllReturn** `<Boolean>` ⚠️ **[DANGER]** - Requires config enabled. Enable/disable global AllReturn mode affecting ALL mods' boolean/void methods
 - **Memory Remove Entity** `<Entity>` ⚠️ **[DANGER]** - Requires config enabled. Remove entity via LWJGL internal channel
-- **Restore Entity's Lifecycle Methods** `<Entity>` ⚠️ **[DANGER]** - Requires config enabled. Restore an entity's critical lifecycle methods (getHealth/setHealth/hurt/die/isAlive/etc.) to the vanilla implementation
-- **Unrestore Entity's Lifecycle Methods** `<Entity>` - Cancel the lifecycle method restore, returning the entity to its custom implementation
 - **Add Health Whitelist Keyword** `<Keyword>` - Add a keyword to health whitelist. Fields containing this keyword will be modified during health changes
 - **Remove Health Whitelist Keyword** `<Keyword>` - Remove a keyword from health whitelist
 - **Add Health Blacklist Keyword** `<Keyword>` - Add a keyword to health blacklist. Fields containing this keyword will be skipped during health changes
@@ -101,9 +99,9 @@ A new mod element type for visually enhancing specific entity types. Create an E
 - **Force Loading** — Force-load entities of this type; do not use for entities that spawn in large numbers
 - **Custom Boss Bar** — Custom frame/fill textures with optional shader effects, configurable size and offset
 - **Custom Fill Ratio** — Override the health/max health values used to calculate boss bar fill ratio (fill = current / max)
-- **Entity Layer** — Additional render layer with shader preset, glow, hurt overlay, and alpha settings
+- **Entity Layer** — Additional render layer with 3 modes: texture-only, shader-only, or mixed (texture + shader two-pass). Also supports glow, hurt overlay, and alpha settings
 - **Global Fog** — Custom fog color/distance, global or radius-based, with configurable shape
-- **Global Skybox** — Custom skybox with texture and/or shader (12 built-in presets: TheLastEnd, DreamSakura, Forest, Ocean, Storm, Volcano, Arcane, Aurora, Hacker, Starlight, Cosmos, BlackHole), alpha, and size
+- **Global Skybox** — Custom skybox with texture and/or shader (12 built-in presets + custom ShaderPreset elements), alpha, size, and texture color modulation (UV scale + RGB channels)
 - **Combat Music** — Custom combat music with source, volume, pitch, loop, and strict lock options
 - **Conditional Triggers** — Each sub-module (Boss Bar, Fog, Skybox, Music) supports an optional logic procedure to dynamically control whether the effect is active per entity per tick
 
@@ -152,10 +150,26 @@ A mod element for enhancing an existing item with animated/styled text and an EC
 - **Condition** — Optional per-line logic procedure; return true to show that line, leave empty to always show it
 
 **Render Layer** — an ECA shader preset drawn as an overlay pass on top of normal item rendering (GUI, first/third person, dropped item, item frames):
-- **Shader Preset** — One of the 12 built-in presets (TheLastEnd, DreamSakura, Forest, Ocean, Storm, Volcano, Arcane, Aurora, Hacker, Starlight, Cosmos, BlackHole); its `ITEM` render type is used for the overlay
+- **Shader Preset** — Select from the 12 built-in presets plus any custom ShaderPreset elements defined in the workspace. Its `ITEM` render type is used for the overlay
+- **Shader Alpha** — Control the opacity of the shader overlay (0.0 = fully transparent, 1.0 = fully opaque)
 - **Enable Render Layer** — Master switch; when off, no shader overlay is drawn (text effects still work)
 - **Render Condition** — Optional logic procedure evaluated per stack; return true to draw the overlay, leave empty to always render
 - **Color-Key Mask** — Optionally restrict the shader to pixels matching a target color within a tolerance; otherwise the shader covers the whole texture
+
+### ECA Shader Preset (Mod Element)
+
+A mod element for registering custom shader presets so they become selectable in all ECA shader dropdowns (Entity Extension layers, skyboxes, boss bars, item extension render layers, etc.).
+
+**Workflow:**
+1. **In-game**: Use `/eca shaderGenerator` to visually compose your shader, then click **Export**.
+2. The export creates 5 files under `config/eca/shadergenerator/<namespace>/<name>/`:
+   `<name>.fsh`, `<name>_block.vsh`, `<name>_block.json`, `<name>_entity.vsh`, `<name>_entity.json`
+3. **Copy** all 5 files into your workspace: `src/main/resources/assets/<modid>/shaders/core/`
+4. **In MCreator**: Create an ECA Shader Preset element — the dropdown auto-scans the folder above and lists any valid five-file sets.
+
+- **Preset Name** — The shader preset name (without file extension). The dropdown automatically scans your workspace's shader resources for custom presets; ECA's 12 built-in presets are not listed here (they are already registered by ECA and selectable in the consumer dropdowns of other elements). You can also type a custom name manually.
+
+When generated, this produces a lightweight `@RegisterShaderPreset` annotation class. ECA auto-discovers it at startup — no manual registration code needed.
 
 ### Requirements
 
@@ -269,8 +283,6 @@ MIT License - See [LICENSE](LICENSE) file for details.
 - **AllReturn是否已启用** - 检查AllReturn是否激活
 - **设置全局AllReturn** `<布尔值>` ⚠️ **【危险】** - 需配置文件启用。启用/禁用全局AllReturn模式，影响所有mod的boolean/void方法
 - **内存移除实体** `<实体>` ⚠️ **【危险】** - 需配置文件启用。通过LWJGL内部通道移除实体
-- **还原实体的生命周期方法** `<实体>` ⚠️ **【危险】** - 需配置文件启用。将实体的关键生命周期方法（getHealth/setHealth/hurt/die/isAlive/等）还原为原版实现
-- **取消实体的生命周期方法还原** `<实体>` - 取消生命周期方法还原，使实体恢复其自定义实现
 - **添加血量白名单关键字** `<关键字>` - 添加血量白名单关键字，包含此关键字的字段将在血量修改时被修改
 - **移除血量白名单关键字** `<关键字>` - 从血量白名单中移除关键字
 - **添加血量黑名单关键字** `<关键字>` - 添加血量黑名单关键字，包含此关键字的字段将在血量修改时被跳过
@@ -333,9 +345,9 @@ MIT License - See [LICENSE](LICENSE) file for details.
 - **强制加载** — 将该类型实体设为强加载实体，请勿用于会大量生成的实体
 - **自定义Boss血条** — 自定义框架/填充纹理，可选着色器效果，可配置大小和偏移
 - **自定义填充比例** — 覆盖用于计算Boss血条填充比例的血量/最大血量值（填充比例 = 当前血量 / 最大血量）
-- **实体图层** — 额外渲染图层，支持着色器预设、发光、受伤叠加和透明度设置
+- **实体图层** — 额外渲染图层，支持3种模式：纯贴图、纯着色器或混合（贴图+着色器双层叠加）。同时支持发光、受伤叠加和透明度设置
 - **全局迷雾** — 自定义迷雾颜色/距离，全局或半径模式，可配置形状
-- **全局天空盒** — 自定义天空盒纹理和/或着色器（12种内置预设：TheLastEnd、DreamSakura、Forest、Ocean、Storm、Volcano、Arcane、Aurora、Hacker、Starlight、Cosmos、BlackHole），透明度和大小
+- **全局天空盒** — 自定义天空盒纹理和/或着色器（12种内置预设 + 自定义着色器预设元素），支持透明度、大小和贴图色彩调制（UV缩放 + RGB通道）
 - **战斗音乐** — 自定义战斗音乐，支持音源、音量、音调、循环和严格锁定选项
 - **条件触发** — 每个子模块（Boss血条、迷雾、天空盒、战斗音乐）支持可选的逻辑过程块，可按实体每tick动态控制效果是否激活
 
@@ -384,10 +396,26 @@ MIT License - See [LICENSE](LICENSE) file for details.
 - **条件** — 可选的逐行逻辑流程，返回 true 时显示该行，留空则始终显示
 
 **渲染层** — ECA 着色器预设，作为额外的叠加渲染层绘制在物品正常渲染之上（GUI、第一/第三人称、掉落物、物品展示框）：
-- **着色器预设** — 12 种内置预设之一（TheLastEnd、DreamSakura、Forest、Ocean、Storm、Volcano、Arcane、Aurora、Hacker、Starlight、Cosmos、BlackHole），使用其 `ITEM` 渲染类型进行叠加
+- **着色器预设** — 可从 12 种内置预设以及工作区中自定义的着色器预设元素中选择，使用其 `ITEM` 渲染类型进行叠加
+- **着色器透明度** — 控制着色器叠加层的不透明度（0.0 = 完全透明，1.0 = 完全不透明）
 - **启用渲染层** — 总开关；关闭时不绘制着色器叠加（文本效果仍生效）
 - **渲染条件** — 可选的逻辑流程，按堆叠逐个求值，返回 true 时绘制叠加，留空则始终渲染
 - **Color-Key 蒙版** — 可选地仅在与目标颜色匹配（在容差内）的像素上叠加着色器；否则着色器覆盖整个贴图
+
+### ECA着色器预设（模组元素）
+
+用于注册自定义着色器预设的模组元素，注册后即可在所有 ECA 着色器下拉框中选用（实体扩展图层、天空盒、Boss 血条、物品扩展渲染层等）。
+
+**工作流程：**
+1. **游戏内**：使用 `/eca shaderGenerator` 可视化组合着色器，完成后点击**导出**。
+2. 导出会在 `config/eca/shadergenerator/<命名空间>/<名称>/` 下生成 5 个文件：
+   `<名称>.fsh`、`<名称>_block.vsh`、`<名称>_block.json`、`<名称>_entity.vsh`、`<名称>_entity.json`
+3. **复制**全部 5 个文件到工作区：`src/main/resources/assets/<modid>/shaders/core/`
+4. **在 MCreator 中**：创建一个 ECA 着色器预设元素——下拉框自动扫描上述文件夹中的有效五文件集。
+
+- **预设名称** — 着色器预设名称（不含扩展名）。下拉框自动扫描工作区着色器资源中的自定义预设；ECA 的 12 个内置预设不在此列出（它们已由 ECA 自行注册，可在其他元素的消费者下拉框中选用）。也可手动输入自定义名称。
+
+此元素生成的代码为轻量级的 `@RegisterShaderPreset` 注解类，ECA 启动时自动发现，无需手动编写注册代码。
 
 ### 环境要求
 

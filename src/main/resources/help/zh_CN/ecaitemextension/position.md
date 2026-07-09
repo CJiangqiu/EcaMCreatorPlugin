@@ -1,0 +1,1 @@
+此 tooltip 行在物品标准 tooltip 中的插入位置。HEAD = 物品名称上方，BODY = 与原版 tooltip 行混排，TAIL = 在所有其他行之后。默认：BODY。

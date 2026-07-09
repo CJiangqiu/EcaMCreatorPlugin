@@ -24,11 +24,6 @@ import java.awt.*;
 
 public class EcaItemExtensionGUI extends ModElementGUI<EcaItemExtensionElement> {
 
-    private static final String[] PRESETS = {
-            "TheLastEnd", "DreamSakura", "Forest", "Ocean", "Storm", "Volcano",
-            "Arcane", "Aurora", "Hacker", "Starlight", "Cosmos", "BlackHole"
-    };
-
     private static final String[] COLOR_EFFECTS = {"NONE", "GRADIENT", "RAINBOW", "SOLID"};
 
     private final MCItemHolder item = new MCItemHolder(mcreator, ElementUtil::loadBlocksAndItems);
@@ -53,8 +48,9 @@ public class EcaItemExtensionGUI extends ModElementGUI<EcaItemExtensionElement> 
     private JTooltipLinesList tooltipLines;
 
     //渲染层（第二页）
-    private final JComboBox<String> preset = new JComboBox<>(PRESETS);
+    private final JComboBox<String> preset = new JComboBox<>();
     private final JCheckBox renderLayerEnabled = new JCheckBox();
+    private final JSpinner alpha = new JSpinner(new SpinnerNumberModel(100, 0, 100, 1));
     private ProcedureSelector shouldRenderCondition;
     private final JCheckBox colorKeyEnabled = new JCheckBox();
     private JColor colorKeyColor;
@@ -83,7 +79,7 @@ public class EcaItemExtensionGUI extends ModElementGUI<EcaItemExtensionElement> 
                 L10N.t("elementgui.ecaitemextension.name_condition"),
                 AbstractProcedureSelector.Side.CLIENT, true,
                 VariableTypeLoader.BuiltInTypes.LOGIC, itemDeps);
-        tooltipLines = new JTooltipLinesList(mcreator, this, "ecaitemextension/tooltip", itemDeps);
+        tooltipLines = new JTooltipLinesList(mcreator, this.withEntry("ecaitemextension/tooltip"), itemDeps);
         shouldRenderCondition = new ProcedureSelector(
                 this.withEntry("ecaitemextension/should_render_condition"), mcreator,
                 L10N.t("elementgui.ecaitemextension.should_render_condition"),
@@ -104,6 +100,7 @@ public class EcaItemExtensionGUI extends ModElementGUI<EcaItemExtensionElement> 
         nameGlitch.addItemListener(e -> refreshTextPageState());
         renderLayerEnabled.addItemListener(e -> refreshRenderPageState());
         colorKeyEnabled.addItemListener(e -> refreshRenderPageState());
+        refreshPresetCombo();
         refreshTextPageState();
         refreshRenderPageState();
     }
@@ -132,6 +129,7 @@ public class EcaItemExtensionGUI extends ModElementGUI<EcaItemExtensionElement> 
     private void refreshRenderPageState() {
         boolean rl = renderLayerEnabled.isSelected();
         preset.setEnabled(rl);
+        alpha.setEnabled(rl);
         shouldRenderCondition.setEnabled(rl);
         colorKeyEnabled.setEnabled(rl);
         boolean ck = rl && colorKeyEnabled.isSelected();
@@ -191,6 +189,8 @@ public class EcaItemExtensionGUI extends ModElementGUI<EcaItemExtensionElement> 
                 "elementgui.ecaitemextension.preset", preset, gbc);
         addRowWithHelp(panel, "ecaitemextension/render_layer_enabled",
                 "elementgui.ecaitemextension.render_layer_enabled", renderLayerEnabled, gbc);
+        addRowWithHelp(panel, "ecaitemextension/alpha",
+                "elementgui.ecaitemextension.alpha", alpha, gbc);
         addRowWithHelp(panel, "ecaitemextension/color_key_enabled",
                 "elementgui.ecaitemextension.color_key_enabled", colorKeyEnabled, gbc);
         addRowWithHelp(panel, "ecaitemextension/color_key_color",
@@ -212,6 +212,13 @@ public class EcaItemExtensionGUI extends ModElementGUI<EcaItemExtensionElement> 
         nameCondition.refreshListKeepSelected();
         tooltipLines.reloadDataLists();
         shouldRenderCondition.refreshListKeepSelected();
+        refreshPresetCombo();
+    }
+
+    private void refreshPresetCombo() {
+        ShaderPresetUtil.populateCombo(preset,
+                ShaderPresetUtil.getAvailableShaderPresets(mcreator),
+                (String) preset.getSelectedItem());
     }
 
     @Override
@@ -243,6 +250,7 @@ public class EcaItemExtensionGUI extends ModElementGUI<EcaItemExtensionElement> 
 
         if (element.preset != null) preset.setSelectedItem(element.preset);
         renderLayerEnabled.setSelected(element.renderLayerEnabled);
+        alpha.setValue((int)(element.alpha * 100));
         shouldRenderCondition.setSelectedProcedure(element.shouldRenderCondition);
         colorKeyEnabled.setSelected(element.colorKeyEnabled);
         colorKeyColor.setColor(hexToColor(element.colorKeyColor));
@@ -278,6 +286,7 @@ public class EcaItemExtensionGUI extends ModElementGUI<EcaItemExtensionElement> 
         Object selected = preset.getSelectedItem();
         element.preset = selected != null ? selected.toString() : "Starlight";
         element.renderLayerEnabled = renderLayerEnabled.isSelected();
+        element.alpha = (int) alpha.getValue() / 100.0;
         element.shouldRenderCondition = shouldRenderCondition.getSelectedProcedure();
         element.colorKeyEnabled = colorKeyEnabled.isSelected();
         element.colorKeyColor = colorToHex(colorKeyColor.getColor());

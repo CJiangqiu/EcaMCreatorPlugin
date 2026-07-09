@@ -1,0 +1,1 @@
+The opacity of the shader render layer on the item. 0 = fully transparent (invisible), 100 = fully opaque. Default: 100.

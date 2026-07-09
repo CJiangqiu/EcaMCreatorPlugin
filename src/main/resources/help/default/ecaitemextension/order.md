@@ -1,0 +1,1 @@
+Sort order within the same position group. Lower numbers appear first, higher numbers appear later. The vanilla tooltip is treated as order 0. Default: 0.

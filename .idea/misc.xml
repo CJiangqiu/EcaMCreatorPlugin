@@ -6,7 +6,7 @@
     <file type="web" url="file://$PROJECT_DIR$/../MCreator" />
     <file type="web" url="file://$PROJECT_DIR$/../../../Mcreator/MCreator-2024.4.52410" />
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_21" project-jdk-name="mcreator_sdk17" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_21" project-jdk-name="jbr-21" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
 </project>

@@ -18,8 +18,11 @@
             }</#macro>
 <#macro entityLayerClass entry>new EntityLayerExtension() {
                 @Override public boolean enabled() { return true; }
+<#if entry.enableTexture && entry.texture?has_content>
+                @Override public net.minecraft.resources.ResourceLocation getTexture() { return ${name}EntityExtension.this.texture("screens/${entry.texture}.png"); }
+</#if>
 <#if entry.renderType?has_content>
-                @Override public RenderType getRenderType() { return ${renderTypeClass(entry.renderType)}.BOSS_LAYER; }
+                @Override public RenderType getRenderType() { return <@presetRenderType name=entry.renderType variant="BOSS_LAYER"/>; }
 </#if>
                 @Override public boolean isGlow() { return ${entry.glow?c}; }
                 @Override public boolean isHurtOverlay() { return ${entry.hurtOverlay?c}; }
@@ -44,10 +47,14 @@
 </#if>
 <#if entry.enableShader && entry.shaderRenderType?has_content>
                 @Override public boolean enableShader() { return true; }
-                @Override public RenderType shaderRenderType() { return ${renderTypeClass(entry.shaderRenderType)}.SKYBOX; }
+                @Override public RenderType shaderRenderType() { return <@presetRenderType name=entry.shaderRenderType variant="SKYBOX"/>; }
 </#if>
                 @Override public float alpha() { return ${entry.alpha?c}f; }
                 @Override public float size() { return ${entry.size?c}f; }
+                @Override public float textureUvScale() { return ${entry.textureUvScale?c}f; }
+                @Override public float textureRed() { return ${entry.textureRed?c}f; }
+                @Override public float textureGreen() { return ${entry.textureGreen?c}f; }
+                @Override public float textureBlue() { return ${entry.textureBlue?c}f; }
             }</#macro>
 package ${package}.entityextension;
 
@@ -89,36 +96,38 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+<#function isBuiltin name>
+    <#return name == "TheLastEnd" || name == "DreamSakura" || name == "Forest" || name == "Ocean" || name == "Storm" || name == "Volcano" || name == "Arcane" || name == "Aurora" || name == "Hacker" || name == "Starlight" || name == "Cosmos" || name == "BlackHole">
+</#function>
 <#function renderTypeClass name>
     <#switch name>
-        <#case "TheLastEnd">
-            <#return "net.eca.client.render.TheLastEndRenderTypes">
-        <#case "DreamSakura">
-            <#return "net.eca.client.render.DreamSakuraRenderTypes">
-        <#case "Forest">
-            <#return "net.eca.client.render.ForestRenderTypes">
-        <#case "Ocean">
-            <#return "net.eca.client.render.OceanRenderTypes">
-        <#case "Storm">
-            <#return "net.eca.client.render.StormRenderTypes">
-        <#case "Volcano">
-            <#return "net.eca.client.render.VolcanoRenderTypes">
-        <#case "Arcane">
-            <#return "net.eca.client.render.ArcaneRenderTypes">
-        <#case "Aurora">
-            <#return "net.eca.client.render.AuroraRenderTypes">
-        <#case "Hacker">
-            <#return "net.eca.client.render.HackerRenderTypes">
-        <#case "Starlight">
-            <#return "net.eca.client.render.StarlightRenderTypes">
-        <#case "Cosmos">
-            <#return "net.eca.client.render.CosmosRenderTypes">
-        <#case "BlackHole">
-            <#return "net.eca.client.render.BlackHoleRenderTypes">
-        <#default>
-            <#return "">
+        <#case "TheLastEnd"><#return "net.eca.client.render.TheLastEndRenderTypes">
+        <#case "DreamSakura"><#return "net.eca.client.render.DreamSakuraRenderTypes">
+        <#case "Forest"><#return "net.eca.client.render.ForestRenderTypes">
+        <#case "Ocean"><#return "net.eca.client.render.OceanRenderTypes">
+        <#case "Storm"><#return "net.eca.client.render.StormRenderTypes">
+        <#case "Volcano"><#return "net.eca.client.render.VolcanoRenderTypes">
+        <#case "Arcane"><#return "net.eca.client.render.ArcaneRenderTypes">
+        <#case "Aurora"><#return "net.eca.client.render.AuroraRenderTypes">
+        <#case "Hacker"><#return "net.eca.client.render.HackerRenderTypes">
+        <#case "Starlight"><#return "net.eca.client.render.StarlightRenderTypes">
+        <#case "Cosmos"><#return "net.eca.client.render.CosmosRenderTypes">
+        <#case "BlackHole"><#return "net.eca.client.render.BlackHoleRenderTypes">
+        <#default><#return "">
     </#switch>
 </#function>
+<#function ecaPresetMethod variant>
+    <#switch variant>
+        <#case "BOSS_BAR"><#return "bossBar">
+        <#case "BOSS_LAYER"><#return "bossLayer">
+        <#case "SKYBOX"><#return "skybox">
+        <#case "ITEM"><#return "item">
+        <#default><#return "">
+    </#switch>
+</#function>
+<#macro presetRenderType name variant>
+    <#if isBuiltin(name)>${renderTypeClass(name)}.${variant}<#else>net.eca.client.render.preset.EcaPresets.${ecaPresetMethod(variant)}("${modid}:${name}")</#if>
+</#macro>
 
 @RegisterEntityExtension
 public class ${name}EntityExtension extends EntityExtension {
@@ -206,7 +215,7 @@ public class ${name}EntityExtension extends EntityExtension {
     <#if data.bossBarFrameShaderEnabled && data.bossBarFrameRenderType?has_content>
             @Override
             public RenderType getFrameRenderType() {
-                return ${renderTypeClass(data.bossBarFrameRenderType)}.BOSS_BAR;
+                return <@presetRenderType name=data.bossBarFrameRenderType variant="BOSS_BAR"/>;
             }
 
             @Override public int getFrameWidth() { return ${data.bossBarFrameWidth}; }
@@ -215,7 +224,7 @@ public class ${name}EntityExtension extends EntityExtension {
     <#if data.bossBarFillShaderEnabled && data.bossBarFillRenderType?has_content>
             @Override
             public RenderType getFillRenderType() {
-                return ${renderTypeClass(data.bossBarFillRenderType)}.BOSS_BAR;
+                return <@presetRenderType name=data.bossBarFillRenderType variant="BOSS_BAR"/>;
             }
 
             @Override public int getFillWidth() { return ${data.bossBarFillWidth}; }
@@ -232,6 +241,12 @@ public class ${name}EntityExtension extends EntityExtension {
     </#if>
     <#if (data.bossBarFillOffsetY != 0)>
             @Override public int getFillOffsetY() { return ${data.bossBarFillOffsetY}; }
+    </#if>
+    <#if (data.bossBarFrameAlpha != 100)>
+            @Override public float getFrameAlpha() { return ${data.bossBarFrameAlpha / 100.0?c}f; }
+    </#if>
+    <#if (data.bossBarFillAlpha != 100)>
+            @Override public float getFillAlpha() { return ${data.bossBarFillAlpha / 100.0?c}f; }
     </#if>
         };
     }

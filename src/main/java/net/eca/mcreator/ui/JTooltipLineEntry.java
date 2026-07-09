@@ -5,8 +5,8 @@ import net.mcreator.blockly.data.Dependency;
 import net.mcreator.ui.MCreator;
 import net.mcreator.ui.component.JColor;
 import net.mcreator.ui.component.entries.JSimpleListEntry;
+import net.mcreator.ui.help.IHelpContext;
 import net.mcreator.ui.init.L10N;
-import net.mcreator.ui.modgui.ModElementGUI;
 import net.mcreator.ui.procedure.AbstractProcedureSelector;
 import net.mcreator.ui.procedure.ProcedureSelector;
 import net.mcreator.ui.procedure.StringProcedureSelector;
@@ -34,21 +34,22 @@ public class JTooltipLineEntry extends JSimpleListEntry<TooltipLine> {
     private final JCheckBox italic = new JCheckBox(L10N.t("elementgui.ecaitemextension.italic"));
     private final JCheckBox underline = new JCheckBox(L10N.t("elementgui.ecaitemextension.underline"));
     private final JCheckBox strikethrough = new JCheckBox(L10N.t("elementgui.ecaitemextension.strikethrough"));
+    private final JComboBox<String> position = new JComboBox<>(new String[]{"HEAD", "BODY", "TAIL"});
+    private final JSpinner order = new JSpinner(new SpinnerNumberModel(0, -999, 999, 1));
     private final ProcedureSelector condition;
 
-    //2024.4 的 HelpUtils 只对 ModElementHelpContext 挂点击事件，链式 withEntry 会丢类型，故直接拿 ModElementGUI 调
-    public JTooltipLineEntry(MCreator mcreator, ModElementGUI<?> modElementGUI, JPanel parent,
+    public JTooltipLineEntry(MCreator mcreator, IHelpContext gui, JPanel parent,
                              List<JTooltipLineEntry> entryList, Dependency[] deps) {
         super(parent, entryList);
 
         color1 = new JColor(mcreator, false, false);
         color2 = new JColor(mcreator, false, false);
         text = new StringProcedureSelector(
-                modElementGUI.withEntry("ecaitemextension/tooltip_line_text"), mcreator,
+                gui.withEntry("ecaitemextension/tooltip_line_text"), mcreator,
                 L10N.t("elementgui.ecaitemextension.tooltip_line_text"),
                 AbstractProcedureSelector.Side.CLIENT, new VTextField(16), 140, deps);
         condition = new ProcedureSelector(
-                modElementGUI.withEntry("ecaitemextension/tooltip_line_condition"), mcreator,
+                gui.withEntry("ecaitemextension/tooltip_line_condition"), mcreator,
                 L10N.t("elementgui.ecaitemextension.tooltip_line_condition"),
                 AbstractProcedureSelector.Side.CLIENT, true,
                 VariableTypeLoader.BuiltInTypes.LOGIC, deps);
@@ -57,6 +58,13 @@ public class JTooltipLineEntry extends JSimpleListEntry<TooltipLine> {
         rowText.setOpaque(false);
         rowText.add(text);
         rowText.add(condition);
+
+        JPanel rowPos = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 2));
+        rowPos.setOpaque(false);
+        rowPos.add(L10N.label("elementgui.ecaitemextension.position"));
+        rowPos.add(position);
+        rowPos.add(L10N.label("elementgui.ecaitemextension.order"));
+        rowPos.add(order);
 
         JPanel rowColor = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 2));
         rowColor.setOpaque(false);
@@ -86,6 +94,7 @@ public class JTooltipLineEntry extends JSimpleListEntry<TooltipLine> {
         body.setOpaque(false);
         body.setLayout(new BoxLayout(body, BoxLayout.PAGE_AXIS));
         body.add(rowText);
+        body.add(rowPos);
         body.add(rowColor);
         body.add(rowStyle);
         line.add(body);
@@ -123,6 +132,8 @@ public class JTooltipLineEntry extends JSimpleListEntry<TooltipLine> {
         italic.setEnabled(enabled);
         underline.setEnabled(enabled);
         strikethrough.setEnabled(enabled);
+        position.setEnabled(enabled);
+        order.setEnabled(enabled);
         condition.setEnabled(enabled);
     }
 
@@ -143,6 +154,8 @@ public class JTooltipLineEntry extends JSimpleListEntry<TooltipLine> {
         l.italic = italic.isSelected();
         l.underline = underline.isSelected();
         l.strikethrough = strikethrough.isSelected();
+        l.position = (String) position.getSelectedItem();
+        l.order = (int) order.getValue();
         l.condition = condition.getSelectedProcedure();
         return l;
     }
@@ -162,6 +175,8 @@ public class JTooltipLineEntry extends JSimpleListEntry<TooltipLine> {
         italic.setSelected(l.italic);
         underline.setSelected(l.underline);
         strikethrough.setSelected(l.strikethrough);
+        if (l.position != null) position.setSelectedItem(l.position);
+        order.setValue(l.order);
         if (l.condition != null) condition.setSelectedProcedure(l.condition);
         refreshState();
     }
