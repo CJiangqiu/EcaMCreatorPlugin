@@ -10,8 +10,7 @@ import net.mcreator.ui.component.util.PanelUtils;
 import net.mcreator.ui.help.HelpUtils;
 import net.mcreator.ui.init.L10N;
 import net.mcreator.ui.minecraft.DataListComboBox;
-import net.mcreator.ui.dialogs.TypedTextureSelectorDialog;
-import net.mcreator.ui.minecraft.TextureHolder;
+import net.mcreator.ui.minecraft.TextureComboBox;
 import net.mcreator.ui.modgui.ModElementGUI;
 import net.mcreator.ui.procedure.AbstractProcedureSelector;
 import net.mcreator.ui.procedure.NumberProcedureSelector;
@@ -37,9 +36,9 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
     // Boss Bar
     private final JCheckBox bossBarEnabled = new JCheckBox();
     private final JCheckBox bossBarFrameEnableTexture = new JCheckBox();
-    private TextureHolder bossBarFrameTexture;
+    private TextureComboBox bossBarFrameTexture;
     private final JCheckBox bossBarFillEnableTexture = new JCheckBox();
-    private TextureHolder bossBarFillTexture;
+    private TextureComboBox bossBarFillTexture;
     private final JCheckBox bossBarFrameShaderEnabled = new JCheckBox();
     private final JComboBox<String> bossBarFrameRenderType = new JComboBox<>();
     private final JSpinner bossBarFrameWidth = new JSpinner(new SpinnerNumberModel(182, 1, 2048, 1));
@@ -89,9 +88,9 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
 
         entityType = new DataListComboBox(mcreator,
                 ElementUtil.loadAllSpawnableEntities(mcreator.getWorkspace()));
-        bossBarFrameTexture = new TextureHolder(new TypedTextureSelectorDialog(mcreator, TextureType.SCREEN), 28);
+        bossBarFrameTexture = new TextureComboBox(mcreator, TextureType.SCREEN);
         bossBarFrameTexture.setPreferredSize(new Dimension(300, 28));
-        bossBarFillTexture = new TextureHolder(new TypedTextureSelectorDialog(mcreator, TextureType.SCREEN), 28);
+        bossBarFillTexture = new TextureComboBox(mcreator, TextureType.SCREEN);
         bossBarFillTexture.setPreferredSize(new Dimension(300, 28));
         musicRules = new JMusicRulesList(mcreator, this.withEntry("entity_extension/music_rules"), entityDeps);
         fogEntries = new JFogEntriesList(mcreator, this.withEntry("entity_extension/fog_entries"), entityDeps);
@@ -247,7 +246,7 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         return row;
     }
 
-    private static JPanel buildTextureRow(JCheckBox enable, TextureHolder holder) {
+    private static JPanel buildTextureRow(JCheckBox enable, TextureComboBox holder) {
         JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
         row.add(enable);
         holder.setPreferredSize(new Dimension(300, 28));
@@ -382,9 +381,9 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
 
         element.bossBarEnabled = bossBarEnabled.isSelected();
         element.bossBarFrameEnableTexture = bossBarFrameEnableTexture.isSelected();
-        element.bossBarFrameTexture = bossBarFrameTexture.getID();
+        element.bossBarFrameTexture = bossBarFrameTexture.getTextureName();
         element.bossBarFillEnableTexture = bossBarFillEnableTexture.isSelected();
-        element.bossBarFillTexture = bossBarFillTexture.getID();
+        element.bossBarFillTexture = bossBarFillTexture.getTextureName();
         element.bossBarFrameShaderEnabled = bossBarFrameShaderEnabled.isSelected();
         element.bossBarFrameRenderType = getCombo(bossBarFrameRenderType);
         element.bossBarFrameWidth = (int) bossBarFrameWidth.getValue();

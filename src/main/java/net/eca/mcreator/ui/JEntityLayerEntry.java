@@ -36,7 +36,7 @@ public class JEntityLayerEntry extends JSimpleListEntry<EntityLayerEntry> {
         ShaderPresetUtil.populateCombo(renderType,
                 ShaderPresetUtil.getAvailableShaderPresets(mcreator), null);
 
-        texture = new TextureComboBox(mcreator, TextureType.SCREEN);
+        texture = new TextureComboBox(mcreator, TextureType.ENTITY);
         texture.setAddPNGExtension(false);
         texture.setPreferredSize(new Dimension(220, 28));
         condition = new ProcedureSelector(

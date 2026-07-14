@@ -9,6 +9,10 @@ version = new JsonSlurper().parse(file('src/main/resources/plugin.json'))['info'
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
 repositories {
     mavenCentral()
 }

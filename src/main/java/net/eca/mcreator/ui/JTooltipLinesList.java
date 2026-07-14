@@ -17,7 +17,6 @@ public class JTooltipLinesList extends JSimpleEntriesList<JTooltipLineEntry, Too
     private final ModElementGUI<?> modElementGUI;
     private final Dependency[] deps;
 
-    //同时传 ModElementGUI 和顶层 help 入口：父类拿 ModElementHelpContext 用于本身的边框，子条目用 modElementGUI 重新生成 ModElementHelpContext 以保留点击行为
     public JTooltipLinesList(MCreator mcreator, ModElementGUI<?> modElementGUI, String helpEntry, Dependency[] deps) {
         super(mcreator, modElementGUI.withEntry(helpEntry));
         this.modElementGUI = modElementGUI;
