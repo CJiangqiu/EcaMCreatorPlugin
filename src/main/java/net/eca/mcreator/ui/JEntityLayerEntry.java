@@ -37,7 +37,7 @@ public class JEntityLayerEntry extends JSimpleListEntry<EntityLayerEntry> {
         ShaderPresetUtil.populateCombo(renderType,
                 ShaderPresetUtil.getAvailableShaderPresets(mcreator), null);
 
-        texture = new TextureHolder(new TypedTextureSelectorDialog(mcreator, TextureType.SCREEN), 28);
+        texture = new TextureHolder(new TypedTextureSelectorDialog(mcreator, TextureType.ENTITY), 28);
         texture.setPreferredSize(new Dimension(220, 28));
         condition = new ProcedureSelector(
                 gui.withEntry("entity_extension/entity_layer_entry_condition"), mcreator,
