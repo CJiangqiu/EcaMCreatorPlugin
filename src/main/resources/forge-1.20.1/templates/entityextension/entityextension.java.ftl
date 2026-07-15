@@ -19,7 +19,7 @@
 <#macro entityLayerClass entry>new EntityLayerExtension() {
                 @Override public boolean enabled() { return true; }
 <#if entry.enableTexture && entry.texture?has_content>
-                @Override public net.minecraft.resources.ResourceLocation getTexture() { return ${name}EntityExtension.this.texture("entity/${entry.texture}.png"); }
+                @Override public net.minecraft.resources.ResourceLocation getTexture() { return ${name}EntityExtension.this.texture("entities/${entry.texture}.png"); }
 </#if>
 <#if entry.renderType?has_content>
                 @Override public RenderType getRenderType() { return <@presetRenderType name=entry.renderType variant="BOSS_LAYER"/>; }
