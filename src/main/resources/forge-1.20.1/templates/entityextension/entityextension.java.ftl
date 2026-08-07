@@ -23,6 +23,11 @@
 </#if>
 <#if entry.renderType?has_content>
                 @Override public RenderType getRenderType() { return <@presetRenderType name=entry.renderType variant="BOSS_LAYER"/>; }
+<#if entry.enableMask && entry.maskTexture?has_content>
+                @Override public java.util.List<net.eca.client.render.ShaderMaskPass> getShaderPasses() {
+                    return java.util.List.of(net.eca.client.render.ShaderMaskPass.masked(<@presetRenderType name=entry.renderType variant="BOSS_LAYER"/>, ${name}EntityExtension.this.texture("entities/${entry.maskTexture}.png"), 0x${entry.maskColor}, ${entry.maskTolerance?c}f, ${entry.alpha?c}f));
+                }
+</#if>
 </#if>
                 @Override public boolean isGlow() { return ${entry.glow?c}; }
                 @Override public boolean isHurtOverlay() { return ${entry.hurtOverlay?c}; }
@@ -243,10 +248,10 @@ public class ${name}EntityExtension extends EntityExtension {
             @Override public int getFillOffsetY() { return ${data.bossBarFillOffsetY}; }
     </#if>
     <#if (data.bossBarFrameAlpha != 100)>
-            @Override public float getFrameAlpha() { return ${data.bossBarFrameAlpha / 100.0?c}f; }
+            @Override public float getFrameAlpha() { return ${(data.bossBarFrameAlpha / 100.0)?c}f; }
     </#if>
     <#if (data.bossBarFillAlpha != 100)>
-            @Override public float getFillAlpha() { return ${data.bossBarFillAlpha / 100.0?c}f; }
+            @Override public float getFillAlpha() { return ${(data.bossBarFillAlpha / 100.0)?c}f; }
     </#if>
         };
     }

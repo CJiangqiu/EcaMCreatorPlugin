@@ -89,8 +89,10 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         entityType = new DataListComboBox(mcreator,
                 ElementUtil.loadAllSpawnableEntities(mcreator.getWorkspace()));
         bossBarFrameTexture = new TextureComboBox(mcreator, TextureType.SCREEN);
+        bossBarFrameTexture.setAddPNGExtension(false);
         bossBarFrameTexture.setPreferredSize(new Dimension(300, 28));
         bossBarFillTexture = new TextureComboBox(mcreator, TextureType.SCREEN);
+        bossBarFillTexture.setAddPNGExtension(false);
         bossBarFillTexture.setPreferredSize(new Dimension(300, 28));
         musicRules = new JMusicRulesList(mcreator, this.withEntry("entity_extension/music_rules"), entityDeps);
         fogEntries = new JFogEntriesList(mcreator, this.withEntry("entity_extension/fog_entries"), entityDeps);
@@ -98,7 +100,7 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         bossBarCondition = new ProcedureSelector(
                 this.withEntry("entity_extension/boss_bar_condition"), mcreator,
                 L10N.t("elementgui.entity_extension.boss_bar_condition"),
-                AbstractProcedureSelector.Side.BOTH, true,
+                AbstractProcedureSelector.Side.CLIENT, true,
                 VariableTypeLoader.BuiltInTypes.LOGIC, entityDeps);
         entityLayerEntries = new JEntityLayerEntriesList(mcreator, this.withEntry("entity_extension/entity_layer_entries"), entityDeps);
         customHealthValue = new NumberProcedureSelector(

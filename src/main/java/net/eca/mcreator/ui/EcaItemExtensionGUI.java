@@ -83,7 +83,7 @@ public class EcaItemExtensionGUI extends ModElementGUI<EcaItemExtensionElement> 
         shouldRenderCondition = new ProcedureSelector(
                 this.withEntry("ecaitemextension/should_render_condition"), mcreator,
                 L10N.t("elementgui.ecaitemextension.should_render_condition"),
-                AbstractProcedureSelector.Side.BOTH, true,
+                AbstractProcedureSelector.Side.CLIENT, true,
                 VariableTypeLoader.BuiltInTypes.LOGIC, itemDeps);
 
         nameEffectEnabled.setSelected(true);

@@ -1,4 +1,4 @@
-if (world instanceof net.minecraft.server.level.ServerLevel _serverLevel) {
+if (world instanceof net.minecraft.server.level.ServerLevel _serverLevel${cbi}) {
 <#switch field$preset>
 <#case "TheLastEnd"><#assign _presetId="the_last_end"><#break>
 <#case "DreamSakura"><#assign _presetId="dream_sakura"><#break>
@@ -14,7 +14,7 @@ if (world instanceof net.minecraft.server.level.ServerLevel _serverLevel) {
 <#case "BlackHole"><#assign _presetId="black_hole"><#break>
 <#default><#assign _presetId="the_last_end"><#break>
 </#switch>
-net.eca.api.EcaAPI.setGlobalSkybox(_serverLevel, new net.eca.network.EntityExtensionOverridePacket.SkyboxData(
+net.eca.api.EcaAPI.setGlobalSkybox(_serverLevel${cbi}, new net.eca.network.EntityExtensionOverridePacket.SkyboxData(
     false, null, true, new net.minecraft.resources.ResourceLocation("eca", "${_presetId}"),
     (float)(${input$alpha}), 100.0f, 16.0f, 1.0f, 1.0f, 1.0f));
 }

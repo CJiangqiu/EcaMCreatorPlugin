@@ -36,7 +36,7 @@ public class JFogEntry extends JSimpleListEntry<FogEntry> {
         condition = new ProcedureSelector(
                 gui.withEntry("entity_extension/fog_entry_condition"), mcreator,
                 L10N.t("elementgui.entity_extension.fog_entry_condition"),
-                AbstractProcedureSelector.Side.BOTH, true,
+                AbstractProcedureSelector.Side.CLIENT, true,
                 VariableTypeLoader.BuiltInTypes.LOGIC, deps);
 
         JPanel rowTop = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 2));

@@ -1,3 +1,3 @@
-if (${input$entity} instanceof net.minecraft.world.entity.LivingEntity _livingEntity) {
-net.eca.api.EcaAPI.unbanHealing(_livingEntity);
+if (${input$entity} instanceof net.minecraft.world.entity.LivingEntity _livingEntity${cbi}) {
+net.eca.api.EcaAPI.unbanHealing(_livingEntity${cbi});
 }

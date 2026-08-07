@@ -9,7 +9,7 @@
   "javaplugin": "net.eca.mcreator.EcaPlugin",
   "info": {
     "name": "Epic Core API Plugin",
-    "version": "1.1.6-fix-fix",
+    "version": "1.1.7-fix-fix",
     "description": "Add the Epic Core API mod as a dependency, providing several entity manipulation APIs.\n",
     "author": "CJiangqiu"
   }

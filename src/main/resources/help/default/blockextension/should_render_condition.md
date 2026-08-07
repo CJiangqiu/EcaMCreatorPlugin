@@ -1,0 +1,1 @@
+Note! The dependencies used by this condition must be available on the client side, otherwise the condition will not work. Optional condition evaluated per block position. Return true to draw the shader layer at that position, false to skip it. Leave empty to always render.

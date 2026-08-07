@@ -1,1 +1,1 @@
-(${input$entity} instanceof net.minecraft.world.entity.LivingEntity _livingEntity ? (net.eca.api.EcaAPI.getLockedHealth(_livingEntity) != null ? net.eca.api.EcaAPI.getLockedHealth(_livingEntity) : 0.0f) : 0.0f)
+(${input$entity} instanceof net.minecraft.world.entity.LivingEntity _livingEntity${cbi} ? (net.eca.api.EcaAPI.getLockedHealth(_livingEntity${cbi}) != null ? net.eca.api.EcaAPI.getLockedHealth(_livingEntity${cbi}) : 0.0f) : 0.0f)

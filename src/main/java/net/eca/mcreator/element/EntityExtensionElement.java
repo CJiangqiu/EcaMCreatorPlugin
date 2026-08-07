@@ -89,11 +89,19 @@ public class EntityExtensionElement extends GeneratableElement {
         public boolean glow;
         public boolean hurtOverlay;
         public double alpha;
+        // 着色器遮罩：仅在启用着色器时生效，遮罩贴图中目标颜色的像素才会被着色
+        public boolean enableMask;
+        public String maskTexture;
+        public String maskColor;
+        public double maskTolerance;
 
         public EntityLayerEntry() {
             this.texture = "";
             this.renderType = "";
             this.alpha = 0.8;
+            this.maskTexture = "";
+            this.maskColor = "000000";
+            this.maskTolerance = 0.05;
         }
     }
 
