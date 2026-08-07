@@ -99,7 +99,7 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         bossBarCondition = new ProcedureSelector(
                 this.withEntry("entity_extension/boss_bar_condition"), mcreator,
                 L10N.t("elementgui.entity_extension.boss_bar_condition"),
-                AbstractProcedureSelector.Side.BOTH, true,
+                AbstractProcedureSelector.Side.CLIENT, true,
                 VariableTypeLoader.BuiltInTypes.LOGIC, entityDeps);
         entityLayerEntries = new JEntityLayerEntriesList(mcreator, this.withEntry("entity_extension/entity_layer_entries"), entityDeps);
         customHealthValue = new NumberProcedureSelector(

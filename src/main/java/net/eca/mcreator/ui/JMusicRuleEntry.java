@@ -37,7 +37,7 @@ public class JMusicRuleEntry extends JSimpleListEntry<MusicRule> {
         condition = new ProcedureSelector(
                 gui.withEntry("entity_extension/music_rule_condition"), mcreator,
                 L10N.t("elementgui.entity_extension.music_rule_condition"),
-                AbstractProcedureSelector.Side.BOTH, true,
+                AbstractProcedureSelector.Side.CLIENT, true,
                 VariableTypeLoader.BuiltInTypes.LOGIC, deps);
 
         JPanel rowTop = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 2));

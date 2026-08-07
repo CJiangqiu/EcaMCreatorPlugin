@@ -105,6 +105,8 @@ A new mod element type for visually enhancing specific entity types. Create an E
 - **Combat Music** — Custom combat music with source, volume, pitch, loop, and strict lock options
 - **Conditional Triggers** — Each sub-module (Boss Bar, Fog, Skybox, Music) supports an optional logic procedure to dynamically control whether the effect is active per entity per tick
 
+**Note!** These conditions are evaluated on the client, so the dependencies they use must be available on the client side, otherwise the condition will not work. An entity's attack target, its last attacker and its AI state only exist on the server and are never synchronized to clients, so a condition built on them is permanently false — drive those cases from a server-side procedure instead (for combat music, use the global music procedure blocks). Custom Fill Ratio is the exception: it is evaluated on the server.
+
 When multiple extension entities exist in the same dimension, the one with highest priority controls global effects.
 
 ### BossShow (Mod Element)
@@ -155,6 +157,22 @@ A mod element for enhancing an existing item with animated/styled text and an EC
 - **Enable Render Layer** — Master switch; when off, no shader overlay is drawn (text effects still work)
 - **Render Condition** — Optional logic procedure evaluated per stack; return true to draw the overlay, leave empty to always render
 - **Color-Key Mask** — Optionally restrict the shader to pixels matching a target color within a tolerance; otherwise the shader covers the whole texture
+
+**Note!** The Name, Tooltip and Render conditions are all evaluated on the client, so the dependencies they use must be available on the client side, otherwise the condition will not work.
+
+### ECA Block Extension (Mod Element)
+
+A mod element that draws an ECA shader preset as an overlay pass on top of an existing block, both for placed blocks and for falling blocks. Configure:
+
+- **Block** — The block this extension applies to (one extension per block)
+- **Enable Render Layer** — Master switch; when off, the extension stays registered but nothing is drawn
+- **Shader Preset** — Select from the 12 built-in presets plus any custom ShaderPreset elements defined in the workspace
+- **Shader Alpha** — Control the opacity of the shader overlay (0.0 = fully transparent, 1.0 = fully opaque)
+- **Full Brightness** — Draw the overlay at full brightness, ignoring the light level at the block position
+- **Shader Mask** — Optionally restrict the shader to the areas marked by a mask texture, with a configurable target color and tolerance; otherwise the shader covers the whole block
+- **Render Condition** — Optional logic procedure evaluated per block position; return true to draw the overlay, leave empty to always render
+
+**Note!** The render condition is evaluated on the client, so the dependencies it uses must be available on the client side, otherwise the condition will not work.
 
 ### ECA Shader Preset (Mod Element)
 
@@ -351,6 +369,8 @@ MIT License - See [LICENSE](LICENSE) file for details.
 - **战斗音乐** — 自定义战斗音乐，支持音源、音量、音调、循环和严格锁定选项
 - **条件触发** — 每个子模块（Boss血条、迷雾、天空盒、战斗音乐）支持可选的逻辑过程块，可按实体每tick动态控制效果是否激活
 
+**注意！** 这些条件在客户端求值，所使用的依赖必须客户端侧可见，否则条件不会生效。实体的攻击目标、最后攻击者、AI 状态仅存在于服务端且不会同步到客户端，基于它们的条件永远为假——这类需求请改用服务端流程驱动（战斗音乐可用全局音乐流程块）。自定义填充比例是例外，它在服务端求值。
+
 当同一维度存在多个拓展实体时，优先级最高的控制全局效果。
 
 ### BossShow 演出（模组元素）
@@ -401,6 +421,22 @@ MIT License - See [LICENSE](LICENSE) file for details.
 - **启用渲染层** — 总开关；关闭时不绘制着色器叠加（文本效果仍生效）
 - **渲染条件** — 可选的逻辑流程，按堆叠逐个求值，返回 true 时绘制叠加，留空则始终渲染
 - **Color-Key 蒙版** — 可选地仅在与目标颜色匹配（在容差内）的像素上叠加着色器；否则着色器覆盖整个贴图
+
+**注意！** 名字条件、Tooltip 行条件、渲染条件均在客户端求值，所使用的依赖必须客户端侧可见，否则条件不会生效。
+
+### ECA方块扩展（模组元素）
+
+用于为已有方块附加 ECA 着色器预设渲染层的模组元素，叠加绘制在已放置方块与下落方块之上。可配置：
+
+- **方块** — 本扩展作用的方块（每个方块一个扩展）
+- **启用渲染层** — 总开关；关闭时扩展仍会注册，但不绘制任何内容
+- **着色器预设** — 可从 12 种内置预设以及工作区中自定义的着色器预设元素中选择
+- **着色器透明度** — 控制着色器叠加层的不透明度（0.0 = 完全透明，1.0 = 完全不透明）
+- **全亮度渲染** — 以全亮度绘制叠加层，忽略方块所在位置的光照等级
+- **着色器遮罩** — 可选地将着色器限制在遮罩贴图标记的区域内，可配置目标颜色与容差；否则着色器覆盖整个方块
+- **渲染条件** — 可选的逻辑流程，按方块位置逐个求值，返回 true 时绘制叠加，留空则始终渲染
+
+**注意！** 渲染条件在客户端求值，所使用的依赖必须客户端侧可见，否则条件不会生效。
 
 ### ECA着色器预设（模组元素）
 

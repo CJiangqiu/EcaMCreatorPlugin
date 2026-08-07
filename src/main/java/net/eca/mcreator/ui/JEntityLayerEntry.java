@@ -3,6 +3,7 @@ package net.eca.mcreator.ui;
 import net.eca.mcreator.element.EntityExtensionElement.EntityLayerEntry;
 import net.mcreator.blockly.data.Dependency;
 import net.mcreator.ui.MCreator;
+import net.mcreator.ui.component.JColor;
 import net.mcreator.ui.component.entries.JSimpleListEntry;
 import net.mcreator.ui.dialogs.TypedTextureSelectorDialog;
 import net.mcreator.ui.help.HelpUtils;
@@ -28,6 +29,10 @@ public class JEntityLayerEntry extends JSimpleListEntry<EntityLayerEntry> {
     private final JCheckBox glow = new JCheckBox(L10N.t("elementgui.entity_extension.entity_layer_glow"));
     private final JCheckBox hurtOverlay = new JCheckBox(L10N.t("elementgui.entity_extension.entity_layer_hurt_overlay"));
     private final JSpinner alpha = new JSpinner(new SpinnerNumberModel(80, 0, 100, 1));
+    private final JCheckBox enableMask = new JCheckBox(L10N.t("elementgui.entity_extension.entity_layer_enable_mask"));
+    private final TextureHolder maskTexture;
+    private final JColor maskColor;
+    private final JSpinner maskTolerance = new JSpinner(new SpinnerNumberModel(0.05, 0.0, 1.0, 0.05));
 
     public JEntityLayerEntry(MCreator mcreator, IHelpContext gui, JPanel parent,
                              List<JEntityLayerEntry> entryList, Dependency[] deps) {
@@ -39,10 +44,14 @@ public class JEntityLayerEntry extends JSimpleListEntry<EntityLayerEntry> {
 
         texture = new TextureHolder(new TypedTextureSelectorDialog(mcreator, TextureType.ENTITY), 28);
         texture.setPreferredSize(new Dimension(220, 28));
+        maskTexture = new TextureHolder(new TypedTextureSelectorDialog(mcreator, TextureType.ENTITY), 28);
+        maskTexture.setPreferredSize(new Dimension(220, 28));
+        maskColor = new JColor(mcreator, false, false);
+        maskColor.setColor(Color.BLACK);
         condition = new ProcedureSelector(
                 gui.withEntry("entity_extension/entity_layer_entry_condition"), mcreator,
                 L10N.t("elementgui.entity_extension.entity_layer_entry_condition"),
-                AbstractProcedureSelector.Side.BOTH, true,
+                AbstractProcedureSelector.Side.CLIENT, true,
                 VariableTypeLoader.BuiltInTypes.LOGIC, deps);
 
         // 行1: 条件 + 贴图 + 着色器
@@ -62,11 +71,22 @@ public class JEntityLayerEntry extends JSimpleListEntry<EntityLayerEntry> {
         rowBottom.add(HelpUtils.wrapWithHelpButton(gui.withEntry("entity_extension/entity_layer_glow"), glow));
         rowBottom.add(HelpUtils.wrapWithHelpButton(gui.withEntry("entity_extension/entity_layer_hurt_overlay"), hurtOverlay));
 
+        // 行3: 着色器遮罩（遮罩贴图 + 目标颜色）
+        JPanel rowMask = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 2));
+        rowMask.setOpaque(false);
+        rowMask.add(HelpUtils.wrapWithHelpButton(gui.withEntry("entity_extension/entity_layer_enable_mask"), enableMask));
+        rowMask.add(maskTexture);
+        rowMask.add(helpLabel(gui, "entity_layer_mask_color"));
+        rowMask.add(maskColor);
+        rowMask.add(helpLabel(gui, "entity_layer_mask_tolerance"));
+        rowMask.add(maskTolerance);
+
         JPanel body = new JPanel();
         body.setOpaque(false);
         body.setLayout(new BoxLayout(body, BoxLayout.PAGE_AXIS));
         body.add(rowTop);
         body.add(rowBottom);
+        body.add(rowMask);
         line.add(body);
     }
 
@@ -94,6 +114,10 @@ public class JEntityLayerEntry extends JSimpleListEntry<EntityLayerEntry> {
         glow.setEnabled(enabled);
         hurtOverlay.setEnabled(enabled);
         alpha.setEnabled(enabled);
+        enableMask.setEnabled(enabled);
+        maskTexture.setEnabled(enabled);
+        maskColor.setEnabled(enabled);
+        maskTolerance.setEnabled(enabled);
     }
 
     @Override
@@ -107,6 +131,10 @@ public class JEntityLayerEntry extends JSimpleListEntry<EntityLayerEntry> {
         e.glow = glow.isSelected();
         e.hurtOverlay = hurtOverlay.isSelected();
         e.alpha = (int) alpha.getValue() / 100.0;
+        e.enableMask = enableMask.isSelected();
+        e.maskTexture = maskTexture.getID();
+        e.maskColor = colorToHex(maskColor.getColor());
+        e.maskTolerance = (double) maskTolerance.getValue();
         return e;
     }
 
@@ -120,5 +148,23 @@ public class JEntityLayerEntry extends JSimpleListEntry<EntityLayerEntry> {
         glow.setSelected(e.glow);
         hurtOverlay.setSelected(e.hurtOverlay);
         alpha.setValue((int)(e.alpha * 100));
+        enableMask.setSelected(e.enableMask);
+        maskTexture.setTextureFromTextureName(e.maskTexture != null ? e.maskTexture : "");
+        maskColor.setColor(hexToColor(e.maskColor));
+        maskTolerance.setValue(e.maskTolerance);
+    }
+
+    // 遮罩颜色与 hex 字符串互转，与 JFogEntry 的处理保持一致
+    private static Color hexToColor(String hex) {
+        if (hex == null || hex.isEmpty()) return Color.BLACK;
+        try {
+            return new Color(Integer.parseInt(hex, 16));
+        } catch (NumberFormatException e) {
+            return Color.BLACK;
+        }
+    }
+
+    private static String colorToHex(Color c) {
+        return String.format("%06X", c.getRGB() & 0xFFFFFF);
     }
 }

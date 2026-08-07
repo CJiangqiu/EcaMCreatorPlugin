@@ -1,0 +1,3 @@
+templates:
+  - template: blockextension/blockextension.java.ftl
+    name: "@SRCROOT/@BASEPACKAGEPATH/blockextension/@NAMEBlockExtension.java"

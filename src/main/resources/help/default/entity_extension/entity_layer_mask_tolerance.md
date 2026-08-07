@@ -1,0 +1,1 @@
+RGB distance tolerance for mask color matching (0.0 ~ 1.0). Larger values match a wider range of colors around the mask color, which helps when the mask texture has soft or compressed edges. Only used when the shader mask is enabled.

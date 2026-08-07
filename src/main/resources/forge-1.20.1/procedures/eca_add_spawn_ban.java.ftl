@@ -1,3 +1,3 @@
-if (world instanceof net.minecraft.server.level.ServerLevel _serverLevel && ${input$entity} != null) {
-net.eca.api.EcaAPI.banSpawn(_serverLevel, ${input$entity}.getType(), (int) (${input$time}));
+if (world instanceof net.minecraft.server.level.ServerLevel _serverLevel${cbi} && ${input$entity} != null) {
+net.eca.api.EcaAPI.banSpawn(_serverLevel${cbi}, ${input$entity}.getType(), (int) (${input$time}));
 }

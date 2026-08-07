@@ -1,0 +1,1 @@
+Note! The dependencies used by this condition must be available on the client side, otherwise the condition will not work. Optional logic procedure (with x/y/z/world/entity dependencies) that controls when the custom boss bar is displayed. Return true to show the boss bar, false to hide it. Leave empty to always show the boss bar (when the target entity is a boss).

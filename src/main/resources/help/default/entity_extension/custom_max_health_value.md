@@ -1,1 +1,1 @@
-The max health value for calculating boss bar fill ratio. Can be a fixed number or a procedure that returns a number based on the entity.
+Note! This value is evaluated on the server side, so server-only dependencies can be used. The max health value for calculating boss bar fill ratio. Can be a fixed number or a procedure that returns a number based on the entity.

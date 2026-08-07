@@ -1,1 +1,1 @@
-(${input$entity} instanceof net.minecraft.world.entity.LivingEntity _livingEntity ? net.eca.api.EcaAPI.isHealingBanned(_livingEntity) : false)
+(${input$entity} instanceof net.minecraft.world.entity.LivingEntity _livingEntity${cbi} ? net.eca.api.EcaAPI.isHealingBanned(_livingEntity${cbi}) : false)
