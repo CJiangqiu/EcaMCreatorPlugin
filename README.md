@@ -180,7 +180,7 @@ A mod element for enhancing an existing item with animated/styled text and an EC
 **Name Rendering** — override the item's display name with animated styled text:
 - **Target Item** — The item this extension applies to (one extension per item)
 - **Enable Name Effect** — Master switch for the name override; player-set custom names (anvil) always take priority
-- **Name Condition** — Optional logic procedure (with an `itemstack` dependency) evaluated per stack; return true to apply the styled name, leave empty to always apply
+- **Name Condition** — Optional logic procedure (with an itemstack dependency) evaluated per stack; return true to apply the styled name, leave empty to always apply
 - **Name Text** — A fixed string or a procedure that returns text
 - **Color Effect** — NONE, GRADIENT (slides between two colors), RAINBOW (full hue cycle), or SOLID; with configurable animation period and colors
 - **Shimmer / Glitch** — Optional toggles (each with an intensity) that make random characters flash brighter or turn to obfuscated gibberish
@@ -192,7 +192,7 @@ A mod element for enhancing an existing item with animated/styled text and an EC
 - **Condition** — Optional per-line logic procedure; return true to show that line, leave empty to always show it
 
 **Render Layer** — an ECA shader preset drawn as an overlay pass on top of normal item rendering (GUI, first/third person, dropped item, item frames):
-- **Shader Preset** — Select from the 12 built-in presets plus any custom ShaderPreset elements defined in the workspace. Its `ITEM` render type is used for the overlay
+- **Shader Preset** — Select from the 12 built-in presets plus any custom ShaderPreset elements defined in the workspace. Its ITEM render type is used for the overlay
 - **Shader Alpha** — Control the opacity of the shader overlay (0.0 = fully transparent, 1.0 = fully opaque)
 - **Enable Render Layer** — Master switch; when off, no shader overlay is drawn (text effects still work)
 - **Render Condition** — Optional logic procedure evaluated per stack; return true to draw the overlay, leave empty to always render
@@ -224,7 +224,7 @@ Declares a faction: its identity, and how it treats other factions and entities 
 
 Rows without a condition are static presets; rows with one are checked at runtime and take priority, falling back to the presets when false. So "hostile to the guards, but friendly while they are asleep" is two rows on the same faction. ECA resolves relations in this order: same faction → conditional rows → static rows → the other faction's definition → default relation.
 
-**Note!** The display name is read once when the faction is registered at mod load, so a procedure there runs before any world exists and must not rely on world or entity dependencies. Relation conditions are evaluated on the server at query time instead, where `entity` is the target being judged and `sourceentity` is a member of this faction — it may be empty when the query has no member context.
+**Note!** The display name is read once when the faction is registered at mod load, so a procedure there runs before any world exists and must not rely on world or entity dependencies. Relation conditions are evaluated on the server at query time instead, where entity is the target being judged and sourceentity is a member of this faction — it may be empty when the query has no member context.
 
 ### ECA Raid (Mod Element)
 
@@ -511,7 +511,7 @@ MIT License - See [LICENSE](LICENSE) file for details.
 **名字渲染** — 用动态样式文本覆盖物品的显示名：
 - **目标物品** — 该扩展作用的物品（每个物品只能有一个扩展）
 - **启用名字效果** — 名字覆盖的总开关；玩家用铁砧改的名字始终优先
-- **名字条件** — 可选的逻辑流程（带 `itemstack` 依赖），按堆叠逐个求值，返回 true 时应用样式名字，留空则始终应用
+- **名字条件** — 可选的逻辑流程（带 itemstack 依赖），按堆叠逐个求值，返回 true 时应用样式名字，留空则始终应用
 - **名字文本** — 固定字符串或返回文本的流程
 - **颜色效果** — NONE、GRADIENT（双色滑动渐变）、RAINBOW（整段彩虹循环）或 SOLID，可配置动画周期与颜色
 - **闪烁 / 乱码** — 可选开关（各带强度），让随机字符变亮或变成混淆乱码
@@ -523,7 +523,7 @@ MIT License - See [LICENSE](LICENSE) file for details.
 - **条件** — 可选的逐行逻辑流程，返回 true 时显示该行，留空则始终显示
 
 **渲染层** — ECA 着色器预设，作为额外的叠加渲染层绘制在物品正常渲染之上（GUI、第一/第三人称、掉落物、物品展示框）：
-- **着色器预设** — 可从 12 种内置预设以及工作区中自定义的着色器预设元素中选择，使用其 `ITEM` 渲染类型进行叠加
+- **着色器预设** — 可从 12 种内置预设以及工作区中自定义的着色器预设元素中选择，使用其 ITEM 渲染类型进行叠加
 - **着色器透明度** — 控制着色器叠加层的不透明度（0.0 = 完全透明，1.0 = 完全不透明）
 - **启用渲染层** — 总开关；关闭时不绘制着色器叠加（文本效果仍生效）
 - **渲染条件** — 可选的逻辑流程，按堆叠逐个求值，返回 true 时绘制叠加，留空则始终渲染
@@ -555,7 +555,7 @@ MIT License - See [LICENSE](LICENSE) file for details.
 
 不带条件的条目是静态预设；带条件的在运行时判定，优先级更高，条件不成立时回退到预设。所以「平时与守卫敌对，但他们睡着时友好」就是针对同一阵营写两条。ECA 按此顺序解析关系：同阵营 → 带条件的条目 → 静态条目 → 对方阵营的定义 → 默认关系。
 
-**注意！** 显示名在模组加载注册阵营时读取一次，那里的流程运行时世界尚不存在，不能依赖世界或实体。关系条件则是在查询时于服务端求值，`entity` 是被判定的目标，`sourceentity` 是本阵营的某个成员——当查询没有成员上下文时它可能为空。
+**注意！** 显示名在模组加载注册阵营时读取一次，那里的流程运行时世界尚不存在，不能依赖世界或实体。关系条件则是在查询时于服务端求值，entity 是被判定的目标，sourceentity 是本阵营的某个成员——当查询没有成员上下文时它可能为空。
 
 ### ECA袭击（模组元素）
 
