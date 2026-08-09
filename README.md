@@ -216,46 +216,30 @@ A mod element that draws an ECA shader preset as an overlay pass on top of an ex
 
 ### ECA Faction (Mod Element)
 
-A mod element that declares a faction: its identity, and how it treats other factions and entities that belong to no faction. Membership itself is bound at runtime with the faction procedure blocks — this element defines the faction, not its members.
+Declares a faction: its identity, and how it treats other factions and entities that belong to no faction. Membership is bound at runtime with the faction procedure blocks — this element defines the faction, not its members. The faction ID is the element's registry name, so the procedure blocks can offer it in a dropdown.
 
-The faction's ID is its mod element registry name, so the faction procedure blocks can offer it in a dropdown instead of asking you to type an ID. The editor has two pages:
+- **Display Name** — A fixed string, a procedure that returns text, or a translation key. Falls back to the registry name when empty
+- **Faction Colour** — Used wherever the faction is shown in UI, such as name tags and glow outlines
+- **Relations** — A list where each row gives one faction one relation, optionally gated by a condition. Hostile members attack each other normally, Friendly ones never target or damage each other, and Neutral ones will not target each other but accidental damage still applies. Pick **(No faction)** to target entities with no faction at all
 
-**General**
-- **Display Name** — A fixed string or a procedure that returns text; may also be a translation key such as `faction.mymod.undead.name`. Leave empty to fall back to the element registry name
-- **Faction Colour** — Colour used when the faction is shown in UI (name tags, glow outline, etc.)
-**Relations** — a single list where each row targets one faction with one relation, plus an optional condition:
-- **Faction** — The target faction, picked from the ECA Faction elements in your workspace. Pick **(No faction)** to target entities that belong to no faction at all
-- **Relation** — Hostile means members attack each other normally, Friendly means they never target or damage each other, Neutral means they will not target each other but accidental damage still applies
-- **Condition** — Leave empty to make the row a static preset. When set, the relation applies only while the condition returns true, otherwise resolution falls back to the static presets
+Rows without a condition are static presets; rows with one are checked at runtime and take priority, falling back to the presets when false. So "hostile to the guards, but friendly while they are asleep" is two rows on the same faction. ECA resolves relations in this order: same faction → conditional rows → static rows → the other faction's definition → default relation.
 
-So "hostile to the guards, but friendly while they are asleep" is two rows on the same faction: one unconditional Hostile, one conditional Friendly. A **(No faction)** row works the same way — without a condition it is this faction's default relation, with one it is checked at runtime and falls back to that default. ECA resolves relations in this order: same faction → conditional rows → static rows → the other faction's definition → default relation.
-
-**Note!** The Display Name is read once when the faction is registered at mod load, so a procedure used there runs before any world exists and must not rely on world or entity dependencies. Relation conditions are different — they are evaluated on the server at query time, where `entity` is the target being judged and `sourceentity` is a member of this faction (it may be empty when the query has no member context, so do not rely on it unconditionally).
+**Note!** The display name is read once when the faction is registered at mod load, so a procedure there runs before any world exists and must not rely on world or entity dependencies. Relation conditions are evaluated on the server at query time instead, where `entity` is the target being judged and `sourceentity` is a member of this faction — it may be empty when the query has no member context.
 
 ### ECA Raid (Mod Element)
 
-A mod element that declares a raid: the waves it sends, the faction its raiders belong to, when it is won or lost, and what happens along the way.
+Declares a raid: the waves it sends, the faction its raiders belong to, when it is won or lost, and what happens along the way.
 
-**Raids never start on their own.** ECA has no trigger condition inside the raid definition by design — a raid describes *what* the raid is, and *when* it happens is entirely up to you. Drive it from your own procedure with **Start Raid At** or **Start Raid In Structure**: on a player entering an area, on a block being broken, at a certain time of day, from a command, or anything else. The element below therefore has victory, defeat and wave-advance conditions, but no start condition.
+**Raids never start on their own.** ECA deliberately keeps the trigger out of the definition — this element describes what the raid is, while when it happens is up to you. Start it from your own procedure with **Start Raid At** or **Start Raid In Structure**, on whatever trigger you like. That is why there are victory, defeat and wave-advance conditions here, but no start condition.
 
-The editor has three pages:
+- **Display Name** — Shown on the raid boss bar; a fixed string, a procedure, or a translation key
+- **Raider Faction** — What spawned raiders are bound to. This binding is what makes vanilla AI and ECA's attack rules treat them as hostile to defenders; without it the raid relies entirely on each entity's own AI and wave leaders degrade into ordinary raiders
+- **Structure Anchor** — How the raid finds its centre: use the position passed to the start block directly, anchor to one specific structure, or anchor to any structure carrying a tag. The last two are mutually exclusive in ECA, so there is one field for both
+- **Raider Goal Priority**, **Endless**, **Boss Bar Colour**, **Max Duration**, **Wave Cooldown**, **Participant Radius**, **Celebration** — Behaviour, appearance and pacing
+- **Waves** — A list of spawn entries. Rows sharing a wave number are merged into one wave and waves run in ascending order, so you type the number on each row instead of nesting lists. A row can be marked as the wave's **Leader**, which requires a Raider Faction because the leader is made that faction's leader. Delay and radius are wave-level, so the first row of each wave decides them
+- **Conditions and events** — Nine optional procedures, all evaluated on the server with the raid centre as their position: advance-wave, victory and defeat conditions, plus callbacks for raid start, wave start, wave end, victory, defeat and stop
 
-**General**
-- **Display Name** — A fixed string or a procedure that returns text, shown on the raid boss bar. Leave empty to fall back to the element registry name
-- **Raider Faction** — The faction spawned raiders are bound to. This binding is what makes vanilla AI and ECA's attack rules treat raiders as hostile to defenders; without it a raid relies entirely on each entity's own AI, and wave leaders degrade into ordinary raiders
-- **Structure Anchor** + **Structure / Tag** — How the raid finds its centre: *None* uses the position you pass to the start block directly, *Structure* anchors to one specific structure, *Tag* anchors to any structure carrying that tag. These are mutually exclusive in ECA, which is why there is one field rather than two
-- **Raider Goal Priority** — Priority of the AI goal that walks raiders toward the centre
-- **Endless** — Cycle the wave list forever instead of ending after the last wave
-- **Boss Bar Colour**, **Max Duration**, **Wave Cooldown**, **Participant Radius**, **Celebration** — Appearance and pacing
-
-**Waves** — a single list of spawn entries. Rows sharing a wave number are merged into one wave, and waves run in ascending order of that number, so you type the wave number on each row rather than nesting lists:
-- **Wave** / **Entity Type** / **Count** — What this row spawns and which wave it belongs to
-- **Leader** — Make this entity the wave's leader instead of an ordinary entry. Requires a Raider Faction; the leader is made that faction's leader, which is what makes every raider answer when it attacks or is attacked
-- **Delay** / **Radius** — Wave-level properties, so the values from the first row of each wave are used
-
-**Conditions & Events** — nine optional procedures, all evaluated on the server with the raid centre as their position:
-- **Advance wave / Victory / Defeat conditions** — Leave empty to use ECA's defaults (previous wave dead; all waves spawned and cleared; target structure gone). Overriding replaces the default entirely — note that a custom victory condition also drops the built-in "endless raids never win" guard, and that an unanchored raid never loses by default because it has no structure to check
-- **On raid start / wave start / wave end / victory / defeat / stop** — On stop runs on every termination path, so it also fires after victory or defeat
+Leaving a condition empty uses ECA's default: the previous wave is dead, all waves spawned and cleared, or the target structure is gone. Overriding replaces that default entirely — a custom victory condition also drops the built-in "endless raids never win" guard, and an unanchored raid never loses by default because it has no structure to check. The stop callback runs on every termination path, so it also fires after victory or defeat.
 
 ### ECA Shader Preset (Mod Element)
 
@@ -563,46 +547,30 @@ MIT License - See [LICENSE](LICENSE) file for details.
 
 ### ECA阵营（模组元素）
 
-用于声明一个阵营的模组元素：它的身份，以及它如何对待其他阵营和无阵营实体。成员归属本身是运行时用阵营流程块绑定的——本元素定义阵营，而非其成员。
+声明一个阵营：它的身份，以及它如何对待其他阵营和无阵营实体。成员归属在运行时用阵营流程块绑定——本元素定义阵营，而非其成员。阵营 ID 取自元素注册名，因此流程块里可以直接下拉选取。
 
-阵营 ID 取自模组元素的注册名，因此阵营流程块可以用下拉列表直接选取，无需手动输入 ID。编辑器分为两页：
+- **显示名** — 固定文本、返回文本的流程，或翻译键。留空则回退为注册名
+- **阵营颜色** — 名牌、发光轮廓等界面显示处使用的颜色
+- **关系列表** — 每条针对一个阵营给出一种关系，可附带条件。敌对表示可正常互相攻击；友好表示互不设为目标、也不造成伤害；中立表示不主动设为目标，但误伤仍生效。选择 **(No faction)** 则针对完全没有阵营的实体
 
-**基础**
-- **显示名** — 可填固定文本或返回文本的流程，也可填翻译键，例如 `faction.mymod.undead.name`。留空则回退为元素注册名
-- **阵营颜色** — 该阵营在界面中显示时使用的颜色（名牌、发光轮廓等）
-**关系** —— 单个列表，每条针对一个阵营给出一种关系，并可附带条件：
-- **阵营** — 目标阵营，从工作区已有的 ECA 阵营元素中选取。选择 **(No faction)** 则针对完全没有阵营的实体
-- **关系** — 敌对表示成员之间可正常攻击；友好表示互不设为目标、也不造成伤害；中立表示不会主动设为目标，但误伤仍会生效
-- **条件** — 留空则本条作为静态预设。填写后，仅当条件返回真时采用该关系，否则回退到静态预设
+不带条件的条目是静态预设；带条件的在运行时判定，优先级更高，条件不成立时回退到预设。所以「平时与守卫敌对，但他们睡着时友好」就是针对同一阵营写两条。ECA 按此顺序解析关系：同阵营 → 带条件的条目 → 静态条目 → 对方阵营的定义 → 默认关系。
 
-所以「平时与守卫敌对，但他们睡着时友好」只需针对同一阵营写两条：一条无条件敌对，一条带条件友好。**(No faction)** 行同理——不填条件即为本阵营的默认关系，填了条件则在运行时判定、不成立时回退到该默认关系。ECA 按此顺序解析关系：同阵营 → 带条件的条目 → 静态条目 → 对方阵营的定义 → 默认关系。
-
-**注意！** 显示名在模组加载注册阵营时读取一次，因此那里的流程运行时世界尚不存在，不能依赖世界或实体。关系条件则不同——它在查询时于服务端求值，`entity` 是被判定的目标，`sourceentity` 是本阵营的某个成员（当查询没有成员上下文时可能为空，请勿无条件依赖它）。
+**注意！** 显示名在模组加载注册阵营时读取一次，那里的流程运行时世界尚不存在，不能依赖世界或实体。关系条件则是在查询时于服务端求值，`entity` 是被判定的目标，`sourceentity` 是本阵营的某个成员——当查询没有成员上下文时它可能为空。
 
 ### ECA袭击（模组元素）
 
-用于声明一场袭击的模组元素：派出哪些波次、袭击者属于哪个阵营、何时判定胜负、以及过程中触发什么。
+声明一场袭击：派出哪些波次、袭击者属于哪个阵营、何时判定胜负、以及过程中触发什么。
 
-**袭击不会自行开始。** ECA 刻意没有在袭击定义里设置触发条件——袭击定义描述的是"这场袭击是什么样"，"什么时候打"完全由你决定。请在自己的流程里用**在坐标发起袭击**或**在结构中发起袭击**来驱动：玩家进入某区域、某方块被破坏、到达特定时间、命令触发，或任何其他时机。因此下面的元素有胜利、失败、推进波次的判定，但**没有开始条件**。
+**袭击不会自行开始。** ECA 刻意把触发留在定义之外——本元素描述的是「这场袭击是什么样」，「什么时候打」由你决定。请在自己的流程里用**在坐标发起袭击**或**在结构中发起袭击**，配合任意触发时机来驱动。这也是这里有胜利、失败、推进波次的判定，却没有开始条件的原因。
 
-编辑器分为三页：
+- **显示名** — 显示在袭击 Boss 血条上；可填固定文本、流程或翻译键
+- **袭击者阵营** — 生成的袭击者绑定到哪个阵营。这个绑定是让原版 AI 与 ECA 攻击规则把它们视为防守方敌人的关键；不设置的话袭击完全依赖每个实体自身的 AI，波次首领也会退化为普通袭击者
+- **结构锚定方式** — 袭击如何确定中心：直接用发起时传入的坐标、锚定到某个具体结构、或锚定到带某标签的任意结构。后两者在 ECA 中互斥，所以共用一个输入框
+- **袭击者目标优先级**、**无尽模式**、**Boss血条颜色**、**最长持续时间**、**波次冷却**、**参与半径**、**庆祝时长** — 行为、外观与节奏
+- **波次** — 生成条目列表。波次号相同的行合并为同一波，各波按波次号升序进行，因此波次号是每行手填的，不用嵌套列表。某行可标记为本波**首领**，这需要设置袭击者阵营，因为首领会被设为该阵营的首领。延迟与半径是波次级属性，取每波首行的值
+- **条件与事件** — 9 个可选流程，全部在服务端求值、位置依赖为袭击中心：推进波次、胜利、失败三个判定，以及袭击开始、波次开始、波次结束、胜利、失败、停止六个回调
 
-**基础**
-- **显示名** — 可填固定文本或返回文本的流程，显示在袭击 Boss 血条上。留空则回退为元素注册名
-- **袭击者阵营** — 生成的袭击者所绑定的阵营。这个绑定是让原版 AI 与 ECA 攻击规则把袭击者视为防守方敌人的关键；不设置的话袭击完全依赖每个实体自身的 AI，且波次首领会退化为普通袭击者
-- **结构锚定方式** + **结构 / 标签** — 袭击如何确定中心：*不锚定*直接以发起时传入的坐标为中心，*指定结构*锚定到某个具体结构，*结构标签*锚定到带该标签的任意结构。这两种方式在 ECA 中互斥，所以这里只有一个输入框而非两个
-- **袭击者目标优先级** — 让袭击者走向中心的 AI 目标优先级
-- **无尽模式** — 循环播放波次列表而不是在最后一波后结束
-- **Boss血条颜色**、**最长持续时间**、**波次冷却**、**参与半径**、**庆祝时长** — 外观与节奏
-
-**波次** —— 单个生成条目列表。波次号相同的行会合并为同一波，各波按波次号升序进行，因此波次号是每行手动填写的，而非嵌套列表：
-- **波次** / **实体类型** / **数量** — 本行生成什么、属于第几波
-- **首领** — 把该实体设为本波首领而非普通条目。需要设置袭击者阵营；首领会被设为该阵营的首领，这正是让全体袭击者在其攻击或被攻击时响应的机制
-- **延迟** / **半径** — 波次级属性，取每波首行的值
-
-**条件与事件** —— 9 个可选流程，全部在服务端求值，位置依赖为袭击中心：
-- **推进波次 / 胜利 / 失败条件** — 留空则使用 ECA 默认规则（上一波全灭；所有波次已生成且清空；目标结构不再覆盖中心）。自定义会完全取代默认规则——注意自定义胜利条件会连带取消「无尽袭击永不胜利」的内置保护，而未锚定结构的袭击因为没有结构可查，默认永远不会失败
-- **袭击开始 / 波次开始 / 波次结束 / 胜利 / 失败 / 停止时** — 停止回调在任何结束路径上都会执行，因此它也会在胜利或失败之后再触发一次
+判定留空则使用 ECA 默认规则：上一波全灭、所有波次已生成且清空、目标结构不再覆盖中心。自定义会完全取代默认规则——自定义胜利条件会连带取消「无尽袭击永不胜利」的内置保护，而未锚定结构的袭击因为没有结构可查，默认永远不会失败。停止回调在任何结束路径上都会执行，因此它也会在胜利或失败之后再触发一次。
 
 ### ECA着色器预设（模组元素）
 
