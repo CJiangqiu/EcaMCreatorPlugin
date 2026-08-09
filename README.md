@@ -246,15 +246,29 @@ Leaving a condition empty uses ECA's default: the previous wave is dead, all wav
 A mod element for registering custom shader presets so they become selectable in all ECA shader dropdowns (Entity Extension layers, skyboxes, boss bars, item extension render layers, etc.).
 
 **Workflow:**
-1. **In-game**: Use `/eca shaderGenerator` to visually compose your shader, then click **Export**.
-2. The export creates 5 files under `config/eca/shadergenerator/<namespace>/<name>/`:
-   `<name>.fsh`, `<name>_block.vsh`, `<name>_block.json`, `<name>_entity.vsh`, `<name>_entity.json`
-3. **Copy** all 5 files into your workspace: `src/main/resources/assets/<modid>/shaders/core/`
+1. **In-game**: Use /eca shaderGenerator to visually compose your shader, then click **Export**.
+2. The export creates a five-file set:
+
+   ```
+   config/eca/shadergenerator/<namespace>/<name>/
+       <name>.fsh
+       <name>_block.vsh
+       <name>_block.json
+       <name>_entity.vsh
+       <name>_entity.json
+   ```
+
+3. **Copy** all 5 files into your workspace:
+
+   ```
+   src/main/resources/assets/<modid>/shaders/core/
+   ```
+
 4. **In MCreator**: Create an ECA Shader Preset element — the dropdown auto-scans the folder above and lists any valid five-file sets.
 
 - **Preset Name** — The shader preset name (without file extension). The dropdown automatically scans your workspace's shader resources for custom presets; ECA's 12 built-in presets are not listed here (they are already registered by ECA and selectable in the consumer dropdowns of other elements). You can also type a custom name manually.
 
-When generated, this produces a lightweight `@RegisterShaderPreset` annotation class. ECA auto-discovers it at startup — no manual registration code needed.
+When generated, this produces a lightweight @RegisterShaderPreset annotation class. ECA auto-discovers it at startup — no manual registration code needed.
 
 ### Requirements
 
@@ -577,15 +591,29 @@ MIT License - See [LICENSE](LICENSE) file for details.
 用于注册自定义着色器预设的模组元素，注册后即可在所有 ECA 着色器下拉框中选用（实体扩展图层、天空盒、Boss 血条、物品扩展渲染层等）。
 
 **工作流程：**
-1. **游戏内**：使用 `/eca shaderGenerator` 可视化组合着色器，完成后点击**导出**。
-2. 导出会在 `config/eca/shadergenerator/<命名空间>/<名称>/` 下生成 5 个文件：
-   `<名称>.fsh`、`<名称>_block.vsh`、`<名称>_block.json`、`<名称>_entity.vsh`、`<名称>_entity.json`
-3. **复制**全部 5 个文件到工作区：`src/main/resources/assets/<modid>/shaders/core/`
+1. **游戏内**：使用 /eca shaderGenerator 可视化组合着色器，完成后点击**导出**。
+2. 导出会生成一套五文件集：
+
+   ```
+   config/eca/shadergenerator/<命名空间>/<名称>/
+       <名称>.fsh
+       <名称>_block.vsh
+       <名称>_block.json
+       <名称>_entity.vsh
+       <名称>_entity.json
+   ```
+
+3. **复制**全部 5 个文件到工作区：
+
+   ```
+   src/main/resources/assets/<modid>/shaders/core/
+   ```
+
 4. **在 MCreator 中**：创建一个 ECA 着色器预设元素——下拉框自动扫描上述文件夹中的有效五文件集。
 
 - **预设名称** — 着色器预设名称（不含扩展名）。下拉框自动扫描工作区着色器资源中的自定义预设；ECA 的 12 个内置预设不在此列出（它们已由 ECA 自行注册，可在其他元素的消费者下拉框中选用）。也可手动输入自定义名称。
 
-此元素生成的代码为轻量级的 `@RegisterShaderPreset` 注解类，ECA 启动时自动发现，无需手动编写注册代码。
+此元素生成的代码为轻量级的 @RegisterShaderPreset 注解类，ECA 启动时自动发现，无需手动编写注册代码。
 
 ### 环境要求
 
