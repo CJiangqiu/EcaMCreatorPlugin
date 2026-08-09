@@ -1,0 +1,36 @@
+﻿{
+  "args0": [
+    {
+      "type": "input_value",
+      "name": "raidId",
+      "check": "Number"
+    },
+    {
+      "type": "input_value",
+      "name": "victory",
+      "check": "Boolean"
+    }
+  ],
+  "inputsInline": true,
+  "previousStatement": null,
+  "nextStatement": null,
+  "colour": 35,
+  "mcreator": {
+    "toolbox_id": "eca",
+    "group": "eca_11_03",
+    "toolbox_init": [
+      "<value name=\"raidId\"><block type=\"math_number\"><field name=\"NUM\">-1</field></block></value>",
+      "<value name=\"victory\"><block type=\"logic_boolean\"><field name=\"BOOL\">TRUE</field></block></value>"
+    ],
+    "inputs": [
+      "raidId",
+      "victory"
+    ],
+    "dependencies": [
+      {
+        "name": "world",
+        "type": "world"
+      }
+    ]
+  }
+}

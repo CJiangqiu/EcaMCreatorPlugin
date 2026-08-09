@@ -1,0 +1,1 @@
+Note! This condition is evaluated on the server. Return true to spawn the next wave. Leave empty to use ECA's default rule: the previous wave is dead, matching vanilla. Override for timed or overlapping waves. Position dependencies are the raid centre.

@@ -1,0 +1,1 @@
+Note! This procedure runs on the server after a wave has spawned. ECA also passes the zero-based wave index, but MCreator procedures have no matching input, so it is not available here — track it with a variable if you need it. Position dependencies are the raid centre.

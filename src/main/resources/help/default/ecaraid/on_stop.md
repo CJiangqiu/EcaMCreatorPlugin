@@ -1,0 +1,1 @@
+Note! This procedure runs on the server on every termination path — victory, defeat, timeout or an explicit end call — so it also runs after On victory or On defeat. Use it for cleanup that must happen regardless of outcome. Position dependencies are the raid centre.

@@ -13,6 +13,8 @@ public class EntityExtensionElement extends GeneratableElement {
 
     public EntityEntry entityType;
     public int priority;
+    // 本类型实体自动加入的阵营（元素名，空=不加入）
+    public String factionId;
     public boolean enableForceLoading;
 
     // Condition Procedures
@@ -63,6 +65,7 @@ public class EntityExtensionElement extends GeneratableElement {
 
     public EntityExtensionElement(ModElement element) {
         super(element);
+        this.factionId = "";
 
         this.priority = 5;
         this.bossBarFrameWidth = 182;

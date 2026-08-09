@@ -1,0 +1,17 @@
+﻿{
+  "args0": [],
+  "inputsInline": true,
+  "output": "Number",
+  "colour": 35,
+  "mcreator": {
+    "toolbox_id": "eca",
+    "group": "eca_11_05",
+    "return_type": "number",
+    "dependencies": [
+      {
+        "name": "world",
+        "type": "world"
+      }
+    ]
+  }
+}

@@ -1,0 +1,1 @@
+(world instanceof net.minecraft.server.level.ServerLevel ? net.eca.api.EcaAPI.getActiveRaids((net.minecraft.server.level.ServerLevel) world).size() : 0)

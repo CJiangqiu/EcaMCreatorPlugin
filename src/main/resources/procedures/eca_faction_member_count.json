@@ -1,0 +1,22 @@
+﻿{
+  "args0": [
+    {
+      "type": "field_data_list_selector",
+      "name": "faction",
+      "datalist": "ecafactions",
+      "customEntryProviders": "ecafaction"
+    }
+  ],
+  "inputsInline": true,
+  "output": "Number",
+  "colour": 195,
+  "mcreator": {
+    "toolbox_id": "eca",
+    "group": "eca_10_09",
+    "return_type": "number",
+    "fields": [
+      "faction"
+    ],
+    "dependencies": []
+  }
+}

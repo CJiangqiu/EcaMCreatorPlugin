@@ -28,6 +28,7 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
     // General
     private DataListComboBox entityType;
     private final JSpinner priority = new JSpinner(new SpinnerNumberModel(5, 0, 100, 1));
+    private final JComboBox<String> factionId = new JComboBox<>();
     private final JCheckBox enableForceLoading = new JCheckBox();
 
     // Condition Procedures
@@ -88,6 +89,8 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
 
         entityType = new DataListComboBox(mcreator,
                 ElementUtil.loadAllSpawnableEntities(mcreator.getWorkspace()));
+        // 本类型实体自动加入的阵营；首项 (None) 表示不加入任何阵营
+        EcaFactionUtil.populateCombo(factionId, mcreator, null, true);
         bossBarFrameTexture = new TextureComboBox(mcreator, TextureType.SCREEN);
         bossBarFrameTexture.setAddPNGExtension(false);
         bossBarFrameTexture.setPreferredSize(new Dimension(300, 28));
@@ -122,6 +125,8 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
                 "elementgui.entity_extension.entity_type", entityType, gbc);
         addRowWithHelp(generalPanel, "entity_extension/priority",
                 "elementgui.entity_extension.priority", priority, gbc);
+        addRowWithHelp(generalPanel, "entity_extension/faction_id",
+                "elementgui.entity_extension.faction_id", factionId, gbc);
         addRowWithHelp(generalPanel, "entity_extension/enable_force_loading",
                 "elementgui.entity_extension.enable_force_loading", enableForceLoading, gbc);
         addPage(L10N.t("elementgui.entityextension.general"), PanelUtils.totalCenterInPanel(generalPanel), false);
@@ -219,6 +224,7 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
 
         // Setup all enable/disable toggles
         refreshShaderCombos();
+        EcaFactionUtil.populateCombo(factionId, mcreator, null, true);
         setupBossBarToggle();
         setupEnableToggle(entityLayerEnabled, entityLayerEntries);
         setupEnableToggle(globalFogEnabled, fogEntries);
@@ -320,6 +326,8 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
     @Override
     protected void openInEditingMode(EntityExtensionElement element) {
         entityType.setSelectedItem(element.entityType);
+        factionId.setSelectedItem(element.factionId != null && !element.factionId.isEmpty()
+                ? element.factionId : EcaFactionUtil.NONE);
         priority.setValue(element.priority);
         enableForceLoading.setSelected(element.enableForceLoading);
 
@@ -377,6 +385,8 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         element.entityType = new EntityEntry(modElement.getWorkspace(),
                 entityType.getSelectedItem());
         element.priority = (int) priority.getValue();
+        // 存阵营元素名，生成时再解析为注册名；(None) 存为空
+        element.factionId = EcaFactionUtil.toStoredValue(factionId);
         element.enableForceLoading = enableForceLoading.isSelected();
 
         element.bossBarCondition = bossBarCondition.getSelectedProcedure();
@@ -425,6 +435,7 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
     public void reloadDataLists() {
         super.reloadDataLists();
         refreshShaderCombos();
+        EcaFactionUtil.populateCombo(factionId, mcreator, null, true);
         bossBarCondition.refreshListKeepSelected();
         entityLayerEntries.reloadDataLists();
         fogEntries.reloadDataLists();

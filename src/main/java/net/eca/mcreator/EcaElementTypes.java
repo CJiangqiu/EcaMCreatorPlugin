@@ -2,11 +2,15 @@ package net.eca.mcreator;
 
 import net.eca.mcreator.element.BlockExtensionElement;
 import net.eca.mcreator.element.BossShowElement;
+import net.eca.mcreator.element.EcaFactionElement;
+import net.eca.mcreator.element.EcaRaidElement;
 import net.eca.mcreator.element.EntityExtensionElement;
 import net.eca.mcreator.element.EcaItemExtensionElement;
 import net.eca.mcreator.element.ShaderPresetElement;
 import net.eca.mcreator.ui.BlockExtensionGUI;
 import net.eca.mcreator.ui.BossShowGUI;
+import net.eca.mcreator.ui.EcaFactionGUI;
+import net.eca.mcreator.ui.EcaRaidGUI;
 import net.eca.mcreator.ui.EntityExtensionGUI;
 import net.eca.mcreator.ui.EcaItemExtensionGUI;
 import net.eca.mcreator.ui.ShaderPresetGUI;
@@ -20,6 +24,8 @@ public class EcaElementTypes {
     public static ModElementType<?> ECA_ITEM_EXTENSION;
     public static ModElementType<?> SHADER_PRESET;
     public static ModElementType<?> BLOCK_EXTENSION;
+    public static ModElementType<?> ECA_FACTION;
+    public static ModElementType<?> ECA_RAID;
 
     public static void load() {
         ENTITY_EXTENSION = ModElementTypeLoader.register(
@@ -37,5 +43,11 @@ public class EcaElementTypes {
         BLOCK_EXTENSION = ModElementTypeLoader.register(
                 new ModElementType<>("blockextension", null, BlockExtensionGUI::new,
                         BlockExtensionElement.class));
+        ECA_FACTION = ModElementTypeLoader.register(
+                new ModElementType<>("ecafaction", null, EcaFactionGUI::new,
+                        EcaFactionElement.class));
+        ECA_RAID = ModElementTypeLoader.register(
+                new ModElementType<>("ecaraid", null, EcaRaidGUI::new,
+                        EcaRaidElement.class));
     }
 }

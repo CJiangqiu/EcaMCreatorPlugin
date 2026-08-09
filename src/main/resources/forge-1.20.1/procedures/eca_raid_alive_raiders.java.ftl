@@ -1,0 +1,1 @@
+(world instanceof net.minecraft.server.level.ServerLevel && net.eca.api.EcaAPI.getRaid((net.minecraft.server.level.ServerLevel) world, (int)(${input$raidId})) != null ? net.eca.api.EcaAPI.getRaid((net.minecraft.server.level.ServerLevel) world, (int)(${input$raidId})).getAliveRaiderCount() : 0)

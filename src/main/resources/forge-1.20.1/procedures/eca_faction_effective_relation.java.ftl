@@ -1,0 +1,1 @@
+(net.eca.api.EcaAPI.getEffectiveFactionRelation(${input$source}, ${input$target}) != null ? net.eca.api.EcaAPI.getEffectiveFactionRelation(${input$source}, ${input$target}).name() : "")

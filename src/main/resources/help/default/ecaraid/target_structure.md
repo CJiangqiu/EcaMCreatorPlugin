@@ -1,0 +1,1 @@
+The structure or structure tag to anchor to, written as a full resource location such as `minecraft:village_plains` or `minecraft:village`. Which one it means depends on the Structure Anchor above; the field is disabled when that is set to None. Vanilla worldgen structures are not listed by MCreator, so this is a plain text field.

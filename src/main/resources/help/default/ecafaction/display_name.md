@@ -1,0 +1,1 @@
+Note! This is read once when the faction is registered at mod load, so a procedure used here runs before any world exists and must not rely on world or entity dependencies. Human-readable name shown in UI, or a translation key such as `faction.mymod.undead.name`. Leave empty to fall back to the element registry name.

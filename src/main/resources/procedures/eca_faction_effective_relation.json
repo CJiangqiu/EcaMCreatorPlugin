@@ -1,0 +1,31 @@
+﻿{
+  "args0": [
+    {
+      "type": "input_value",
+      "name": "source",
+      "check": "Entity"
+    },
+    {
+      "type": "input_value",
+      "name": "target",
+      "check": "Entity"
+    }
+  ],
+  "inputsInline": true,
+  "output": "String",
+  "colour": 195,
+  "mcreator": {
+    "toolbox_id": "eca",
+    "group": "eca_10_13",
+    "toolbox_init": [
+      "<value name=\"source\"><block type=\"entity_from_deps\"></block></value>",
+      "<value name=\"target\"><block type=\"source_entity_from_deps\"></block></value>"
+    ],
+    "inputs": [
+      "source",
+      "target"
+    ],
+    "return_type": "string",
+    "dependencies": []
+  }
+}

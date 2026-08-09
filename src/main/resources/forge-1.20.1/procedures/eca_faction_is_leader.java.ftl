@@ -1,0 +1,1 @@
+net.eca.api.EcaAPI.isFactionLeader(${input$entity})

@@ -1,0 +1,1 @@
+(world instanceof net.minecraft.world.level.Level _lvl${cbi} ? net.eca.api.EcaAPI.resolveFactionLeader("${generator.getRegistryNameForModElement(generator.getElementPlainName(field$faction))}", _lvl${cbi}.getServer()) : null)

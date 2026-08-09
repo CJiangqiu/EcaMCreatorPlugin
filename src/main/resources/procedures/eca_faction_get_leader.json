@@ -1,0 +1,27 @@
+﻿{
+  "args0": [
+    {
+      "type": "field_data_list_selector",
+      "name": "faction",
+      "datalist": "ecafactions",
+      "customEntryProviders": "ecafaction"
+    }
+  ],
+  "inputsInline": true,
+  "output": "Entity",
+  "colour": 195,
+  "mcreator": {
+    "toolbox_id": "eca",
+    "group": "eca_10_21",
+    "return_type": "entity",
+    "fields": [
+      "faction"
+    ],
+    "dependencies": [
+      {
+        "name": "world",
+        "type": "world"
+      }
+    ]
+  }
+}

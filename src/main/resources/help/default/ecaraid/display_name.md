@@ -1,0 +1,1 @@
+Note! This is read once when the raid is registered at mod load, so a procedure used here runs before any world exists and must not rely on world dependencies. Name shown on the raid boss bar, or a translation key. Leave empty to fall back to the element registry name.
