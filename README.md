@@ -14,12 +14,13 @@
 
 I created this plugin to provide convenient and powerful entity manipulation APIs for MCreator developers. Although I rarely use MCreator to create mods anymore, I still want to help those who continue using MCreator and struggle with entity-related operations.
 
-This plugin integrates [Epic Core API](https://github.com/CJiangqiu/EpicCoreAPI) as a dependency and provides several entity manipulation procedure blocks that would otherwise be difficult or impossible to implement in vanilla MCreator.
+This plugin integrates [Epic Core API](https://github.com/CJiangqiu/EpicCoreAPI) as a dependency and provides procedure blocks that would otherwise be difficult or impossible to implement in vanilla MCreator, plus seven mod element types — Entity Extension, BossShow, Item Extension, Block Extension, Faction, Raid and Shader Preset — that expose ECA's extension, faction, raid and shader systems without writing any Java.
 
 ### Procedure Blocks
 
 - **Force Kill Entity** `<Entity>` - Set health to 0, trigger die(), drop loot, grant advancements, and remove the entity (death messages are not sent)
 - **Force Set Health** `<Entity> <Health>` - Modify entity health through multi-phase process: vanilla fields, smart field scanning, and bytecode reverse tracking
+- **Force Deal Damage** `<Amount> <Entity> <DamageSource>` - Deal damage that is guaranteed to land: clears the hurt cooldown, runs the vanilla damage pipeline (armor, resistance, absorption, knockback, aggro), then force-writes health if it did not actually drop. A lethal hit stops at zero health and lets vanilla play the death animation
 - **Force Revive** `<Entity>` - Clear the entity's death flag and reset deathTime using VarHandle
 - **Force Revive by UUID** `<UUID>` - Revive an entity by UUID, useful when the entity has been removed from the world
 - **Set Force Invulnerable** `<Entity> <Boolean>` - Enable/disable invulnerability with automatic health locking (locks health when enabled, unlocks when disabled)
@@ -89,6 +90,45 @@ This plugin integrates [Epic Core API](https://github.com/CJiangqiu/EpicCoreAPI)
 - **Is Resurrection Daemon Running** - Check whether the resurrection daemon thread is currently running
 - **Add to Resurrection Tracking** `<Entity>` - Add an entity to resurrection tracking; while the daemon runs it is auto-revived shortly after death. Do not use on entities that spawn in large numbers
 - **Remove from Resurrection Tracking** `<Entity>` - Remove an entity from resurrection tracking so it is no longer auto-revived
+
+**Factions** — every faction parameter below is a dropdown listing the ECA Faction elements registered in your workspace, so you never type an ID by hand:
+
+- **Create Faction** `<Faction> <Name> <Colour>` - Create a new faction at runtime and persist it to the world
+- **Remove Faction** `<Faction>` - Delete a faction and unbind all of its members
+- **Merge Factions** `<From> <Into>` - Move every member of the first faction into the second, then delete the first; returns how many members were moved
+- **Does Faction Exist** `<Faction>` - Check whether a faction with this ID is registered
+- **Join Faction** `<Entity> <Faction>` - Bind an entity to a faction
+- **Leave Faction** `<Entity>` - Unbind an entity from whatever faction it belongs to
+- **Get Entity Faction** `<Entity>` - Get the faction ID an entity belongs to, or an empty string if it has none
+- **Are Same Faction** `<Entity> <Entity>` - Check whether two entities belong to the same faction
+- **Faction Member Count** `<Faction>` - Get how many members a faction currently has
+- **Kick All From Faction** `<Faction>` - Unbind every member without deleting the faction itself
+- **Set Faction Relation** `<Faction> <Faction> <Relation>` - Set the runtime relation between two factions, overriding the preset lists
+- **Get Faction Relation** `<Faction> <Faction>` - Get the relation set between two factions
+- **Get Effective Relation** `<Entity> <Entity>` - Resolve the final relation between two entities, taking same-faction, dynamic overrides, preset lists and defaults into account
+- **Can Harm** `<Entity> <Entity>` - Check whether the faction relation allows the first entity to damage the second
+- **Can Target** `<Entity> <Entity>` - Check whether the faction relation allows the first entity to set the second as its attack target
+- **Are Friendly** `<Entity> <Entity>` - Check whether two entities are friendly or in the same faction
+- **Alert Faction Members** `<Faction> <Attacker> <Victim>` - Notify a faction's members that one of them was attacked, so they can react
+- **Set Faction Leader** `<Faction> <Entity>` - Assign an entity as the faction's leader
+- **Clear Faction Leader** `<Faction>` - Remove the faction's current leader
+- **Is Faction Leader** `<Entity>` - Check whether an entity is the leader of its faction
+- **Get Faction Leader** `<Faction>` - Get the faction's leader entity, or nothing if it has no leader or the leader is not loaded
+
+**Raids** — the raid parameter is a dropdown listing the ECA Raid elements registered in your workspace. Starting a raid returns a numeric instance ID, which the other blocks take:
+
+- **Start Raid At** `<Raid> <X> <Y> <Z>` - Start a raid with an explicit centre, bypassing the structure lookup. Returns the raid instance ID, or -1 on failure
+- **Start Raid In Structure** `<Raid> <X> <Y> <Z>` - Start a raid inside its target structure; the centre is taken from the structure bounds. Returns -1 if the position is not inside that structure
+- **End Raid** `<RaidID> <Victory>` - End an active raid, counting it as a victory or a defeat
+- **Get Nearest Raid** `<X> <Y> <Z> <MaxDistance>` - Get the instance ID of the nearest active raid within the distance, or -1
+- **Active Raid Count** - How many raids are currently active in this dimension
+- **Does Raid Exist** `<RaidID>` - Check whether a raid instance is currently tracked
+- **Is Raid Over** `<RaidID>` - Check whether a raid instance has finished
+- **Get Raid Status** `<RaidID>` - Get the status as text: ONGOING, VICTORY, DEFEAT or STOPPED
+- **Get Raid Waves Spawned** `<RaidID>` - How many waves the raid has spawned so far
+- **Get Raid Wave Count** `<RaidID>` - How many waves the raid's definition declares
+- **Get Raid Alive Raiders** `<RaidID>` - How many raiders of this raid are still alive
+- **Get Raid Definition ID** `<RaidID>` - The raid definition ID this instance was started from
 
 All procedure blocks are located in the **"Epic Core API"** category in the procedure editor.
 
@@ -173,6 +213,49 @@ A mod element that draws an ECA shader preset as an overlay pass on top of an ex
 - **Render Condition** — Optional logic procedure evaluated per block position; return true to draw the overlay, leave empty to always render
 
 **Note!** The render condition is evaluated on the client, so the dependencies it uses must be available on the client side, otherwise the condition will not work.
+
+### ECA Faction (Mod Element)
+
+A mod element that declares a faction: its identity, and how it treats other factions and entities that belong to no faction. Membership itself is bound at runtime with the faction procedure blocks — this element defines the faction, not its members.
+
+The faction's ID is its mod element registry name, so the faction procedure blocks can offer it in a dropdown instead of asking you to type an ID. The editor has two pages:
+
+**General**
+- **Display Name** — A fixed string or a procedure that returns text; may also be a translation key such as `faction.mymod.undead.name`. Leave empty to fall back to the element registry name
+- **Faction Colour** — Colour used when the faction is shown in UI (name tags, glow outline, etc.)
+**Relations** — a single list where each row targets one faction with one relation, plus an optional condition:
+- **Faction** — The target faction, picked from the ECA Faction elements in your workspace. Pick **(No faction)** to target entities that belong to no faction at all
+- **Relation** — Hostile means members attack each other normally, Friendly means they never target or damage each other, Neutral means they will not target each other but accidental damage still applies
+- **Condition** — Leave empty to make the row a static preset. When set, the relation applies only while the condition returns true, otherwise resolution falls back to the static presets
+
+So "hostile to the guards, but friendly while they are asleep" is two rows on the same faction: one unconditional Hostile, one conditional Friendly. A **(No faction)** row works the same way — without a condition it is this faction's default relation, with one it is checked at runtime and falls back to that default. ECA resolves relations in this order: same faction → conditional rows → static rows → the other faction's definition → default relation.
+
+**Note!** The Display Name is read once when the faction is registered at mod load, so a procedure used there runs before any world exists and must not rely on world or entity dependencies. Relation conditions are different — they are evaluated on the server at query time, where `entity` is the target being judged and `sourceentity` is a member of this faction (it may be empty when the query has no member context, so do not rely on it unconditionally).
+
+### ECA Raid (Mod Element)
+
+A mod element that declares a raid: the waves it sends, the faction its raiders belong to, when it is won or lost, and what happens along the way.
+
+**Raids never start on their own.** ECA has no trigger condition inside the raid definition by design — a raid describes *what* the raid is, and *when* it happens is entirely up to you. Drive it from your own procedure with **Start Raid At** or **Start Raid In Structure**: on a player entering an area, on a block being broken, at a certain time of day, from a command, or anything else. The element below therefore has victory, defeat and wave-advance conditions, but no start condition.
+
+The editor has three pages:
+
+**General**
+- **Display Name** — A fixed string or a procedure that returns text, shown on the raid boss bar. Leave empty to fall back to the element registry name
+- **Raider Faction** — The faction spawned raiders are bound to. This binding is what makes vanilla AI and ECA's attack rules treat raiders as hostile to defenders; without it a raid relies entirely on each entity's own AI, and wave leaders degrade into ordinary raiders
+- **Structure Anchor** + **Structure / Tag** — How the raid finds its centre: *None* uses the position you pass to the start block directly, *Structure* anchors to one specific structure, *Tag* anchors to any structure carrying that tag. These are mutually exclusive in ECA, which is why there is one field rather than two
+- **Raider Goal Priority** — Priority of the AI goal that walks raiders toward the centre
+- **Endless** — Cycle the wave list forever instead of ending after the last wave
+- **Boss Bar Colour**, **Max Duration**, **Wave Cooldown**, **Participant Radius**, **Celebration** — Appearance and pacing
+
+**Waves** — a single list of spawn entries. Rows sharing a wave number are merged into one wave, and waves run in ascending order of that number, so you type the wave number on each row rather than nesting lists:
+- **Wave** / **Entity Type** / **Count** — What this row spawns and which wave it belongs to
+- **Leader** — Make this entity the wave's leader instead of an ordinary entry. Requires a Raider Faction; the leader is made that faction's leader, which is what makes every raider answer when it attacks or is attacked
+- **Delay** / **Radius** — Wave-level properties, so the values from the first row of each wave are used
+
+**Conditions & Events** — nine optional procedures, all evaluated on the server with the raid centre as their position:
+- **Advance wave / Victory / Defeat conditions** — Leave empty to use ECA's defaults (previous wave dead; all waves spawned and cleared; target structure gone). Overriding replaces the default entirely — note that a custom victory condition also drops the built-in "endless raids never win" guard, and that an unanchored raid never loses by default because it has no structure to check
+- **On raid start / wave start / wave end / victory / defeat / stop** — On stop runs on every termination path, so it also fires after victory or defeat
 
 ### ECA Shader Preset (Mod Element)
 
@@ -278,12 +361,13 @@ MIT License - See [LICENSE](LICENSE) file for details.
 
 我创建这个插件是为了提供一些便捷且强大的实体操作 API。尽管现在我几乎不再使用 MCreator 制作 Mod，但我仍然想要去帮助那些依然使用 MCreator 且一直苦恼于实体相关操作的开发者。
 
-这个插件将 [Epic Core API](https://github.com/CJiangqiu/EpicCoreAPI) Mod 添加为依赖，并提供了一些在原版 MCreator 中难以或无法实现的实体操作流程块。
+这个插件将 [Epic Core API](https://github.com/CJiangqiu/EpicCoreAPI) Mod 添加为依赖，提供了一些在原版 MCreator 中难以或无法实现的流程块，以及 7 种模组元素——实体拓展、BossShow 演出、物品扩展、方块扩展、阵营、袭击、着色器预设——让你无需编写 Java 即可使用 ECA 的扩展、阵营、袭击与着色器系统。
 
 ### 流程块
 
 - **强制杀死实体** `<实体>` - 设置血量为0、触发die()、掉落战利品、给予成就并移除实体（不会发送死亡消息）
 - **强制设置生命值** `<实体> <血量>` - 通过多阶段修改实体血量：原版字段、智能字段扫描、字节码逆向追踪
+- **强制造成伤害** `<伤害值> <实体> <伤害来源>` - 确保掉血真正生效：清除受伤冷却，走原版伤害流程（护甲、抗性、伤害吸收、击退、仇恨），若血量实际未下降则兜底强制改血。致死时停在0血由原版播放死亡动画
 - **强制复活实体** `<实体>` - 使用VarHandle清除实体的死亡标志并重置deathTime
 - **通过UUID强制复活实体** `<UUID>` - 通过UUID复活实体，适用于实体已被移除的情况
 - **设置强制无敌** `<实体> <布尔值>` - 开启/关闭无敌并自动处理血量锁定（开启时锁血，关闭时解锁）
@@ -353,6 +437,45 @@ MIT License - See [LICENSE](LICENSE) file for details.
 - **复活守护线程是否运行中** - 检查复活守护线程当前是否正在运行
 - **加入复活追踪** `<实体>` - 将实体加入复活追踪，守护线程运行期间该实体会在死亡后很快被自动复活。请勿用于会大量生成的实体
 - **移出复活追踪** `<实体>` - 将实体移出复活追踪，使其不再被自动复活
+
+**阵营** —— 下列所有阵营参数都是下拉列表，列出工作区中已注册的 ECA 阵营元素，无需手动输入 ID：
+
+- **创建阵营** `<阵营> <名称> <颜色>` - 在运行时创建一个新阵营并持久化到世界存档
+- **删除阵营** `<阵营>` - 删除阵营并解除其所有成员的归属
+- **合并阵营** `<源阵营> <目标阵营>` - 把前一个阵营的全部成员转入后一个阵营，然后删除前者；返回转移的成员数量
+- **阵营是否存在** `<阵营>` - 检查是否已注册该 ID 的阵营
+- **加入阵营** `<实体> <阵营>` - 把实体绑定到指定阵营
+- **移出阵营** `<实体>` - 解除实体当前的阵营归属
+- **获取实体阵营** `<实体>` - 获取实体所属的阵营 ID，无阵营时返回空字符串
+- **是否同阵营** `<实体> <实体>` - 检查两个实体是否属于同一阵营
+- **阵营成员数量** `<阵营>` - 获取阵营当前的成员数量
+- **清空阵营成员** `<阵营>` - 解除阵营全部成员的归属，但不删除阵营本身
+- **设置阵营关系** `<阵营> <阵营> <关系>` - 在运行时设置两个阵营之间的关系，覆盖预设列表
+- **获取阵营关系** `<阵营> <阵营>` - 获取两个阵营之间已设置的关系
+- **获取有效关系** `<实体> <实体>` - 解析两个实体之间的最终关系，会综合同阵营、动态覆盖、预设列表与默认关系
+- **能否伤害** `<实体> <实体>` - 检查阵营关系是否允许前者对后者造成伤害
+- **能否设为目标** `<实体> <实体>` - 检查阵营关系是否允许前者将后者设为攻击目标
+- **是否友好** `<实体> <实体>` - 检查两个实体是否友好或同阵营
+- **警报阵营成员** `<阵营> <攻击者> <受害者>` - 通知阵营成员其同伴遭到攻击，使其做出反应
+- **设置阵营首领** `<阵营> <实体>` - 将实体指定为该阵营的首领
+- **清除阵营首领** `<阵营>` - 移除该阵营当前的首领
+- **是否为阵营首领** `<实体>` - 检查实体是否为其所属阵营的首领
+- **获取阵营首领** `<阵营>` - 获取该阵营的首领实体；无首领或首领未加载时返回空
+
+**袭击** —— 袭击参数是下拉列表，列出工作区中已注册的 ECA 袭击元素。发起袭击会返回一个数字实例 ID，其余块都以它为参数：
+
+- **在坐标发起袭击** `<袭击> <X> <Y> <Z>` - 以指定坐标为中心强制发起，跳过结构查询。返回袭击实例 ID，失败返回 -1
+- **在结构中发起袭击** `<袭击> <X> <Y> <Z>` - 在目标结构内发起，中心取自结构包围盒。坐标不在该结构内时返回 -1
+- **结束袭击** `<袭击ID> <是否胜利>` - 结束一场进行中的袭击，按胜利或失败计入
+- **获取最近的袭击** `<X> <Y> <Z> <最大距离>` - 获取该距离内最近的活跃袭击实例 ID，没有则返回 -1
+- **活跃袭击数量** - 当前维度中正在进行的袭击数量
+- **袭击是否存在** `<袭击ID>` - 检查该袭击实例当前是否被追踪
+- **袭击是否已结束** `<袭击ID>` - 检查该袭击实例是否已经结束
+- **获取袭击状态** `<袭击ID>` - 以文本获取状态：ONGOING、VICTORY、DEFEAT 或 STOPPED
+- **获取袭击已生成波数** `<袭击ID>` - 该袭击目前已生成的波次数量
+- **获取袭击总波数** `<袭击ID>` - 该袭击定义声明的波次总数
+- **获取袭击存活袭击者数量** `<袭击ID>` - 该袭击中仍然存活的袭击者数量
+- **获取袭击定义ID** `<袭击ID>` - 该实例所基于的袭击定义 ID
 
 所有流程块位于流程编辑器中的 **"Epic Core API"** 分类。
 
@@ -437,6 +560,49 @@ MIT License - See [LICENSE](LICENSE) file for details.
 - **渲染条件** — 可选的逻辑流程，按方块位置逐个求值，返回 true 时绘制叠加，留空则始终渲染
 
 **注意！** 渲染条件在客户端求值，所使用的依赖必须客户端侧可见，否则条件不会生效。
+
+### ECA阵营（模组元素）
+
+用于声明一个阵营的模组元素：它的身份，以及它如何对待其他阵营和无阵营实体。成员归属本身是运行时用阵营流程块绑定的——本元素定义阵营，而非其成员。
+
+阵营 ID 取自模组元素的注册名，因此阵营流程块可以用下拉列表直接选取，无需手动输入 ID。编辑器分为两页：
+
+**基础**
+- **显示名** — 可填固定文本或返回文本的流程，也可填翻译键，例如 `faction.mymod.undead.name`。留空则回退为元素注册名
+- **阵营颜色** — 该阵营在界面中显示时使用的颜色（名牌、发光轮廓等）
+**关系** —— 单个列表，每条针对一个阵营给出一种关系，并可附带条件：
+- **阵营** — 目标阵营，从工作区已有的 ECA 阵营元素中选取。选择 **(No faction)** 则针对完全没有阵营的实体
+- **关系** — 敌对表示成员之间可正常攻击；友好表示互不设为目标、也不造成伤害；中立表示不会主动设为目标，但误伤仍会生效
+- **条件** — 留空则本条作为静态预设。填写后，仅当条件返回真时采用该关系，否则回退到静态预设
+
+所以「平时与守卫敌对，但他们睡着时友好」只需针对同一阵营写两条：一条无条件敌对，一条带条件友好。**(No faction)** 行同理——不填条件即为本阵营的默认关系，填了条件则在运行时判定、不成立时回退到该默认关系。ECA 按此顺序解析关系：同阵营 → 带条件的条目 → 静态条目 → 对方阵营的定义 → 默认关系。
+
+**注意！** 显示名在模组加载注册阵营时读取一次，因此那里的流程运行时世界尚不存在，不能依赖世界或实体。关系条件则不同——它在查询时于服务端求值，`entity` 是被判定的目标，`sourceentity` 是本阵营的某个成员（当查询没有成员上下文时可能为空，请勿无条件依赖它）。
+
+### ECA袭击（模组元素）
+
+用于声明一场袭击的模组元素：派出哪些波次、袭击者属于哪个阵营、何时判定胜负、以及过程中触发什么。
+
+**袭击不会自行开始。** ECA 刻意没有在袭击定义里设置触发条件——袭击定义描述的是"这场袭击是什么样"，"什么时候打"完全由你决定。请在自己的流程里用**在坐标发起袭击**或**在结构中发起袭击**来驱动：玩家进入某区域、某方块被破坏、到达特定时间、命令触发，或任何其他时机。因此下面的元素有胜利、失败、推进波次的判定，但**没有开始条件**。
+
+编辑器分为三页：
+
+**基础**
+- **显示名** — 可填固定文本或返回文本的流程，显示在袭击 Boss 血条上。留空则回退为元素注册名
+- **袭击者阵营** — 生成的袭击者所绑定的阵营。这个绑定是让原版 AI 与 ECA 攻击规则把袭击者视为防守方敌人的关键；不设置的话袭击完全依赖每个实体自身的 AI，且波次首领会退化为普通袭击者
+- **结构锚定方式** + **结构 / 标签** — 袭击如何确定中心：*不锚定*直接以发起时传入的坐标为中心，*指定结构*锚定到某个具体结构，*结构标签*锚定到带该标签的任意结构。这两种方式在 ECA 中互斥，所以这里只有一个输入框而非两个
+- **袭击者目标优先级** — 让袭击者走向中心的 AI 目标优先级
+- **无尽模式** — 循环播放波次列表而不是在最后一波后结束
+- **Boss血条颜色**、**最长持续时间**、**波次冷却**、**参与半径**、**庆祝时长** — 外观与节奏
+
+**波次** —— 单个生成条目列表。波次号相同的行会合并为同一波，各波按波次号升序进行，因此波次号是每行手动填写的，而非嵌套列表：
+- **波次** / **实体类型** / **数量** — 本行生成什么、属于第几波
+- **首领** — 把该实体设为本波首领而非普通条目。需要设置袭击者阵营；首领会被设为该阵营的首领，这正是让全体袭击者在其攻击或被攻击时响应的机制
+- **延迟** / **半径** — 波次级属性，取每波首行的值
+
+**条件与事件** —— 9 个可选流程，全部在服务端求值，位置依赖为袭击中心：
+- **推进波次 / 胜利 / 失败条件** — 留空则使用 ECA 默认规则（上一波全灭；所有波次已生成且清空；目标结构不再覆盖中心）。自定义会完全取代默认规则——注意自定义胜利条件会连带取消「无尽袭击永不胜利」的内置保护，而未锚定结构的袭击因为没有结构可查，默认永远不会失败
+- **袭击开始 / 波次开始 / 波次结束 / 胜利 / 失败 / 停止时** — 停止回调在任何结束路径上都会执行，因此它也会在胜利或失败之后再触发一次
 
 ### ECA着色器预设（模组元素）
 

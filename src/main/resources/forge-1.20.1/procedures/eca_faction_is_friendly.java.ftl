@@ -1,0 +1,1 @@
+net.eca.api.EcaAPI.isFriendly(${input$a}, ${input$b})

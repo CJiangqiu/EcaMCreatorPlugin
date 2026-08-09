@@ -1,0 +1,1 @@
+net.eca.api.EcaAPI.canTarget(${input$source}, ${input$target})

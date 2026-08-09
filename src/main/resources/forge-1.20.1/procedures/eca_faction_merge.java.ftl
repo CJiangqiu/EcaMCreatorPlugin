@@ -1,0 +1,1 @@
+(world instanceof net.minecraft.world.level.Level ? net.eca.api.EcaAPI.mergeFactions("${generator.getRegistryNameForModElement(generator.getElementPlainName(field$into))}", "${generator.getRegistryNameForModElement(generator.getElementPlainName(field$from))}", (net.minecraft.world.level.Level) world) : 0)

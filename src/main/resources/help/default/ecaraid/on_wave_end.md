@@ -1,0 +1,1 @@
+Note! This procedure runs on the server once a spawned wave has no raiders left, before either the next wave starts or final victory is awarded. ECA also passes the zero-based wave index, but MCreator procedures have no matching input, so it is not available here. Position dependencies are the raid centre.

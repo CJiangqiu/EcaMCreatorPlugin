@@ -1,0 +1,1 @@
+net.eca.api.EcaAPI.areSameFaction(${input$a}, ${input$b})

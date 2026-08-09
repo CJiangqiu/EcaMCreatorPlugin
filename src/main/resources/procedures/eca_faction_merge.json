@@ -1,0 +1,34 @@
+﻿{
+  "args0": [
+    {
+      "type": "field_data_list_selector",
+      "name": "from",
+      "datalist": "ecafactions",
+      "customEntryProviders": "ecafaction"
+    },
+    {
+      "type": "field_data_list_selector",
+      "name": "into",
+      "datalist": "ecafactions",
+      "customEntryProviders": "ecafaction"
+    }
+  ],
+  "inputsInline": true,
+  "output": "Number",
+  "colour": 195,
+  "mcreator": {
+    "toolbox_id": "eca",
+    "group": "eca_10_03",
+    "return_type": "number",
+    "fields": [
+      "from",
+      "into"
+    ],
+    "dependencies": [
+      {
+        "name": "world",
+        "type": "world"
+      }
+    ]
+  }
+}

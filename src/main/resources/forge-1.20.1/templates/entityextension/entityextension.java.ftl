@@ -145,6 +145,14 @@ public class ${name}EntityExtension extends EntityExtension {
         super(${data.entityType.getMappedValue(1)}, ${data.priority});
     }
 
+<#if data.factionId?? && data.factionId?has_content>
+    <#-- 本类型实体加入世界时自动入营；阵营 ID 取元素注册名，与阵营元素 getId() 同源 -->
+    @Override
+    public String getFactionId() {
+        return "${generator.getRegistryNameForModElement(data.factionId)}";
+    }
+
+</#if>
     @Override
     public boolean enableForceLoading() {
         return ${data.enableForceLoading?c};

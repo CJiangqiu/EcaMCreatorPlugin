@@ -1,0 +1,29 @@
+﻿{
+  "args0": [
+    {
+      "type": "input_value",
+      "name": "raidId",
+      "check": "Number"
+    }
+  ],
+  "inputsInline": true,
+  "output": "Number",
+  "colour": 35,
+  "mcreator": {
+    "toolbox_id": "eca",
+    "group": "eca_11_09",
+    "toolbox_init": [
+      "<value name=\"raidId\"><block type=\"math_number\"><field name=\"NUM\">-1</field></block></value>"
+    ],
+    "inputs": [
+      "raidId"
+    ],
+    "return_type": "number",
+    "dependencies": [
+      {
+        "name": "world",
+        "type": "world"
+      }
+    ]
+  }
+}

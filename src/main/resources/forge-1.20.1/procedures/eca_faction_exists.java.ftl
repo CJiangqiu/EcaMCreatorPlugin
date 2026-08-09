@@ -1,0 +1,1 @@
+(net.eca.api.EcaAPI.getFaction("${generator.getRegistryNameForModElement(generator.getElementPlainName(field$faction))}") != null)

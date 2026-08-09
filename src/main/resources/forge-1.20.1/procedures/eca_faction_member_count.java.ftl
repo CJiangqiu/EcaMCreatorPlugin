@@ -1,0 +1,1 @@
+net.eca.api.EcaAPI.getFactionMemberCount("${generator.getRegistryNameForModElement(generator.getElementPlainName(field$faction))}")

@@ -1,0 +1,1 @@
+net.eca.api.EcaAPI.canHarm(${input$source}, ${input$target})

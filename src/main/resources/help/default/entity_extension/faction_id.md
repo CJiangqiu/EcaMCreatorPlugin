@@ -1,0 +1,1 @@
+The faction that entities of this type join automatically when they enter the world, picked from the ECA Faction elements in your workspace. Leave empty to opt out. The binding is dropped again if this extension stops applying, and it never clears a faction the entity joined through some other route.

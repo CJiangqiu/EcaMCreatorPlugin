@@ -1,0 +1,1 @@
+Note! This condition is evaluated on the server. Return true to end the raid as a victory. Leave empty to use ECA's default rule: all waves spawned and every raider dead, and never for endless raids. Overriding replaces that rule entirely, including the endless guard — an endless raid with a custom victory condition can win. Position dependencies are the raid centre.

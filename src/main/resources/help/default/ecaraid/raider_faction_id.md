@@ -1,0 +1,1 @@
+The faction that spawned raiders are bound to, picked from the ECA Faction elements in your workspace. Binding is what makes vanilla AI, target selectors and ECA's attack rules treat raiders as hostile to defenders — a raid without a faction relies entirely on each entity's own AI, and wave leaders degrade into ordinary raiders. Leave as (None) to skip faction binding.

@@ -1,0 +1,45 @@
+﻿{
+  "args0": [
+    {
+      "type": "field_data_list_selector",
+      "name": "faction",
+      "datalist": "ecafactions",
+      "customEntryProviders": "ecafaction"
+    },
+    {
+      "type": "input_value",
+      "name": "attacker",
+      "check": "Entity"
+    },
+    {
+      "type": "input_value",
+      "name": "victim",
+      "check": "Entity"
+    }
+  ],
+  "inputsInline": true,
+  "previousStatement": null,
+  "nextStatement": null,
+  "colour": 195,
+  "mcreator": {
+    "toolbox_id": "eca",
+    "group": "eca_10_17",
+    "toolbox_init": [
+      "<value name=\"attacker\"><block type=\"source_entity_from_deps\"></block></value>",
+      "<value name=\"victim\"><block type=\"entity_from_deps\"></block></value>"
+    ],
+    "inputs": [
+      "attacker",
+      "victim"
+    ],
+    "fields": [
+      "faction"
+    ],
+    "dependencies": [
+      {
+        "name": "world",
+        "type": "world"
+      }
+    ]
+  }
+}

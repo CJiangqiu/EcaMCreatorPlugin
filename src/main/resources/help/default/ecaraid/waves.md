@@ -1,0 +1,1 @@
+The raid's spawn entries. Rows sharing a wave number are merged into one wave, and waves run in ascending order of that number. Delay and radius are wave-level properties, so the values from the first row of each wave are used and the rest are ignored.

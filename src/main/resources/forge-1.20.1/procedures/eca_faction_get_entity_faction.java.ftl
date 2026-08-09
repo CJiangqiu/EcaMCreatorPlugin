@@ -1,0 +1,1 @@
+(net.eca.api.EcaAPI.getEntityFaction(${input$entity}) != null ? net.eca.api.EcaAPI.getEntityFaction(${input$entity}) : "")
