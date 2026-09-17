@@ -7,8 +7,8 @@
    - `<name>_entity.vsh` + `<name>_entity.json` — NEW_ENTITY profile (entity layer, item overlay)
 3. **Copy** all 5 files to your workspace:
    ```
-   <workspace>/src/main/resources/assets/<modid>/shaders/core/
+   <workspace>/src/main/resources/assets/<modid>/eca/shader_presets/
    ```
-4. **Back in MCreator**: Create an ECA Shader Preset element. The dropdown auto-scans the folder above and lists any valid five-file sets found there. Select yours, or type the name manually.
+4. **Back in MCreator**: Create an ECA Shader Preset element. The dropdown scans the canonical folder above and the legacy `assets/<modid>/shaders/core/` fallback. Select yours, or type the name manually.
 
 Once registered, your preset appears in all ECA shader dropdowns (Entity Extension layers, skyboxes, boss bars, item extension render layers, etc.) alongside the 12 built-in ECA presets.

@@ -23,7 +23,9 @@ import net.eca.util.raid.RaidDefinition;
 import net.eca.util.raid.RaidWave;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @RegisterRaid
 public class ${name}Raid extends RaidDefinition {
@@ -46,13 +48,26 @@ public class ${name}Raid extends RaidDefinition {
 <#list waveIndexes as wi>
 <#assign rows = []/>
 <#list data.waves as e><#if e.wave == wi><#assign rows = rows + [e]/></#if></#list>
+<#assign factionIds = []/>
+<#list rows as r><#if r.factionId?has_content && !factionIds?seq_contains(r.factionId)><#assign factionIds = factionIds + [r.factionId]/></#if></#list>
         RaidWave _wave${wi} = new RaidWave();
 <#list rows as r>
+<#if !r.factionId?has_content>
 <#if r.leader>
         _wave${wi}.setLeader(${r.entityType.getMappedValue(1)});
 <#else>
         _wave${wi}.addEntry(${r.entityType.getMappedValue(1)}, ${r.count});
 </#if>
+</#if>
+</#list>
+<#list factionIds as factionId>
+<#assign factionRows = []/>
+<#list rows as r><#if r.factionId?has_content && r.factionId == factionId><#assign factionRows = factionRows + [r]/></#if></#list>
+        Map<net.minecraft.world.entity.EntityType<?>, Integer> _weights${wi}_${factionId?index} = new LinkedHashMap<>();
+<#list factionRows as r>
+        _weights${wi}_${factionId?index}.put(${r.entityType.getMappedValue(1)}, <#if r.weight gt 0>${r.weight}<#else>1</#if>);
+</#list>
+        _wave${wi}.addFaction("${generator.getRegistryNameForModElement(factionId)}", ${factionRows[0].count}, _weights${wi}_${factionId?index});
 </#list>
         _wave${wi}.spawnDelay(${rows[0].spawnDelay}).spawnRadius(${rows[0].spawnRadius?c});
         _waves.add(_wave${wi});

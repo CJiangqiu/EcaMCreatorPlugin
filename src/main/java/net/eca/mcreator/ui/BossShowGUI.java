@@ -17,10 +17,11 @@ import net.mcreator.workspace.elements.ModElement;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 public class BossShowGUI extends ModElementGUI<BossShowElement> {
 
@@ -61,24 +62,36 @@ public class BossShowGUI extends ModElementGUI<BossShowElement> {
     }
 
     private void reloadBossShowList() {
-        List<String> names = new ArrayList<>();
+        Set<String> found = new LinkedHashSet<>();
         File workspaceFolder = mcreator.getWorkspace().getFolderManager().getWorkspaceFolder();
         String modid = mcreator.getWorkspace().getWorkspaceSettings().getModID();
-        File bossShowDir = new File(workspaceFolder, "src/main/resources/data/" + modid + "/bossshow");
-        File[] files = bossShowDir.listFiles((dir, name) -> name.endsWith(".json"));
-        if (files != null) {
-            Arrays.stream(files)
-                    .map(File::getName)
-                    .map(n -> n.substring(0, n.length() - ".json".length()))
-                    .sorted(Comparator.naturalOrder())
-                    .forEach(names::add);
-        }
+        File dataRoot = new File(workspaceFolder, "src/main/resources/data/" + modid);
+        collectBossShows(new File(dataRoot, "eca/bossshow"), new File(dataRoot, "eca/bossshow"), found);
+        collectBossShows(new File(dataRoot, "bossshow"), new File(dataRoot, "bossshow"), found);
+        List<String> names = found.stream().sorted(Comparator.naturalOrder()).toList();
 
         String previous = (String) bossShowId.getSelectedItem();
         bossShowId.removeAllItems();
         for (String n : names) bossShowId.addItem(n);
         if (previous != null && names.contains(previous))
             bossShowId.setSelectedItem(previous);
+    }
+
+    private static void collectBossShows(File root, File directory, Set<String> output) {
+        File[] files = directory.listFiles();
+        if (files != null) {
+            Arrays.stream(files)
+                    .sorted(Comparator.comparing(File::getName))
+                    .forEach(file -> {
+                        if (file.isDirectory()) {
+                            collectBossShows(root, file, output);
+                        } else if (file.getName().endsWith(".json")) {
+                            String relative = root.toPath().relativize(file.toPath()).toString()
+                                    .replace(File.separatorChar, '/');
+                            output.add(relative.substring(0, relative.length() - ".json".length()));
+                        }
+                    });
+        }
     }
 
     @Override

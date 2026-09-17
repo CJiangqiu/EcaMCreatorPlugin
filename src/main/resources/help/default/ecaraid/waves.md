@@ -1,1 +1,1 @@
-The raid's spawn entries. Rows sharing a wave number are merged into one wave, and waves run in ascending order of that number. Delay and radius are wave-level properties, so the values from the first row of each wave are used and the rest are ignored.
+The raid's spawn entries. Rows without a Group Faction are explicit entries. Rows sharing a wave number and Group Faction form one weighted faction group. Waves run in ascending order. Delay and radius are wave-level properties taken from the first row of each wave.

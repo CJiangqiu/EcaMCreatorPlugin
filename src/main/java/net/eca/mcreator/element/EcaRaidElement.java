@@ -63,6 +63,9 @@ public class EcaRaidElement extends GeneratableElement {
         public int wave;
         public EntityEntry entityType;
         public int count;
+        // 留空时为显式条目；非空时，同波次同阵营的行合并为一个加权生成组
+        public String factionId;
+        public int weight;
         public boolean leader;
         public int spawnDelay;
         public double spawnRadius;
@@ -70,6 +73,8 @@ public class EcaRaidElement extends GeneratableElement {
         public WaveEntry() {
             this.wave = 1;
             this.count = 1;
+            this.factionId = "";
+            this.weight = 1;
             this.spawnRadius = 24.0;
         }
     }
