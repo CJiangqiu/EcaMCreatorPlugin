@@ -13,11 +13,32 @@ forge-1.20.1:
     }
     dependencies {
       def libDir = new File(System.getProperty("user.home"), ".mcreator/lib")
-      def ecaJars = fileTree(dir: libDir, include: 'epic-core-api-*-dev.jar').files
+      def ecaJarPattern = ~/^epic-core-api-(\d+(?:\.\d+)*)(?:-|_)dev\.jar$/
+      def ecaJars = fileTree(
+          dir: libDir,
+          includes: ['epic-core-api-*-dev.jar', 'epic-core-api-*_dev.jar']
+      ).files.findAll { it.name ==~ ecaJarPattern }
       if (!ecaJars.isEmpty()) {
-        def latestEca = ecaJars.sort { it.name }.last()
+        def versionParts = { jar ->
+          def matcher = jar.name =~ ecaJarPattern
+          matcher.matches()
+          matcher.group(1).tokenize('.').collect { it as int }
+        }
+        def latestEca = ecaJars.max { left, right ->
+          def leftVersion = versionParts(left)
+          def rightVersion = versionParts(right)
+          def partCount = Math.max(leftVersion.size(), rightVersion.size())
+          for (int i = 0; i < partCount; i++) {
+            def leftPart = i < leftVersion.size() ? leftVersion[i] : 0
+            def rightPart = i < rightVersion.size() ? rightVersion[i] : 0
+            if (leftPart != rightPart) {
+              return leftPart <=> rightPart
+            }
+          }
+          return left.name <=> right.name
+        }
         implementation files(latestEca)
       } else {
-          implementation fg.deobf("maven.modrinth:epic-core-api:1.1.7-fix-fix:dev")
+        implementation fg.deobf("maven.modrinth:epic-core-api:1.1.8:dev")
       }
     }

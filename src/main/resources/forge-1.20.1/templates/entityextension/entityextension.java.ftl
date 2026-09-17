@@ -5,6 +5,8 @@
 <#macro entityDepsCall obj>
 <#list obj.getDependencies(generator.getWorkspace()) as dep><#switch dep.getName()><#case "entity">entity<#break><#case "world">entity.level()<#break><#case "x">entity.getX()<#break><#case "y">entity.getY()<#break><#case "z">entity.getZ()<#break><#default>${dep.getName()}<#break></#switch><#if dep?has_next>, </#if></#list>
 </#macro>
+<#macro blenderNumber obj><#if hasProc(obj)>(float) ${package}.procedures.${obj.getName()}Procedure.execute(<@entityDepsCall obj/>)<#else>${obj.getFixedValue()}f</#if></#macro>
+<#macro blenderString obj><#if hasProc(obj)>${package}.procedures.${obj.getName()}Procedure.execute(<@entityDepsCall obj/>)<#else>"${JavaConventions.escapeStringForJava(obj.getFixedValue())}"</#if></#macro>
 <#macro musicExtClass rule>new CombatMusicExtension() {
                 @Override public boolean enabled() { return true; }
 <#if rule.soundEventId?has_content>
@@ -78,13 +80,17 @@ import net.eca.util.entity_extension.GlobalSkyboxExtension;
 <#if data.combatMusicEnabled>
 import net.eca.util.entity_extension.CombatMusicExtension;
 </#if>
+<#if data.blenderModelEnabled && data.blenderModelId?has_content>
+import net.eca.util.entity_extension.BlenderModelExtension;
+import net.eca.util.entity_extension.BlenderRenderMode;
+</#if>
 <#if (data.bossBarFrameShaderEnabled && data.bossBarFrameRenderType?has_content || data.bossBarFillShaderEnabled && data.bossBarFillRenderType?has_content || (data.entityLayerEnabled && data.entityLayerEntries?has_content) || (data.globalSkyboxEnabled && data.skyboxEntries?has_content))>
 import net.minecraft.client.renderer.RenderType;
 </#if>
-<#if (data.bossBarFrameTexture?has_content || data.bossBarFillTexture?has_content)>
+<#if (data.bossBarFrameTexture?has_content || data.bossBarFillTexture?has_content || (data.blenderModelEnabled && data.blenderModelId?has_content))>
 import net.minecraft.resources.ResourceLocation;
 </#if>
-<#assign needsLivingEntity = data.customHealthEnabled || data.customMaxHealthEnabled || (data.bossBarEnabled && data.bossBarCondition?? && hasProc(data.bossBarCondition)) || (data.entityLayerEnabled && data.entityLayerEntries?has_content) || (data.globalFogEnabled && data.fogEntries?has_content) || (data.globalSkyboxEnabled && data.skyboxEntries?has_content) || (data.combatMusicEnabled && data.musicRules?has_content)>
+<#assign needsLivingEntity = data.blenderModelEnabled || data.customHealthEnabled || data.customMaxHealthEnabled || data.bossBarDisplayCurrentEnabled || data.bossBarDisplayMaxEnabled || (data.bossBarEnabled && data.bossBarCondition?? && hasProc(data.bossBarCondition)) || (data.entityLayerEnabled && data.entityLayerEntries?has_content) || (data.globalFogEnabled && data.fogEntries?has_content) || (data.globalSkyboxEnabled && data.skyboxEntries?has_content) || (data.combatMusicEnabled && data.musicRules?has_content)>
 <#if needsLivingEntity>
 import net.minecraft.world.entity.LivingEntity;
 </#if>
@@ -93,6 +99,12 @@ import ${package}.procedures.${data.customHealthValue.getName()}Procedure;
 </#if>
 <#if data.customMaxHealthEnabled && data.customMaxHealthValue?? && data.customMaxHealthValue.getName()?? && data.customMaxHealthValue.getName()?has_content && data.customMaxHealthValue.getName() != "null">
 import ${package}.procedures.${data.customMaxHealthValue.getName()}Procedure;
+</#if>
+<#if data.bossBarDisplayCurrentEnabled && data.bossBarDisplayCurrentValue?? && hasProc(data.bossBarDisplayCurrentValue)>
+import ${package}.procedures.${data.bossBarDisplayCurrentValue.getName()}Procedure;
+</#if>
+<#if data.bossBarDisplayMaxEnabled && data.bossBarDisplayMaxValue?? && hasProc(data.bossBarDisplayMaxValue)>
+import ${package}.procedures.${data.bossBarDisplayMaxValue.getName()}Procedure;
 </#if>
 <#if data.bossBarCondition?? && hasProc(data.bossBarCondition)>
 import ${package}.procedures.${data.bossBarCondition.getName()}Procedure;
@@ -261,6 +273,35 @@ public class ${name}EntityExtension extends EntityExtension {
     <#if (data.bossBarFillAlpha != 100)>
             @Override public float getFillAlpha() { return ${(data.bossBarFillAlpha / 100.0)?c}f; }
     </#if>
+    <#if data.bossBarShowValueText>
+            @Override
+            public boolean showValueText() {
+                return true;
+            }
+
+        <#if data.bossBarDisplayCurrentEnabled>
+            @Override
+            public Number getDisplayCurrentValue(LivingEntity entity) {
+            <#if hasProc(data.bossBarDisplayCurrentValue)>
+                return (float) ${data.bossBarDisplayCurrentValue.getName()}Procedure.execute(<@entityDepsCall data.bossBarDisplayCurrentValue/>);
+            <#else>
+                return ${data.bossBarDisplayCurrentValue.getFixedValue()}f;
+            </#if>
+            }
+
+        </#if>
+        <#if data.bossBarDisplayMaxEnabled>
+            @Override
+            public Number getDisplayMaxValue(LivingEntity entity) {
+            <#if hasProc(data.bossBarDisplayMaxValue)>
+                return (float) ${data.bossBarDisplayMaxValue.getName()}Procedure.execute(<@entityDepsCall data.bossBarDisplayMaxValue/>);
+            <#else>
+                return ${data.bossBarDisplayMaxValue.getFixedValue()}f;
+            </#if>
+            }
+
+        </#if>
+    </#if>
         };
     }
 <#else>
@@ -305,6 +346,68 @@ public class ${name}EntityExtension extends EntityExtension {
     @OnlyIn(Dist.CLIENT)
     public EntityLayerExtension entityLayerExtension() {
         return null;
+    }
+</#if>
+
+<#if data.blenderModelEnabled && data.blenderModelId?has_content>
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public BlenderModelExtension blenderModelExtension() {
+        return blenderModelExtension(null);
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public BlenderModelExtension blenderModelExtension(LivingEntity entity) {
+        return new BlenderModelExtension() {
+            @Override
+            public ResourceLocation modelId() {
+                return new ResourceLocation("<#if data.blenderModelId?contains(":")>${JavaConventions.escapeStringForJava(data.blenderModelId)}<#else>${modid}:${JavaConventions.escapeStringForJava(data.blenderModelId)}</#if>");
+            }
+
+            @Override
+            public BlenderRenderMode renderMode() {
+                return BlenderRenderMode.${data.blenderRenderMode};
+            }
+<#if data.blenderRenderCondition?? && hasProc(data.blenderRenderCondition)>
+
+            @Override
+            public boolean shouldRender(LivingEntity entity) {
+                return entity != null && !entity.isInvisible()
+                        && ${package}.procedures.${data.blenderRenderCondition.getName()}Procedure.execute(<@entityDepsCall data.blenderRenderCondition/>);
+            }
+</#if>
+
+            @Override
+            public String animation(LivingEntity entity) {
+                return <@blenderString data.blenderAnimation/>;
+            }
+
+            @Override
+            public float animationSpeed(LivingEntity entity) {
+                return <@blenderNumber data.blenderAnimationSpeed/>;
+            }
+
+            @Override
+            public float scale(LivingEntity entity) {
+                return <@blenderNumber data.blenderScale/>;
+            }
+
+            @Override
+            public float offsetX(LivingEntity entity) {
+                return <@blenderNumber data.blenderOffsetX/>;
+            }
+
+            @Override
+            public float offsetY(LivingEntity entity) {
+                return <@blenderNumber data.blenderOffsetY/>;
+            }
+
+            @Override
+            public float offsetZ(LivingEntity entity) {
+                return <@blenderNumber data.blenderOffsetZ/>;
+            }
+        };
     }
 </#if>
 

@@ -1,0 +1,1 @@
+Optional faction for a weighted spawn group. Rows with the same wave and faction are merged into one group and spawned entities join this faction. Choose (None) for a normal explicit entry that uses the Default Raider Faction.

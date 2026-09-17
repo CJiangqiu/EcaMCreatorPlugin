@@ -1,1 +1,1 @@
-The BossShow cutscene JSON file (scanned from `src/main/resources/data/<modid>/bossshow/`) this element binds to. Create the cutscene first using the in-game BossShow editor and export it into the mod's resources, then it will appear in this dropdown.
+The BossShow cutscene JSON file (scanned from `src/main/resources/data/<modid>/eca/bossshow/`) this element binds to. Nested paths are supported. The legacy `data/<modid>/bossshow/` folder is also scanned for compatibility. Screen effects are stored and played entirely by ECA and require no additional MCreator mapping.

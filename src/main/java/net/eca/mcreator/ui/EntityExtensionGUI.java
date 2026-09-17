@@ -15,8 +15,10 @@ import net.mcreator.ui.modgui.ModElementGUI;
 import net.mcreator.ui.procedure.AbstractProcedureSelector;
 import net.mcreator.ui.procedure.NumberProcedureSelector;
 import net.mcreator.ui.procedure.ProcedureSelector;
+import net.mcreator.ui.procedure.StringProcedureSelector;
 import net.mcreator.workspace.elements.VariableTypeLoader;
 import net.mcreator.ui.validation.AggregatedValidationResult;
+import net.mcreator.ui.validation.component.VTextField;
 import net.mcreator.ui.workspace.resources.TextureType;
 import net.mcreator.workspace.elements.ModElement;
 
@@ -54,6 +56,11 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
     private final JSpinner bossBarFillOffsetY = new JSpinner(new SpinnerNumberModel(0, -1024, 1024, 1));
     private final JSpinner bossBarFrameAlpha = new JSpinner(new SpinnerNumberModel(100, 0, 100, 1));
     private final JSpinner bossBarFillAlpha = new JSpinner(new SpinnerNumberModel(100, 0, 100, 1));
+    private final JCheckBox bossBarShowValueText = new JCheckBox();
+    private final JCheckBox bossBarDisplayCurrentEnabled = new JCheckBox();
+    private NumberProcedureSelector bossBarDisplayCurrentValue;
+    private final JCheckBox bossBarDisplayMaxEnabled = new JCheckBox();
+    private NumberProcedureSelector bossBarDisplayMaxValue;
 
     // Custom Health Display
     private final JCheckBox customHealthEnabled = new JCheckBox();
@@ -64,6 +71,18 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
     // Entity Layer
     private final JCheckBox entityLayerEnabled = new JCheckBox();
     private JEntityLayerEntriesList entityLayerEntries;
+
+    // Blender GLB Model
+    private final JCheckBox blenderModelEnabled = new JCheckBox();
+    private final VTextField blenderModelId = new VTextField(30);
+    private final JComboBox<String> blenderRenderMode = new JComboBox<>(new String[]{"ADDITIVE", "REPLACE"});
+    private ProcedureSelector blenderRenderCondition;
+    private StringProcedureSelector blenderAnimation;
+    private NumberProcedureSelector blenderAnimationSpeed;
+    private NumberProcedureSelector blenderScale;
+    private NumberProcedureSelector blenderOffsetX;
+    private NumberProcedureSelector blenderOffsetY;
+    private NumberProcedureSelector blenderOffsetZ;
 
     // Global Fog
     private final JCheckBox globalFogEnabled = new JCheckBox();
@@ -106,10 +125,34 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
                 AbstractProcedureSelector.Side.CLIENT, true,
                 VariableTypeLoader.BuiltInTypes.LOGIC, entityDeps);
         entityLayerEntries = new JEntityLayerEntriesList(mcreator, this.withEntry("entity_extension/entity_layer_entries"), entityDeps);
+        blenderRenderCondition = new ProcedureSelector(
+                this.withEntry("entity_extension/blender_render_condition"), mcreator,
+                L10N.t("elementgui.entity_extension.blender_render_condition"),
+                AbstractProcedureSelector.Side.CLIENT, true,
+                VariableTypeLoader.BuiltInTypes.LOGIC, entityDeps);
+        blenderAnimation = new StringProcedureSelector(
+                this.withEntry("entity_extension/blender_animation"), mcreator,
+                L10N.t("elementgui.entity_extension.blender_animation"),
+                AbstractProcedureSelector.Side.CLIENT, new VTextField(20), 160, entityDeps);
+        blenderAnimationSpeed = numberSelector("blender_animation_speed", 1.0, 0.01, 1000.0, entityDeps);
+        blenderScale = numberSelector("blender_scale", 1.0, 0.0, 1000.0, entityDeps);
+        blenderOffsetX = numberSelector("blender_offset_x", 0.0, -10000.0, 10000.0, entityDeps);
+        blenderOffsetY = numberSelector("blender_offset_y", 0.0, -10000.0, 10000.0, entityDeps);
+        blenderOffsetZ = numberSelector("blender_offset_z", 0.0, -10000.0, 10000.0, entityDeps);
         customHealthValue = new NumberProcedureSelector(
                 this.withEntry("entity_extension/custom_health_value"), mcreator,
                 L10N.t("elementgui.entity_extension.custom_health_value"),
                 AbstractProcedureSelector.Side.BOTH,
+                new JSpinner(new SpinnerNumberModel(20, 0.0, 1000000, 1)), 0, entityDeps);
+        bossBarDisplayCurrentValue = new NumberProcedureSelector(
+                this.withEntry("entity_extension/boss_bar_display_current_value"), mcreator,
+                L10N.t("elementgui.entity_extension.boss_bar_display_current_value"),
+                AbstractProcedureSelector.Side.CLIENT,
+                new JSpinner(new SpinnerNumberModel(20, 0.0, 1000000, 1)), 0, entityDeps);
+        bossBarDisplayMaxValue = new NumberProcedureSelector(
+                this.withEntry("entity_extension/boss_bar_display_max_value"), mcreator,
+                L10N.t("elementgui.entity_extension.boss_bar_display_max_value"),
+                AbstractProcedureSelector.Side.CLIENT,
                 new JSpinner(new SpinnerNumberModel(20, 0.0, 1000000, 1)), 0, entityDeps);
         customMaxHealthValue = new NumberProcedureSelector(
                 this.withEntry("entity_extension/custom_max_health_value"), mcreator,
@@ -175,6 +218,14 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
                 "elementgui.entity_extension.boss_bar_frame_alpha", bossBarFrameAlpha, gbc);
         addRowWithHelp(bossBarPanel, "entity_extension/boss_bar_fill_alpha",
                 "elementgui.entity_extension.boss_bar_fill_alpha", bossBarFillAlpha, gbc);
+        addRowWithHelp(bossBarPanel, "entity_extension/boss_bar_show_value_text",
+                "elementgui.entity_extension.boss_bar_show_value_text", bossBarShowValueText, gbc);
+        addRowWithHelp(bossBarPanel, "entity_extension/boss_bar_display_current_enabled",
+                "elementgui.entity_extension.boss_bar_display_current_enabled", bossBarDisplayCurrentEnabled, gbc);
+        addFullWidthComponent(bossBarPanel, bossBarDisplayCurrentValue, gbc);
+        addRowWithHelp(bossBarPanel, "entity_extension/boss_bar_display_max_enabled",
+                "elementgui.entity_extension.boss_bar_display_max_enabled", bossBarDisplayMaxEnabled, gbc);
+        addFullWidthComponent(bossBarPanel, bossBarDisplayMaxValue, gbc);
 
         // --- Custom Health Display section ---
         addSectionLabel(bossBarPanel, "elementgui.entity_extension.custom_health_section", gbc);
@@ -197,6 +248,24 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
                 "elementgui.entity_extension.entity_layer_enabled", entityLayerEnabled, gbc);
         addFullWidthComponent(layerPanel, entityLayerEntries, gbc);
         addPage(L10N.t("elementgui.entityextension.layer"), PanelUtils.totalCenterInPanel(layerPanel), false);
+
+        // === Blender Model ===
+        JPanel blenderPanel = new JPanel(new GridBagLayout());
+        gbc = defaultConstraints();
+        addRowWithHelp(blenderPanel, "entity_extension/blender_model_enabled",
+                "elementgui.entity_extension.blender_model_enabled", blenderModelEnabled, gbc);
+        addRowWithHelp(blenderPanel, "entity_extension/blender_model_id",
+                "elementgui.entity_extension.blender_model_id", blenderModelId, gbc);
+        addRowWithHelp(blenderPanel, "entity_extension/blender_render_mode",
+                "elementgui.entity_extension.blender_render_mode", blenderRenderMode, gbc);
+        addFullWidthComponent(blenderPanel, blenderRenderCondition, gbc);
+        addFullWidthComponent(blenderPanel, blenderAnimation, gbc);
+        addFullWidthComponent(blenderPanel, blenderAnimationSpeed, gbc);
+        addFullWidthComponent(blenderPanel, blenderScale, gbc);
+        addFullWidthComponent(blenderPanel, blenderOffsetX, gbc);
+        addFullWidthComponent(blenderPanel, blenderOffsetY, gbc);
+        addFullWidthComponent(blenderPanel, blenderOffsetZ, gbc);
+        addPage(L10N.t("elementgui.entityextension.blender"), PanelUtils.totalCenterInPanel(blenderPanel), false);
 
         // === Global Fog ===
         JPanel fogPanel = new JPanel(new GridBagLayout());
@@ -227,9 +296,36 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         EcaFactionUtil.populateCombo(factionId, mcreator, null, true);
         setupBossBarToggle();
         setupEnableToggle(entityLayerEnabled, entityLayerEntries);
+        setupBlenderToggle();
         setupEnableToggle(globalFogEnabled, fogEntries);
         setupEnableToggle(globalSkyboxEnabled, skyboxEntries);
         setupMusicToggle();
+    }
+
+    private NumberProcedureSelector numberSelector(String key, double value, double min, double max,
+                                                   Dependency[] deps) {
+        return new NumberProcedureSelector(
+                this.withEntry("entity_extension/" + key), mcreator,
+                L10N.t("elementgui.entity_extension." + key),
+                AbstractProcedureSelector.Side.CLIENT,
+                new JSpinner(new SpinnerNumberModel(value, min, max, 0.1)), 0, deps);
+    }
+
+    private void setupBlenderToggle() {
+        Runnable update = () -> {
+            boolean enabled = blenderModelEnabled.isSelected();
+            blenderModelId.setEnabled(enabled);
+            blenderRenderMode.setEnabled(enabled);
+            blenderRenderCondition.setEnabled(enabled);
+            blenderAnimation.setEnabled(enabled);
+            blenderAnimationSpeed.setEnabled(enabled);
+            blenderScale.setEnabled(enabled);
+            blenderOffsetX.setEnabled(enabled);
+            blenderOffsetY.setEnabled(enabled);
+            blenderOffsetZ.setEnabled(enabled);
+        };
+        update.run();
+        blenderModelEnabled.addItemListener(e -> update.run());
     }
 
     private JPanel buildShaderRow(JCheckBox enableBox, JComboBox<String> presetCombo,
@@ -278,6 +374,12 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
             bossBarFillOffsetY.setEnabled(bb);
             bossBarFrameAlpha.setEnabled(bb);
             bossBarFillAlpha.setEnabled(bb);
+            bossBarShowValueText.setEnabled(bb);
+            boolean valueText = bb && bossBarShowValueText.isSelected();
+            bossBarDisplayCurrentEnabled.setEnabled(valueText);
+            bossBarDisplayCurrentValue.setEnabled(valueText && bossBarDisplayCurrentEnabled.isSelected());
+            bossBarDisplayMaxEnabled.setEnabled(valueText);
+            bossBarDisplayMaxValue.setEnabled(valueText && bossBarDisplayMaxEnabled.isSelected());
             bossBarFrameRenderType.setEnabled(bb && bossBarFrameShaderEnabled.isSelected());
             bossBarFrameWidth.setEnabled(bb && bossBarFrameShaderEnabled.isSelected());
             bossBarFrameHeight.setEnabled(bb && bossBarFrameShaderEnabled.isSelected());
@@ -296,6 +398,9 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         bossBarFillEnableTexture.addItemListener(e -> update.run());
         bossBarFrameShaderEnabled.addItemListener(e -> update.run());
         bossBarFillShaderEnabled.addItemListener(e -> update.run());
+        bossBarShowValueText.addItemListener(e -> update.run());
+        bossBarDisplayCurrentEnabled.addItemListener(e -> update.run());
+        bossBarDisplayMaxEnabled.addItemListener(e -> update.run());
         customHealthEnabled.addItemListener(e -> update.run());
         customMaxHealthEnabled.addItemListener(e -> update.run());
     }
@@ -353,6 +458,13 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         bossBarFillOffsetY.setValue(element.bossBarFillOffsetY);
         bossBarFrameAlpha.setValue(element.bossBarFrameAlpha);
         bossBarFillAlpha.setValue(element.bossBarFillAlpha);
+        bossBarShowValueText.setSelected(element.bossBarShowValueText);
+        bossBarDisplayCurrentEnabled.setSelected(element.bossBarDisplayCurrentEnabled);
+        if (element.bossBarDisplayCurrentValue != null)
+            bossBarDisplayCurrentValue.setSelectedProcedure(element.bossBarDisplayCurrentValue);
+        bossBarDisplayMaxEnabled.setSelected(element.bossBarDisplayMaxEnabled);
+        if (element.bossBarDisplayMaxValue != null)
+            bossBarDisplayMaxValue.setSelectedProcedure(element.bossBarDisplayMaxValue);
 
         customHealthEnabled.setSelected(element.customHealthEnabled);
         if (element.customHealthValue != null)
@@ -364,6 +476,24 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         entityLayerEnabled.setSelected(element.entityLayerEnabled);
         if (element.entityLayerEntries != null)
             entityLayerEntries.setEntries(element.entityLayerEntries);
+
+        blenderModelEnabled.setSelected(element.blenderModelEnabled);
+        blenderModelId.setText(nonNull(element.blenderModelId));
+        if (element.blenderRenderMode != null) blenderRenderMode.setSelectedItem(element.blenderRenderMode);
+        if (element.blenderRenderCondition != null)
+            blenderRenderCondition.setSelectedProcedure(element.blenderRenderCondition);
+        if (element.blenderAnimation != null)
+            blenderAnimation.setSelectedProcedure(element.blenderAnimation);
+        if (element.blenderAnimationSpeed != null)
+            blenderAnimationSpeed.setSelectedProcedure(element.blenderAnimationSpeed);
+        if (element.blenderScale != null)
+            blenderScale.setSelectedProcedure(element.blenderScale);
+        if (element.blenderOffsetX != null)
+            blenderOffsetX.setSelectedProcedure(element.blenderOffsetX);
+        if (element.blenderOffsetY != null)
+            blenderOffsetY.setSelectedProcedure(element.blenderOffsetY);
+        if (element.blenderOffsetZ != null)
+            blenderOffsetZ.setSelectedProcedure(element.blenderOffsetZ);
 
         globalFogEnabled.setSelected(element.globalFogEnabled);
         if (element.fogEntries != null)
@@ -410,6 +540,11 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         element.bossBarFillOffsetY = (int) bossBarFillOffsetY.getValue();
         element.bossBarFrameAlpha = (int) bossBarFrameAlpha.getValue();
         element.bossBarFillAlpha = (int) bossBarFillAlpha.getValue();
+        element.bossBarShowValueText = bossBarShowValueText.isSelected();
+        element.bossBarDisplayCurrentEnabled = bossBarDisplayCurrentEnabled.isSelected();
+        element.bossBarDisplayCurrentValue = bossBarDisplayCurrentValue.getSelectedProcedure();
+        element.bossBarDisplayMaxEnabled = bossBarDisplayMaxEnabled.isSelected();
+        element.bossBarDisplayMaxValue = bossBarDisplayMaxValue.getSelectedProcedure();
 
         element.customHealthEnabled = customHealthEnabled.isSelected();
         element.customHealthValue = customHealthValue.getSelectedProcedure();
@@ -418,6 +553,17 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
 
         element.entityLayerEnabled = entityLayerEnabled.isSelected();
         element.entityLayerEntries = entityLayerEntries.getEntries();
+
+        element.blenderModelEnabled = blenderModelEnabled.isSelected();
+        element.blenderModelId = blenderModelId.getText().trim();
+        element.blenderRenderMode = getCombo(blenderRenderMode);
+        element.blenderRenderCondition = blenderRenderCondition.getSelectedProcedure();
+        element.blenderAnimation = blenderAnimation.getSelectedProcedure();
+        element.blenderAnimationSpeed = blenderAnimationSpeed.getSelectedProcedure();
+        element.blenderScale = blenderScale.getSelectedProcedure();
+        element.blenderOffsetX = blenderOffsetX.getSelectedProcedure();
+        element.blenderOffsetY = blenderOffsetY.getSelectedProcedure();
+        element.blenderOffsetZ = blenderOffsetZ.getSelectedProcedure();
 
         element.globalFogEnabled = globalFogEnabled.isSelected();
         element.fogEntries = fogEntries.getEntries();
@@ -438,11 +584,20 @@ public class EntityExtensionGUI extends ModElementGUI<EntityExtensionElement> {
         EcaFactionUtil.populateCombo(factionId, mcreator, null, true);
         bossBarCondition.refreshListKeepSelected();
         entityLayerEntries.reloadDataLists();
+        blenderRenderCondition.refreshListKeepSelected();
+        blenderAnimation.refreshListKeepSelected();
+        blenderAnimationSpeed.refreshListKeepSelected();
+        blenderScale.refreshListKeepSelected();
+        blenderOffsetX.refreshListKeepSelected();
+        blenderOffsetY.refreshListKeepSelected();
+        blenderOffsetZ.refreshListKeepSelected();
         fogEntries.reloadDataLists();
         skyboxEntries.reloadDataLists();
         musicRules.reloadDataLists();
         customHealthValue.refreshListKeepSelected();
         customMaxHealthValue.refreshListKeepSelected();
+        bossBarDisplayCurrentValue.refreshListKeepSelected();
+        bossBarDisplayMaxValue.refreshListKeepSelected();
     }
 
     private void refreshShaderCombos() {

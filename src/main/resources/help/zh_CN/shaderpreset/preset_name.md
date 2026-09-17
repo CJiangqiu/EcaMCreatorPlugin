@@ -7,8 +7,8 @@
    - `<名称>_entity.vsh` + `<名称>_entity.json` — NEW_ENTITY 配置（实体层、物品叠加）
 3. **复制**全部 5 个文件到你的工作区：
    ```
-   <工作区>/src/main/resources/assets/<modid>/shaders/core/
+   <工作区>/src/main/resources/assets/<modid>/eca/shader_presets/
    ```
-4. **回到 MCreator**：创建一个 ECA 着色器预设元素。下拉框会自动扫描上述文件夹中有效的五文件集。选择你的预设，或手动输入名称。
+4. **回到 MCreator**：创建一个 ECA 着色器预设元素。下拉框会扫描上述规范目录，也兼容旧目录 `assets/<modid>/shaders/core/`。选择你的预设，或手动输入名称。
 
 注册后，你的预设将出现在所有 ECA 着色器下拉框中（实体扩展图层、天空盒、Boss 血条、物品扩展渲染层等），与 12 个 ECA 内置预设并列可选。

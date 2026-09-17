@@ -23,7 +23,7 @@ public class JRaidWavesList extends JSimpleEntriesList<JRaidWaveEntry, WaveEntry
                 L10N.t("elementgui.ecaraid.waves"), 0, 0,
                 getFont().deriveFont(12.0f),
                 Theme.current().getForegroundColor()));
-        int prefWidth = Math.max(900, (int) (mcreator.getSize().width * 0.7));
+        int prefWidth = Math.max(1250, (int) (mcreator.getSize().width * 0.85));
         setPreferredSize(new Dimension(prefWidth, (int) (mcreator.getSize().height * 0.45)));
     }
 

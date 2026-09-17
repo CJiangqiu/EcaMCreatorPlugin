@@ -1,4 +1,4 @@
-Each row binds one keyframe `event id` (declared inside the BossShow cutscene) to a procedure. When the cutscene reaches that keyframe tick during playback, the procedure runs server-side.
+Each row binds one `event_id` from the BossShow event track to a procedure. When playback reaches that event cue, the procedure runs server-side. Subtitle and screen-effect tracks are handled directly by ECA and need no mapping here.
 
 Available procedure dependencies:
 - `entity` — the target entity the cutscene is anchored to

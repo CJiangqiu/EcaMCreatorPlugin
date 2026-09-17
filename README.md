@@ -85,11 +85,22 @@ This plugin integrates [Epic Core API](https://github.com/CJiangqiu/EpicCoreAPI)
 - **Stop BossShow** `<Player>` - Stop the currently playing BossShow cutscene for a player
 - **Is BossShow Playing** `<Player>` - Check if a player currently has an active BossShow cutscene playing
 - **Trigger Custom-type BossShow** `<Name> <Player> <Target>` - Trigger the BossShow with the given name that is configured with trigger type "Custom". Starts a new playback and does not interact with any currently playing BossShow
-- **Start Resurrection Daemon** - Start the resurrection daemon thread, which continuously monitors tracked entities and auto-revives any that die or lose container registration
-- **Stop Resurrection Daemon** - Stop the resurrection daemon thread; tracked entities are no longer auto-revived
+- **Start Resurrection Daemon** - Start monitoring tracked entities, repairing server/client presence, snapshotting intact state and rebuilding missing instances
+- **Stop Resurrection Daemon** - Stop automatic repair, snapshot and rebuild processing
 - **Is Resurrection Daemon Running** - Check whether the resurrection daemon thread is currently running
-- **Add to Resurrection Tracking** `<Entity>` - Add an entity to resurrection tracking; while the daemon runs it is auto-revived shortly after death. Do not use on entities that spawn in large numbers
-- **Remove from Resurrection Tracking** `<Entity>` - Remove an entity from resurrection tracking so it is no longer auto-revived
+- **Add to Resurrection Tracking** `<Entity>` - Protect an entity with server/client presence repair, snapshots, displacement recovery and instance rebuilding. Do not use on entities that spawn in large numbers
+- **Remove from Resurrection Tracking** `<Entity>` - Remove an entity from automatic repair and rebuild tracking
+- **Set/Get Resurrection Client Probe Interval** `<Milliseconds>` - Configure or read the client-presence probe interval (clamped to 100–60000 ms)
+- **Set/Get Resurrection Snapshot Interval** `<Milliseconds>` - Configure or read the full-state snapshot interval (clamped to 50–60000 ms)
+- **Resurrection Statistics** - Read cumulative server repairs, entity rebuilds, client repairs, displacement restores and state snapshots
+
+**Blender animations** — these blocks control explicit GLB animation state and must be called on the logical server:
+
+- **Play Blender Animation** `<Entity> <Animation>` - Restart a named animation at exported speed without looping
+- **Play Blender Animation With Settings** `<Entity> <Animation> <Speed> <Loop>` - Restart it with a positive speed and explicit loop mode
+- **Stop / Pause / Resume Blender Animation** `<Entity>` - Control explicit playback; stopping returns to the extension or definition default
+- **Is Blender Animation Playing** `<Entity>` - Check whether an explicit animation state exists
+- **Is Named Blender Animation Playing** `<Entity> <Animation>` - Check the active exported animation name
 
 **Factions** — every faction parameter below is a dropdown listing the ECA Faction elements registered in your workspace, so you never type an ID by hand:
 
@@ -138,8 +149,10 @@ A new mod element type for visually enhancing specific entity types. Create an E
 
 - **Force Loading** — Force-load entities of this type; do not use for entities that spawn in large numbers
 - **Custom Boss Bar** — Custom frame/fill textures with optional shader effects, configurable size and offset
+- **Boss Bar Value Text** — Optionally draw centered `current / max` values, with independent client-side display-value overrides
 - **Custom Fill Ratio** — Override the health/max health values used to calculate boss bar fill ratio (fill = current / max)
 - **Entity Layer** — Additional render layer with 3 modes: texture-only, shader-only, or mixed (texture + shader two-pass). Also supports glow, hurt overlay, and alpha settings
+- **Blender Model** — Attach or replace the entity model with a glTF 2.0 binary (`.glb`) model, with per-entity render condition, default animation, animation speed, scale and local offsets
 - **Global Fog** — Custom fog color/distance, global or radius-based, with configurable shape
 - **Global Skybox** — Custom skybox with texture and/or shader (12 built-in presets + custom ShaderPreset elements), alpha, size, and texture color modulation (UV scale + RGB channels)
 - **Combat Music** — Custom combat music with source, volume, pitch, loop, and strict lock options
@@ -151,13 +164,13 @@ When multiple extension entities exist in the same dimension, the one with highe
 
 ### BossShow (Mod Element)
 
-**BossShow** is ECA's cinematic system: it plays a cutscene that locks the player's camera onto a pre-recorded path around a target entity, with subtitles and server-side event callbacks. Camera paths are recorded in-game with ECA's built-in editor (command: */eca bossShow edit*) and saved as JSON — you don't write keyframes by hand. Each keyframe can carry an *event_id* that fires a server-side callback when playback reaches it. For the full system (in-game editor, recording workflow, JSON format, triggers, subtitle translation), see the [Epic Core API documentation](https://github.com/CJiangqiu/EpicCoreAPI).
+**BossShow** is ECA's cinematic system: it plays a cutscene that locks the player's camera onto a pre-recorded path around a target entity, with independent camera, event, subtitle and screen-effect tracks. Camera paths are recorded in-game with ECA's built-in editor (command: */eca bossShow edit*) and saved as JSON — you don't write frames by hand. Event cues carry an *event_id* that fires a server-side callback when playback reaches that tick. Screen effects, including camera shake, shader output effects and ECA filters, are stored in the same JSON and played entirely by ECA. For the full system (in-game editor, recording workflow, JSON format, triggers and subtitle translation), see the [Epic Core API documentation](https://github.com/CJiangqiu/EpicCoreAPI).
 
-This mod element is the MCreator-side handler: it binds procedures to an existing cutscene's keyframe events, so you can react to a cutscene from your own logic without writing Java. Configure:
+This mod element is the MCreator-side handler: it binds procedures to an existing cutscene's event cues, so you can react to a cutscene from your own logic without writing Java. Screen-effect cues do not need mappings here. Configure:
 
 - **Target Entity Type** — The entity type this BossShow handler is associated with
 - **BossShow ID** — The BossShow cutscene identifier to bind to
-- **Keyframe Event Mappings** — A list of event ID → procedure pairs; each procedure fires when the matching keyframe (with that *event_id*) is reached during playback
+- **Event Mappings** — A list of event ID → procedure pairs; each procedure fires when the matching event cue is reached during playback
 
 Use the BossShow procedure blocks (Play / Stop / Is Playing / Trigger Custom-type) to control cutscenes from within other procedures.
 
@@ -170,8 +183,48 @@ Use the BossShow procedure blocks (Play / Stop / Is Playing / Trigger Custom-typ
 You need to manually copy the BossShow file for the corresponding entity into the matching location in your own mod project:
 
 ```
-<mod project>/src/main/resources/data/<modid>/bossshow/<id>.json
+<mod project>/src/main/resources/data/<modid>/eca/bossshow/<id>.json
 ```
+
+### Blender GLB Model Resources
+
+ECA loads glTF 2.0 binary models directly. Place each model in the canonical—and only—Blender resource layout:
+
+```text
+assets/<modid>/eca/blender/<path>/model.glb
+assets/<modid>/eca/blender/<path>/definition.json
+```
+
+The Entity Extension Model ID is `<modid>:<path>`; when the namespace is omitted, the current workspace Mod ID is used. Blender support has no legacy asset directory fallback.
+
+`definition.json` selects the GLB and controls its model-wide transform:
+
+```json
+{
+  "model": "model.glb",
+  "scale": 1.0,
+  "translation": [0.0, 0.0, 0.0],
+  "rotation": [0.0, 0.0, 0.0],
+  "default_animation": "Idle",
+  "loop": true,
+  "hidden_nodes": ["PresentationGround"]
+}
+```
+
+- `model` names a GLB in the same directory and defaults to `model.glb`.
+- `scale` is a uniform multiplier; the recommended convention is one Blender metre per game block.
+- `translation` is a model-local offset and `rotation` contains X/Y/Z degrees.
+- `default_animation` is used when neither explicit playback nor the entity extension selects an animation.
+- `loop` controls default playback; a non-looping clip holds its last frame.
+- `hidden_nodes` hides each named node and all descendants.
+
+Export from Blender as **glTF Binary (.glb)**. Apply intended object transforms, export normals and the first UV set, embed PNG/JPEG textures where practical, exclude cameras, lights and presentation geometry, and give each action a stable unique name. Animation names are case-sensitive.
+
+`ADDITIVE` draws the GLB alongside the normal entity model. `REPLACE` replaces the body and normal render layers while retaining nameplates, shadows, outlines, entity lighting, depth and shader-pack passes. ECA supports indexed triangle meshes, node hierarchies, base colours/textures, transparency, `STEP`/`LINEAR` translation, rotation and scale animation, and four-influence skeletal skinning using `JOINTS_0`/`WEIGHTS_0`.
+
+Blender animation procedure blocks must run on the logical server. Playing the same animation again restarts it. Paused and completed non-looping animations remain the active explicit state until stopped or replaced. This state is transient and is not saved to entity NBT, so callers must restart it after the entity leaves and later rejoins a server level. Stopping falls back in this order: Entity Extension animation, `definition.json`'s `default_animation`, then the unanimated pose. ECA synchronizes presentation only; skills, cooldowns, hit frames, damage and timing remain the calling mod's responsibility.
+
+Skinning is evaluated on the CPU, so large high-poly crowds should be profiled. Sparse accessors, `JOINTS_1`/`WEIGHTS_1`, morph targets and `CUBICSPLINE` animation are not supported. Blender Geometry Nodes must be applied or baked to ordinary meshes before export; ECA does not execute node graphs in-game.
 
 ### ECA Item Extension (Mod Element)
 
@@ -228,15 +281,15 @@ Rows without a condition are static presets; rows with one are checked at runtim
 
 ### ECA Raid (Mod Element)
 
-Declares a raid: the waves it sends, the faction its raiders belong to, when it is won or lost, and what happens along the way.
+Declares a raid: the waves it sends, how each spawn source is assigned to a faction, when it is won or lost, and what happens along the way.
 
 **Raids never start on their own.** ECA deliberately keeps the trigger out of the definition — this element describes what the raid is, while when it happens is up to you. Start it from your own procedure with **Start Raid At** or **Start Raid In Structure**, on whatever trigger you like. That is why there are victory, defeat and wave-advance conditions here, but no start condition.
 
 - **Display Name** — Shown on the raid boss bar; a fixed string, a procedure, or a translation key
-- **Raider Faction** — What spawned raiders are bound to. This binding is what makes vanilla AI and ECA's attack rules treat them as hostile to defenders; without it the raid relies entirely on each entity's own AI and wave leaders degrade into ordinary raiders
+- **Default Raider Faction** — The faction used by explicit spawn rows and wave leaders. Faction-group rows use their own Group Faction instead. Without a default faction, explicit entries remain unbound and wave leaders degrade into ordinary raiders
 - **Structure Anchor** — How the raid finds its centre: use the position passed to the start block directly, anchor to one specific structure, or anchor to any structure carrying a tag. The last two are mutually exclusive in ECA, so there is one field for both
 - **Raider Goal Priority**, **Endless**, **Boss Bar Colour**, **Max Duration**, **Wave Cooldown**, **Participant Radius**, **Celebration** — Behaviour, appearance and pacing
-- **Waves** — A list of spawn entries. Rows sharing a wave number are merged into one wave and waves run in ascending order, so you type the number on each row instead of nesting lists. A row can be marked as the wave's **Leader**, which requires a Raider Faction because the leader is made that faction's leader. Delay and radius are wave-level, so the first row of each wave decides them
+- **Waves** — Rows with no Group Faction are explicit entity entries and use Count directly. Rows sharing both a wave number and Group Faction form one weighted `addFaction` group: Count from the first row is the group's total spawn count, while each row contributes its entity type and Weight. A faction-group row cannot be a leader. Waves run in ascending order; delay and radius come from the first row of each wave
 - **Conditions and events** — Nine optional procedures, all evaluated on the server with the raid centre as their position: advance-wave, victory and defeat conditions, plus callbacks for raid start, wave start, wave end, victory, defeat and stop
 
 Leaving a condition empty uses ECA's default: the previous wave is dead, all waves spawned and cleared, or the target structure is gone. Overriding replaces that default entirely — a custom victory condition also drops the built-in "endless raids never win" guard, and an unanchored raid never loses by default because it has no structure to check. The stop callback runs on every termination path, so it also fires after victory or defeat.
@@ -249,7 +302,7 @@ A mod element for registering custom shader presets so they become selectable in
 1. **In-game**: Use `/eca shaderGenerator` to visually compose your shader, then click **Export**.
 2. The export creates 5 files under `config/eca/shadergenerator/<namespace>/<name>/`:
    `<name>.fsh`, `<name>_block.vsh`, `<name>_block.json`, `<name>_entity.vsh`, `<name>_entity.json`
-3. **Copy** all 5 files into your workspace: `src/main/resources/assets/<modid>/shaders/core/`
+3. **Copy** all 5 files into your workspace: `src/main/resources/assets/<modid>/eca/shader_presets/`
 4. **In MCreator**: Create an ECA Shader Preset element — the dropdown auto-scans the folder above and lists any valid five-file sets.
 
 - **Preset Name** — The shader preset name (without file extension). The dropdown automatically scans your workspace's shader resources for custom presets; ECA's 12 built-in presets are not listed here (they are already registered by ECA and selectable in the consumer dropdowns of other elements). You can also type a custom name manually.
@@ -303,7 +356,7 @@ By default the build automatically pulls the ECA dev artifact from the Modrinth 
 **(Optional) Use a local dev jar:** If you prefer not to rely on the Maven repository (e.g. offline, or to pin a specific version), download the dev jar from the **CurseForge** files page. The file name looks like this:
 
 ```
-epic-core-api-<version>-dev.jar
+epic-core-api-<version>_dev.jar
 ```
 
 Place it in:
@@ -312,7 +365,7 @@ Place it in:
 <user home>/.mcreator/lib/
 ```
 
-The build automatically detects any matching ECA dev jar in that folder and uses the newest one, falling back to the Modrinth Maven repository only when none is present.
+The build detects both `epic-core-api-<version>_dev.jar` and the legacy `epic-core-api-<version>-dev.jar` naming forms. If multiple matching jars are present, it compares their numeric version components and uses the newest one (for example, `1.1.10` is newer than `1.1.9`). It falls back to the Modrinth Maven artifact only when no matching local jar exists.
 
 #### Step 5: Use the Procedure Blocks
 
@@ -416,11 +469,22 @@ MIT License - See [LICENSE](LICENSE) file for details.
 - **停止BossShow演出** `<玩家>` - 停止玩家当前正在播放的BossShow演出
 - **是否正在观看演出** `<玩家>` - 检查玩家当前是否有活跃的BossShow演出会话
 - **触发名为指定名称的自定义触发类型BossShow** `<名称> <玩家> <目标>` - 触发触发器类型为Custom且名称匹配的BossShow演出，启动一场新的播放，与当前正在播放的BossShow无关
-- **启动复活守护线程** - 启动复活守护线程，它会持续监控被追踪的实体，并自动复活任何死亡或丢失容器注册的实体
-- **停止复活守护线程** - 停止复活守护线程，被追踪的实体将不再被自动复活
+- **启动复活守护线程** - 开始监控被追踪实体，修复服务端/客户端在场状态、保存完整状态快照并重建丢失的实例
+- **停止复活守护线程** - 停止自动修复、快照与重建处理
 - **复活守护线程是否运行中** - 检查复活守护线程当前是否正在运行
-- **加入复活追踪** `<实体>` - 将实体加入复活追踪，守护线程运行期间该实体会在死亡后很快被自动复活。请勿用于会大量生成的实体
-- **移出复活追踪** `<实体>` - 将实体移出复活追踪，使其不再被自动复活
+- **加入复活追踪** `<实体>` - 为实体启用服务端/客户端在场修复、状态快照、异常位移恢复与实例重建。请勿用于会大量生成的实体
+- **移出复活追踪** `<实体>` - 将实体移出自动修复与重建追踪
+- **设置/获取复活客户端探测间隔** `<毫秒>` - 配置或读取客户端在场探测间隔（限制为 100–60000 毫秒）
+- **设置/获取复活状态快照间隔** `<毫秒>` - 配置或读取全量状态快照间隔（限制为 50–60000 毫秒）
+- **复活统计** - 读取累计服务端修复、实体重建、客户端修复、异常位移恢复与状态快照次数
+
+**Blender 动画** —— 下列流程块控制显式 GLB 动画状态，必须在逻辑服务端调用：
+
+- **播放Blender动画** `<实体> <动画>` - 以导出速度、不循环地从头播放指定动画
+- **按设置播放Blender动画** `<实体> <动画> <速度> <循环>` - 使用正数速度和指定循环方式从头播放
+- **停止 / 暂停 / 继续Blender动画** `<实体>` - 控制显式播放；停止后回退到扩展或模型定义的默认动画
+- **是否正在播放Blender动画** `<实体>` - 检查是否存在显式动画状态
+- **是否正在播放指定Blender动画** `<实体> <动画>` - 检查当前导出动画名称
 
 **阵营** —— 下列所有阵营参数都是下拉列表，列出工作区中已注册的 ECA 阵营元素，无需手动输入 ID：
 
@@ -469,8 +533,10 @@ MIT License - See [LICENSE](LICENSE) file for details.
 
 - **强制加载** — 将该类型实体设为强加载实体，请勿用于会大量生成的实体
 - **自定义Boss血条** — 自定义框架/填充纹理，可选着色器效果，可配置大小和偏移
+- **Boss血条数值文本** — 可选地在血条中央绘制“当前值 / 最大值”，并可使用独立的客户端显示值覆盖
 - **自定义填充比例** — 覆盖用于计算Boss血条填充比例的血量/最大血量值（填充比例 = 当前血量 / 最大血量）
 - **实体图层** — 额外渲染图层，支持3种模式：纯贴图、纯着色器或混合（贴图+着色器双层叠加）。同时支持发光、受伤叠加和透明度设置
+- **Blender模型** — 使用 glTF 2.0 二进制（`.glb`）模型附加或替换实体模型，支持按实体渲染条件、默认动画、动画速度、缩放和局部偏移
 - **全局迷雾** — 自定义迷雾颜色/距离，全局或半径模式，可配置形状
 - **全局天空盒** — 自定义天空盒纹理和/或着色器（12种内置预设 + 自定义着色器预设元素），支持透明度、大小和贴图色彩调制（UV缩放 + RGB通道）
 - **战斗音乐** — 自定义战斗音乐，支持音源、音量、音调、循环和严格锁定选项
@@ -482,13 +548,13 @@ MIT License - See [LICENSE](LICENSE) file for details.
 
 ### BossShow 演出（模组元素）
 
-**BossShow** 是 ECA 的演出（过场动画）系统：播放时将玩家镜头锁定到围绕目标实体预先录制的运镜路径上，配有字幕和服务端事件回调。运镜路径通过 ECA 内置的游戏内编辑器（指令：*/eca bossShow edit*）录制并保存为 JSON——无需手写关键帧。每个关键帧可携带一个 *event_id*，播放到该帧时触发服务端回调。完整系统（游戏内编辑器、录制流程、JSON 格式、触发器、字幕翻译）请见 [Epic Core API 文档](https://github.com/CJiangqiu/EpicCoreAPI)。
+**BossShow** 是 ECA 的演出（过场动画）系统：播放时将玩家镜头锁定到围绕目标实体预先录制的运镜路径上，并提供独立的镜头、事件、字幕和屏幕特效轨道。运镜路径通过 ECA 内置的游戏内编辑器（指令：*/eca bossShow edit*）录制并保存为 JSON——无需手写每一帧。事件时间点可携带 *event_id*，播放到对应 tick 时触发服务端回调；相机震动、Shader 输出效果和 ECA 滤镜等屏幕特效也保存在同一 JSON 中，并完全由 ECA 播放。完整系统（游戏内编辑器、录制流程、JSON 格式、触发器、字幕翻译）请见 [Epic Core API 文档](https://github.com/CJiangqiu/EpicCoreAPI)。
 
-本模组元素是 MCreator 侧的处理器：把流程绑定到已有演出的关键帧事件上，让你无需写 Java 就能在演出播放时响应。可配置：
+本模组元素是 MCreator 侧的处理器：把流程绑定到已有演出的事件时间点，让你无需写 Java 就能在演出播放时响应。屏幕特效时间点无需在此映射。可配置：
 
 - **目标实体类型** — 该 BossShow 处理器关联的实体类型
 - **BossShow ID** — 要绑定的演出标识符
-- **关键帧事件映射** — 事件 ID → 流程的映射列表，当播放到带有该 *event_id* 的关键帧时触发对应流程
+- **事件映射** — 事件 ID → 流程的映射列表，当播放到匹配的事件时间点时触发对应流程
 
 可在其他流程中使用 BossShow 相关流程块（播放 / 停止 / 是否播放中 / 触发自定义类型）来控制演出。
 
@@ -501,8 +567,48 @@ MIT License - See [LICENSE](LICENSE) file for details.
 您需要手动复制对应实体的 BossShow 文件到自己的 mod 项目文件的对应位置：
 
 ```
-<mod 项目>/src/main/resources/data/<modid>/bossshow/<id>.json
+<mod 项目>/src/main/resources/data/<modid>/eca/bossshow/<id>.json
 ```
+
+### Blender GLB 模型资源
+
+ECA 可以直接加载 glTF 2.0 二进制模型。每个模型必须放在 Blender 唯一的规范资源目录中：
+
+```text
+assets/<modid>/eca/blender/<路径>/model.glb
+assets/<modid>/eca/blender/<路径>/definition.json
+```
+
+实体扩展中的模型 ID 为 `<modid>:<路径>`；省略命名空间时使用当前工作区 Mod ID。Blender 模型系统没有旧资源目录回退。
+
+`definition.json` 选择 GLB 文件并控制模型整体变换：
+
+```json
+{
+  "model": "model.glb",
+  "scale": 1.0,
+  "translation": [0.0, 0.0, 0.0],
+  "rotation": [0.0, 0.0, 0.0],
+  "default_animation": "Idle",
+  "loop": true,
+  "hidden_nodes": ["PresentationGround"]
+}
+```
+
+- `model` 是同目录下的 GLB 文件名，默认值为 `model.glb`。
+- `scale` 是统一缩放倍率；建议约定 Blender 中一米对应游戏中的一格。
+- `translation` 是模型局部偏移，`rotation` 按 X/Y/Z 角度声明。
+- `default_animation` 在没有显式播放、实体扩展也未选择动画时生效。
+- `loop` 控制默认动画是否循环；非循环动画会保持最后一帧。
+- `hidden_nodes` 隐藏指定节点及其全部子节点。
+
+从 Blender 导出时请选择 **glTF Binary (.glb)**。应应用预期的对象变换，导出法线和第一套 UV，尽量嵌入 PNG/JPEG 贴图，排除摄像机、灯光和展示场景，并为每个动作设置稳定且唯一的名称。动画名称区分大小写。
+
+`ADDITIVE` 会在原实体模型之外附加绘制 GLB。`REPLACE` 会替换实体主体及其原有渲染层，但保留名称、阴影、发光轮廓、实体光照、深度和光影渲染通道。ECA 支持索引三角形网格、节点层级、基础颜色与贴图、透明材质、`STEP`/`LINEAR` 位移、旋转和缩放动画，以及使用 `JOINTS_0`/`WEIGHTS_0` 的每顶点四权重骨骼蒙皮。
+
+Blender 动画流程块必须在逻辑服务端调用。重复播放同名动画会从头开始；暂停或已经播完的非循环动画仍属于活跃显式状态，直到停止或被替换。该状态是临时状态，不会写入实体 NBT；实体离开服务端世界后再次加入时，调用方需要重新播放。停止后依次回退到实体扩展动画、`definition.json` 的 `default_animation`、模型未播放动画时的原始姿态。ECA 只同步动画表现；技能、冷却、命中帧、伤害和时间线仍由调用模组负责。
+
+骨骼蒙皮在 CPU 侧计算，大量高面数实体需要实际评估性能。目前不支持稀疏访问器、`JOINTS_1`/`WEIGHTS_1`、Morph Target 和 `CUBICSPLINE` 动画。Blender 几何节点必须在导出前应用或烘焙为普通网格；ECA 不会在游戏内执行节点图。
 
 ### ECA物品扩展（模组元素）
 
@@ -564,10 +670,10 @@ MIT License - See [LICENSE](LICENSE) file for details.
 **袭击不会自行开始。** ECA 刻意把触发留在定义之外——本元素描述的是「这场袭击是什么样」，「什么时候打」由你决定。请在自己的流程里用**在坐标发起袭击**或**在结构中发起袭击**，配合任意触发时机来驱动。这也是这里有胜利、失败、推进波次的判定，却没有开始条件的原因。
 
 - **显示名** — 显示在袭击 Boss 血条上；可填固定文本、流程或翻译键
-- **袭击者阵营** — 生成的袭击者绑定到哪个阵营。这个绑定是让原版 AI 与 ECA 攻击规则把它们视为防守方敌人的关键；不设置的话袭击完全依赖每个实体自身的 AI，波次首领也会退化为普通袭击者
+- **默认袭击者阵营** — 显式生成条目和波次首领使用的阵营；阵营生成组改用每组自己的「组阵营」。不设置默认阵营时，显式条目不会绑定阵营，波次首领也会退化为普通袭击者
 - **结构锚定方式** — 袭击如何确定中心：直接用发起时传入的坐标、锚定到某个具体结构、或锚定到带某标签的任意结构。后两者在 ECA 中互斥，所以共用一个输入框
 - **袭击者目标优先级**、**无尽模式**、**Boss血条颜色**、**最长持续时间**、**波次冷却**、**参与半径**、**庆祝时长** — 行为、外观与节奏
-- **波次** — 生成条目列表。波次号相同的行合并为同一波，各波按波次号升序进行，因此波次号是每行手填的，不用嵌套列表。某行可标记为本波**首领**，这需要设置袭击者阵营，因为首领会被设为该阵营的首领。延迟与半径是波次级属性，取每波首行的值
+- **波次** — 未选择「组阵营」的行是显式实体条目，「数量」直接表示生成数；波次号和组阵营都相同的多行会合并为一个加权 `addFaction` 组，组首行的「数量」是该组总生成数，每行的实体类型与「权重」组成抽取池。阵营组不能作为首领。各波按波次号升序进行，延迟与半径取每波首行
 - **条件与事件** — 9 个可选流程，全部在服务端求值、位置依赖为袭击中心：推进波次、胜利、失败三个判定，以及袭击开始、波次开始、波次结束、胜利、失败、停止六个回调
 
 判定留空则使用 ECA 默认规则：上一波全灭、所有波次已生成且清空、目标结构不再覆盖中心。自定义会完全取代默认规则——自定义胜利条件会连带取消「无尽袭击永不胜利」的内置保护，而未锚定结构的袭击因为没有结构可查，默认永远不会失败。停止回调在任何结束路径上都会执行，因此它也会在胜利或失败之后再触发一次。
@@ -580,7 +686,7 @@ MIT License - See [LICENSE](LICENSE) file for details.
 1. **游戏内**：使用 `/eca shaderGenerator` 可视化组合着色器，完成后点击**导出**。
 2. 导出会在 `config/eca/shadergenerator/<命名空间>/<名称>/` 下生成 5 个文件：
    `<名称>.fsh`、`<名称>_block.vsh`、`<名称>_block.json`、`<名称>_entity.vsh`、`<名称>_entity.json`
-3. **复制**全部 5 个文件到工作区：`src/main/resources/assets/<modid>/shaders/core/`
+3. **复制**全部 5 个文件到工作区：`src/main/resources/assets/<modid>/eca/shader_presets/`
 4. **在 MCreator 中**：创建一个 ECA 着色器预设元素——下拉框自动扫描上述文件夹中的有效五文件集。
 
 - **预设名称** — 着色器预设名称（不含扩展名）。下拉框自动扫描工作区着色器资源中的自定义预设；ECA 的 12 个内置预设不在此列出（它们已由 ECA 自行注册，可在其他元素的消费者下拉框中选用）。也可手动输入自定义名称。
@@ -634,7 +740,7 @@ MIT License - See [LICENSE](LICENSE) file for details.
 **（可选）使用本地 dev jar：** 如果你不想依赖 Maven 仓库（例如离线，或想锁定特定版本），可从 **CurseForge** 的文件页面下载 dev jar。文件名形如：
 
 ```
-epic-core-api-<版本>-dev.jar
+epic-core-api-<版本>_dev.jar
 ```
 
 放入：
@@ -643,7 +749,7 @@ epic-core-api-<版本>-dev.jar
 <用户目录>/.mcreator/lib/
 ```
 
-构建会自动检测该目录下匹配的 ECA dev jar 并使用版本最新的那个；仅当不存在时才回退到 Modrinth Maven 仓库。
+构建同时识别 `epic-core-api-<版本>_dev.jar` 和旧式的 `epic-core-api-<版本>-dev.jar` 命名。如果目录中有多个匹配的 jar，会比较各段数字版本号并使用最新版本（例如 `1.1.10` 新于 `1.1.9`）；仅在没有任何匹配的本地 jar 时回退到 Modrinth Maven 构件。
 
 #### 第 5 步：使用流程块
 

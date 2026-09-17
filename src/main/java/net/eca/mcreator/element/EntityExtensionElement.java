@@ -4,6 +4,7 @@ import net.mcreator.element.GeneratableElement;
 import net.mcreator.element.parts.EntityEntry;
 import net.mcreator.element.parts.procedure.NumberProcedure;
 import net.mcreator.element.parts.procedure.Procedure;
+import net.mcreator.element.parts.procedure.StringProcedure;
 import net.mcreator.workspace.elements.ModElement;
 
 import java.util.ArrayList;
@@ -40,6 +41,11 @@ public class EntityExtensionElement extends GeneratableElement {
     public int bossBarFillOffsetY;
     public int bossBarFrameAlpha;
     public int bossBarFillAlpha;
+    public boolean bossBarShowValueText;
+    public boolean bossBarDisplayCurrentEnabled;
+    public NumberProcedure bossBarDisplayCurrentValue;
+    public boolean bossBarDisplayMaxEnabled;
+    public NumberProcedure bossBarDisplayMaxValue;
 
     // Custom Health Display
     public boolean customHealthEnabled;
@@ -50,6 +56,18 @@ public class EntityExtensionElement extends GeneratableElement {
     // Entity Layer — a list of layer entries, first matching condition wins
     public boolean entityLayerEnabled;
     public List<EntityLayerEntry> entityLayerEntries;
+
+    // Blender GLB Model
+    public boolean blenderModelEnabled;
+    public String blenderModelId;
+    public String blenderRenderMode;
+    public Procedure blenderRenderCondition;
+    public StringProcedure blenderAnimation;
+    public NumberProcedure blenderAnimationSpeed;
+    public NumberProcedure blenderScale;
+    public NumberProcedure blenderOffsetX;
+    public NumberProcedure blenderOffsetY;
+    public NumberProcedure blenderOffsetZ;
 
     // Global Fog — a list of fog entries, first matching condition wins
     public boolean globalFogEnabled;
@@ -74,8 +92,18 @@ public class EntityExtensionElement extends GeneratableElement {
         this.bossBarFillHeight = 5;
         this.bossBarFrameAlpha = 100;
         this.bossBarFillAlpha = 100;
+        this.bossBarDisplayCurrentValue = new NumberProcedure(null, 20);
+        this.bossBarDisplayMaxValue = new NumberProcedure(null, 20);
         this.customHealthValue = new NumberProcedure(null, 20);
         this.customMaxHealthValue = new NumberProcedure(null, 20);
+        this.blenderModelId = "";
+        this.blenderRenderMode = "ADDITIVE";
+        this.blenderAnimation = new StringProcedure(null, "");
+        this.blenderAnimationSpeed = new NumberProcedure(null, 1);
+        this.blenderScale = new NumberProcedure(null, 1);
+        this.blenderOffsetX = new NumberProcedure(null, 0);
+        this.blenderOffsetY = new NumberProcedure(null, 0);
+        this.blenderOffsetZ = new NumberProcedure(null, 0);
         this.entityLayerEntries = new ArrayList<>();
         this.fogEntries = new ArrayList<>();
         this.skyboxEntries = new ArrayList<>();

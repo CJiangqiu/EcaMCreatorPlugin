@@ -49,20 +49,25 @@ public final class ShaderPresetUtil {
         Set<String> set = new LinkedHashSet<>();
         if (mcreator == null || mcreator.getWorkspace() == null) return set.toArray(new String[0]);
         String modid = mcreator.getWorkspace().getWorkspaceSettings().getModID();
-        File shaderDir = new File(mcreator.getWorkspace().getFolderManager().getWorkspaceFolder(),
-                "src/main/resources/assets/" + modid + "/shaders/core");
+        File assetsRoot = new File(mcreator.getWorkspace().getFolderManager().getWorkspaceFolder(),
+                "src/main/resources/assets/" + modid);
+        collectPresets(new File(assetsRoot, "eca/shader_presets"), set);
+        collectPresets(new File(assetsRoot, "shaders/core"), set);
+        return set.toArray(new String[0]);
+    }
+
+    private static void collectPresets(File shaderDir, Set<String> output) {
         if (shaderDir.isDirectory()) {
             File[] fshFiles = shaderDir.listFiles((d, n) -> n.endsWith(".fsh"));
             if (fshFiles != null) {
                 for (File fsh : fshFiles) {
                     String name = fsh.getName().replace(".fsh", "");
                     if (hasPresetFiles(shaderDir, name)) {
-                        set.add(name);
+                        output.add(name);
                     }
                 }
             }
         }
-        return set.toArray(new String[0]);
     }
 
     /** 检查五文件集是否完整（与ECA源码hasPresetFiles逻辑一致） */

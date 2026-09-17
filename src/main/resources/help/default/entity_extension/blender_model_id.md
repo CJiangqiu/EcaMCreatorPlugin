@@ -1,0 +1,1 @@
+Resource ID of the model directory. `example:aircraft` loads `assets/example/eca/blender/aircraft/definition.json` and the GLB selected by its `model` field (default: `model.glb`). An ID without a namespace uses this workspace's mod ID. This is Blender support's only resource layout; there is no legacy directory fallback.

@@ -1,0 +1,1 @@
+Draw the current and maximum values centered over the custom boss bar. By default, ECA uses the client entity's health and maximum health. Use the separate display-value overrides below when the text should show different values.
