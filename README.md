@@ -40,7 +40,7 @@ This plugin integrates [Epic Core API](https://github.com/CJiangqiu/EpicCoreAPI)
 - **Enable AllReturn** `<Entity>` ⚠️ **[DANGER]** - Requires "Enable Radical Logic" in config. Enables AllReturn for the entity's mod; for players, targets the mods owning their armor and main-hand/off-hand equipment.
 - **Disable AllReturn** - Turn off AllReturn and clear all transformation targets
 - **Is AllReturn Enabled** - Check if AllReturn is active
-- **Set Global AllReturn** `<Boolean>` ⚠️ **[DANGER]** - Requires config enabled. Enable/disable global AllReturn mode affecting ALL mods' boolean/void methods
+- **Set Global AllReturn** `<Boolean>` ⚠️ **[DANGER]** - Requires config enabled. Enable/disable global AllReturn mode affecting eligible boolean/void methods in non-whitelisted mods
 - **Memory Remove Entity** `<Entity>` ⚠️ **[DANGER]** - Requires config enabled. Remove entity via LWJGL internal channel
 - **Add Health Whitelist Keyword** `<Keyword>` - Add a keyword to health whitelist. Fields containing this keyword will be modified during health changes
 - **Remove Health Whitelist Keyword** `<Keyword>` - Remove a keyword from health whitelist
@@ -443,7 +443,7 @@ MIT License - See [LICENSE](LICENSE) file for details.
 - **启用AllReturn** `<实体>` ⚠️ **【危险】** - 需开启“激进攻击逻辑”。对实体所属模组启用AllReturn；玩家则针对盔甲及主副手装备所属模组。
 - **禁用AllReturn** - 关闭AllReturn并清空所有转换目标
 - **AllReturn是否已启用** - 检查AllReturn是否激活
-- **设置全局AllReturn** `<布尔值>` ⚠️ **【危险】** - 需配置文件启用。启用/禁用全局AllReturn模式，影响所有mod的boolean/void方法
+- **设置全局AllReturn** `<布尔值>` ⚠️ **【危险】** - 需配置文件启用。启用/禁用全局AllReturn模式，影响非白名单模组中符合条件的boolean/void方法
 - **内存移除实体** `<实体>` ⚠️ **【危险】** - 需配置文件启用。通过LWJGL内部通道移除实体
 - **添加血量白名单关键字** `<关键字>` - 添加血量白名单关键字，包含此关键字的字段将在血量修改时被修改
 - **移除血量白名单关键字** `<关键字>` - 从血量白名单中移除关键字
@@ -464,7 +464,7 @@ MIT License - See [LICENSE](LICENSE) file for details.
 - **解锁最大血量** `<实体>` - 解锁最大血量
 - **最大血量是否已锁定** `<实体>` - 检查最大血量是否锁定
 - **获取锁定最大血量值** `<实体>` - 获取锁定的最大血量值
-- **禁止治疗** `<实体> <数值>` - 禁止实体治疗，将血量锁定在指定值
+- **禁止治疗** `<实体> <数值>` - 限制被禁疗的实体的生命值无法超过设置的禁疗值。
 - **解禁治疗** `<实体>` - 移除治疗禁令
 - **是否被禁止治疗** `<实体>` - 检查是否被禁止治疗
 - **获取禁治疗数值** `<实体>` - 获取禁止治疗的血量值
