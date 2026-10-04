@@ -1,18 +1,4 @@
-# Epic Core API MCreator Plugin 1.1.8-fix-fix
-
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![MCreator](https://img.shields.io/badge/MCreator-2024.1+-orange.svg)](https://mcreator.net/)
-[![Minecraft](https://img.shields.io/badge/Minecraft-1.20.1-green.svg)](https://www.minecraft.net/)
-
-[English](#english) | [中文](#中文)
-
----
-
 ## English
-
-### Version 1.1.8-fix-fix
-
-The default core dependency is `maven.modrinth:epic-core-api:1.1.8-fix-fix:dev`. To use a local core, place `epic-core-api-1.1.8-fix-fix_dev.jar` in `~/.mcreator/lib/` and regenerate the workspace. Local discovery accepts both `_dev.jar` and `-dev.jar`, compares numeric versions first, and then orders hotfixes as `1.1.8 < 1.1.8-fix < 1.1.8-fix-fix`. A matching local jar takes priority over the remote dependency.
 
 ### About
 
@@ -398,10 +384,6 @@ MIT License - See [LICENSE](LICENSE) file for details.
 ---
 
 ## 中文
-
-### 1.1.8-fix-fix 版本
-
-默认核心依赖为 `maven.modrinth:epic-core-api:1.1.8-fix-fix:dev`。如需使用本地核心，请将 `epic-core-api-1.1.8-fix-fix_dev.jar` 放入 `~/.mcreator/lib/` 后重新生成工作区。本地识别兼容 `_dev.jar` 与 `-dev.jar`，先比较数字版本，再按 `1.1.8 < 1.1.8-fix < 1.1.8-fix-fix` 比较修复版本。匹配的本地 jar 优先于远程依赖。
 
 ### 关于
 
