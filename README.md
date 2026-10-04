@@ -1,12 +1,3 @@
-# Epic Core API MCreator Plugin 1.1.8-fix-fix
-
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![MCreator](https://img.shields.io/badge/MCreator-2024.1+-orange.svg)](https://mcreator.net/)
-[![Minecraft](https://img.shields.io/badge/Minecraft-1.20.1-green.svg)](https://www.minecraft.net/)
-
-[English](#english) | [中文](#中文)
-
----
 
 ## English
 
