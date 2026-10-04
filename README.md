@@ -413,10 +413,6 @@ MIT License - See [LICENSE](LICENSE) file for details.
 
 ## 中文
 
-### 1.1.8-fix-fix 版本
-
-默认核心依赖为 `maven.modrinth:epic-core-api:1.1.8-fix-fix:dev`。如需使用本地核心，请将 `epic-core-api-1.1.8-fix-fix_dev.jar` 放入 `~/.mcreator/lib/` 后重新生成工作区。本地识别兼容 `_dev.jar` 与 `-dev.jar`，先比较数字版本，再按 `1.1.8 < 1.1.8-fix < 1.1.8-fix-fix` 比较修复版本。匹配的本地 jar 优先于远程依赖。
-
 ### 关于
 
 我创建这个插件是为了提供一些便捷且强大的实体操作 API。尽管现在我几乎不再使用 MCreator 制作 Mod，但我仍然想要去帮助那些依然使用 MCreator 且一直苦恼于实体相关操作的开发者。
