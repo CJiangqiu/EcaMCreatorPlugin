@@ -1,4 +1,4 @@
-# Epic Core API MCreator Plugin
+# Epic Core API MCreator Plugin 1.1.8-fix-fix
 
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![MCreator](https://img.shields.io/badge/MCreator-2024.1+-orange.svg)](https://mcreator.net/)
@@ -9,6 +9,10 @@
 ---
 
 ## English
+
+### Version 1.1.8-fix-fix
+
+The default core dependency is `maven.modrinth:epic-core-api:1.1.8-fix-fix:dev`. To use a local core, place `epic-core-api-1.1.8-fix-fix_dev.jar` in `~/.mcreator/lib/` and regenerate the workspace. Local discovery accepts both `_dev.jar` and `-dev.jar`, compares numeric versions first, and then orders hotfixes as `1.1.8 < 1.1.8-fix < 1.1.8-fix-fix`. A matching local jar takes priority over the remote dependency.
 
 ### About
 
@@ -29,11 +33,11 @@ This plugin integrates [Epic Core API](https://github.com/CJiangqiu/EpicCoreAPI)
 - **Unlock Health** `<Entity>` - Remove health lock, allowing getHealth() to return actual health
 - **Is Health Locked** `<Entity>` - Check if entity health is locked
 - **Get Locked Health Value** `<Entity>` - Get the locked health value, or 0 if not locked
-- **Force Get Health** `<Entity>` - Read the entity's real health value directly from DATA_HEALTH_ID using VarHandle
+- **Force Get Health** `<Entity>` - If ECA's health modification analysis has identified the entity's real health, return that health; otherwise, return the entity's vanilla health data.
 - **Is Force Invulnerable** `<Entity>` - Check ECA invulnerability state via EntityData
-- **Force Teleport** `<Entity> <X> <Y> <Z>` - Directly modify position fields using VarHandle with automatic client sync
+- **Force Teleport** `<Entity> <X> <Y> <Z>` - Force teleport an entity to the specified coordinates in its current dimension. Must run on the server's main thread.
 - **Cleanup Boss Bar** `<Entity>` - Scan entity instance fields and remove all ServerBossEvent instances
-- **Enable AllReturn** `<Entity>` ⚠️ **[DANGER]** - Requires config enabled. Transform all boolean/void methods in the entity's mod package
+- **Enable AllReturn** `<Entity>` ⚠️ **[DANGER]** - Requires "Enable Radical Logic" in config. Enables AllReturn for the entity's mod; for players, targets the mods owning their armor and main-hand/off-hand equipment.
 - **Disable AllReturn** - Turn off AllReturn and clear all transformation targets
 - **Is AllReturn Enabled** - Check if AllReturn is active
 - **Set Global AllReturn** `<Boolean>` ⚠️ **[DANGER]** - Requires config enabled. Enable/disable global AllReturn mode affecting ALL mods' boolean/void methods
@@ -57,7 +61,7 @@ This plugin integrates [Epic Core API](https://github.com/CJiangqiu/EpicCoreAPI)
 - **Unlock Max Health** `<Entity>` - Unlock max health
 - **Is Max Health Locked** `<Entity>` - Check if max health is locked
 - **Get Locked Max Health** `<Entity>` - Get locked max health value
-- **Ban Healing** `<Entity> <Value>` - Ban healing for entity, locking health at value
+- **Ban Healing** `<Entity> <Value>` - Prevent the affected entity's health from exceeding the configured healing ban value.
 - **Unban Healing** `<Entity>` - Remove healing ban
 - **Is Healing Banned** `<Entity>` - Check if healing is banned
 - **Get Heal Ban Value** `<Entity>` - Get the heal ban value
@@ -94,13 +98,14 @@ This plugin integrates [Epic Core API](https://github.com/CJiangqiu/EpicCoreAPI)
 - **Set/Get Resurrection Snapshot Interval** `<Milliseconds>` - Configure or read the full-state snapshot interval (clamped to 50–60000 ms)
 - **Resurrection Statistics** - Read cumulative server repairs, entity rebuilds, client repairs, displacement restores and state snapshots
 
-**Blender animations** — these blocks control explicit GLB animation state and must be called on the logical server:
+**Blender animations** — these blocks control or query managed Blender playback and must be called on the logical server:
 
-- **Play Blender Animation** `<Entity> <Animation>` - Restart a named animation at exported speed without looping
-- **Play Blender Animation With Settings** `<Entity> <Animation> <Speed> <Loop>` - Restart it with a positive speed and explicit loop mode
-- **Stop / Pause / Resume Blender Animation** `<Entity>` - Control explicit playback; stopping returns to the extension or definition default
-- **Is Blender Animation Playing** `<Entity>` - Check whether an explicit animation state exists
-- **Is Named Blender Animation Playing** `<Entity> <Animation>` - Check the active exported animation name
+- **Play Blender Animation** `<Entity> <Animation>` - Restart at speed 1 without looping; take manual control and cancel the active skill
+- **Play Blender Animation With Settings** `<Entity> <Animation> <Speed> <Loop>` - Restart with positive speed and the selected loop mode; take manual control and cancel the active skill
+- **Stop Blender Animation** `<Entity>` - Stop the current action, release manual control or cancel the skill, and return to controller selection or the default animation
+- **Pause / Resume Blender Animation** `<Entity>` - Pause the action and skill timing, or resume from the preserved position; lifecycle logic may still replace a paused action
+- **Is Blender Animation Playing** `<Entity>` - Check for managed playback, including controller actions, paused actions and held final poses; this does not indicate an active skill
+- **Is Named Blender Animation Playing** `<Entity> <Animation>` - Check whether that managed playback uses the specified animation name
 
 **Factions** — every faction parameter below is a dropdown listing the ECA Faction elements registered in your workspace, so you never type an ID by hand:
 
@@ -152,7 +157,7 @@ A new mod element type for visually enhancing specific entity types. Create an E
 - **Boss Bar Value Text** — Optionally draw centered `current / max` values, with independent client-side display-value overrides
 - **Custom Fill Ratio** — Override the health/max health values used to calculate boss bar fill ratio (fill = current / max)
 - **Entity Layer** — Additional render layer with 3 modes: texture-only, shader-only, or mixed (texture + shader two-pass). Also supports glow, hurt overlay, and alpha settings
-- **Blender Model** — Attach or replace the entity model with a glTF 2.0 binary (`.glb`) model, with per-entity render condition, default animation, animation speed, scale and local offsets
+- **Blender Model** — Attach or replace the entity model with a native Blender (`.blend`) or glTF 2.0 binary (`.glb`) model, with per-entity render condition, default animation, animation speed, scale and local offsets
 - **Global Fog** — Custom fog color/distance, global or radius-based, with configurable shape
 - **Global Skybox** — Custom skybox with texture and/or shader (12 built-in presets + custom ShaderPreset elements), alpha, size, and texture color modulation (UV scale + RGB channels)
 - **Combat Music** — Custom combat music with source, volume, pitch, loop, and strict lock options
@@ -186,9 +191,9 @@ You need to manually copy the BossShow file for the corresponding entity into th
 <mod project>/src/main/resources/data/<modid>/eca/bossshow/<id>.json
 ```
 
-### Blender GLB Model Resources
+### Blender Model Resources
 
-ECA loads glTF 2.0 binary models directly. Place each model in the canonical—and only—Blender resource layout:
+ECA loads native Blender (`.blend`) files and glTF 2.0 binary (`.glb`) models. Place each model in the canonical—and only—Blender resource layout:
 
 ```text
 assets/<modid>/eca/blender/<path>/model.glb
@@ -197,7 +202,7 @@ assets/<modid>/eca/blender/<path>/definition.json
 
 The Entity Extension Model ID is `<modid>:<path>`; when the namespace is omitted, the current workspace Mod ID is used. Blender support has no legacy asset directory fallback.
 
-`definition.json` selects the GLB and controls its model-wide transform:
+`definition.json` selects the model file and controls its model-wide transform. This example uses GLB:
 
 ```json
 {
@@ -211,20 +216,20 @@ The Entity Extension Model ID is `<modid>:<path>`; when the namespace is omitted
 }
 ```
 
-- `model` names a GLB in the same directory and defaults to `model.glb`.
+- `model` selects a `.blend` or `.glb` file in the model directory and defaults to `model.glb`. To use a native Blender file, place it in the same directory and explicitly set `"model": "model.blend"` (or its actual filename).
 - `scale` is a uniform multiplier; the recommended convention is one Blender metre per game block.
 - `translation` is a model-local offset and `rotation` contains X/Y/Z degrees.
-- `default_animation` is used when neither explicit playback nor the entity extension selects an animation.
+- `default_animation` is the resource fallback when managed playback and the entity extension do not select an animation.
 - `loop` controls default playback; a non-looping clip holds its last frame.
 - `hidden_nodes` hides each named node and all descendants.
 
-Export from Blender as **glTF Binary (.glb)**. Apply intended object transforms, export normals and the first UV set, embed PNG/JPEG textures where practical, exclude cameras, lights and presentation geometry, and give each action a stable unique name. Animation names are case-sensitive.
+When using GLB, export from Blender as **glTF Binary (.glb)**. Apply intended object transforms, export normals and the first UV set, embed PNG/JPEG textures where practical, exclude cameras, lights and presentation geometry, and give each action a stable unique name. Animation names are case-sensitive.
 
-`ADDITIVE` draws the GLB alongside the normal entity model. `REPLACE` replaces the body and normal render layers while retaining nameplates, shadows, outlines, entity lighting, depth and shader-pack passes. ECA supports indexed triangle meshes, node hierarchies, base colours/textures, transparency, `STEP`/`LINEAR` translation, rotation and scale animation, and four-influence skeletal skinning using `JOINTS_0`/`WEIGHTS_0`.
+`ADDITIVE` draws the Blender model alongside the normal entity model. `REPLACE` replaces the body and normal render layers while retaining nameplates, shadows, outlines, entity lighting, depth and shader-pack passes. ECA supports indexed triangle meshes, node hierarchies, base colours/textures, transparency, `STEP`/`LINEAR` translation, rotation and scale animation, and four-influence skeletal skinning using `JOINTS_0`/`WEIGHTS_0`.
 
-Blender animation procedure blocks must run on the logical server. Playing the same animation again restarts it. Paused and completed non-looping animations remain the active explicit state until stopped or replaced. This state is transient and is not saved to entity NBT, so callers must restart it after the entity leaves and later rejoins a server level. Stopping falls back in this order: Entity Extension animation, `definition.json`'s `default_animation`, then the unanimated pose. ECA synchronizes presentation only; skills, cooldowns, hit frames, damage and timing remain the calling mod's responsibility.
+Blender animation procedure blocks must run on the logical server. Successful manual playback restarts the named animation, takes control from the controller and cancels the active skill. Stopping releases manual control or cancels the skill; the controller selects an action on its next update, otherwise playback returns to the extension or resource default. Pausing also pauses skill timing, but lifecycle decisions may still replace the action. Death-locked playback rejects stop and pause operations. Playback queries include controller actions, paused actions and held final poses, and must not be used as skill-active checks.
 
-Skinning is evaluated on the CPU, so large high-poly crowds should be profiled. Sparse accessors, `JOINTS_1`/`WEIGHTS_1`, morph targets and `CUBICSPLINE` animation are not supported. Blender Geometry Nodes must be applied or baked to ordinary meshes before export; ECA does not execute node graphs in-game.
+Skinning is evaluated on the CPU, so large high-poly crowds should be profiled. Sparse accessors, `JOINTS_1`/`WEIGHTS_1`, morph targets and `CUBICSPLINE` animation are not supported. For GLB export, apply or bake Geometry Nodes to ordinary meshes. Native `.blend` loading supports a limited set of geometry and material nodes at runtime; it does not support every Blender node or modifier. See the core ECA Blender Model documentation for supported features.
 
 ### ECA Item Extension (Mod Element)
 
@@ -394,6 +399,10 @@ MIT License - See [LICENSE](LICENSE) file for details.
 
 ## 中文
 
+### 1.1.8-fix-fix 版本
+
+默认核心依赖为 `maven.modrinth:epic-core-api:1.1.8-fix-fix:dev`。如需使用本地核心，请将 `epic-core-api-1.1.8-fix-fix_dev.jar` 放入 `~/.mcreator/lib/` 后重新生成工作区。本地识别兼容 `_dev.jar` 与 `-dev.jar`，先比较数字版本，再按 `1.1.8 < 1.1.8-fix < 1.1.8-fix-fix` 比较修复版本。匹配的本地 jar 优先于远程依赖。
+
 ### 关于
 
 我创建这个插件是为了提供一些便捷且强大的实体操作 API。尽管现在我几乎不再使用 MCreator 制作 Mod，但我仍然想要去帮助那些依然使用 MCreator 且一直苦恼于实体相关操作的开发者。
@@ -413,11 +422,11 @@ MIT License - See [LICENSE](LICENSE) file for details.
 - **解锁血量** `<实体>` - 移除血量锁定，getHealth()恢复返回实际血量
 - **血量是否已锁定** `<实体>` - 检查实体血量是否已锁定
 - **获取锁定血量值** `<实体>` - 获取锁定的血量值，未锁定时返回0
-- **强制获取真实血量** `<实体>` - 使用VarHandle直接从DATA_HEALTH_ID读取实体的真实血量值
+- **强制获取真实血量** `<实体>` - 如果实体的真实血量已经被ECA改血进行了分析并得到真实血量，返回真实血量；否则将会返回实体的原版生命值数据。
 - **是否处于强制无敌状态** `<实体>` - 通过EntityData检查ECA无敌状态
-- **强制传送** `<实体> <X> <Y> <Z>` - 使用VarHandle直接修改位置字段并自动同步到客户端
+- **强制传送** `<实体> <X> <Y> <Z>` - 将实体强制传送到当前维度的指定坐标，需要在服务端主线程执行。
 - **清理Boss血条** `<实体>` - 扫描实体实例字段并移除所有ServerBossEvent实例
-- **启用AllReturn** `<实体>` ⚠️ **【危险】** - 需配置文件启用。对实体所属mod包内所有boolean/void方法进行转换
+- **启用AllReturn** `<实体>` ⚠️ **【危险】** - 需开启“激进攻击逻辑”。对实体所属模组启用AllReturn；玩家则针对盔甲及主副手装备所属模组。
 - **禁用AllReturn** - 关闭AllReturn并清空所有转换目标
 - **AllReturn是否已启用** - 检查AllReturn是否激活
 - **设置全局AllReturn** `<布尔值>` ⚠️ **【危险】** - 需配置文件启用。启用/禁用全局AllReturn模式，影响所有mod的boolean/void方法
@@ -478,13 +487,14 @@ MIT License - See [LICENSE](LICENSE) file for details.
 - **设置/获取复活状态快照间隔** `<毫秒>` - 配置或读取全量状态快照间隔（限制为 50–60000 毫秒）
 - **复活统计** - 读取累计服务端修复、实体重建、客户端修复、异常位移恢复与状态快照次数
 
-**Blender 动画** —— 下列流程块控制显式 GLB 动画状态，必须在逻辑服务端调用：
+**Blender 动画** —— 下列流程块控制或查询受管理的 Blender 动画，必须在逻辑服务端调用：
 
-- **播放Blender动画** `<实体> <动画>` - 以导出速度、不循环地从头播放指定动画
-- **按设置播放Blender动画** `<实体> <动画> <速度> <循环>` - 使用正数速度和指定循环方式从头播放
-- **停止 / 暂停 / 继续Blender动画** `<实体>` - 控制显式播放；停止后回退到扩展或模型定义的默认动画
-- **是否正在播放Blender动画** `<实体>` - 检查是否存在显式动画状态
-- **是否正在播放指定Blender动画** `<实体> <动画>` - 检查当前导出动画名称
+- **播放Blender动画** `<实体> <动画>` - 以速度1、不循环地从头播放，手动接管控制器并取消当前技能
+- **按设置播放Blender动画** `<实体> <动画> <速度> <循环>` - 使用指定正数速度和循环方式从头播放，手动接管控制器并取消当前技能
+- **停止Blender动画** `<实体>` - 停止当前动作，释放手动接管或取消技能，交回控制器或默认动画
+- **暂停 / 继续Blender动画** `<实体>` - 暂停动作与技能计时，或从保留位置继续；生命周期逻辑仍可能替换已暂停的动作
+- **是否正在播放Blender动画** `<实体>` - 检查受管理动画状态，包括控制器动作、暂停和末尾保持；不代表技能正在执行
+- **是否正在播放指定Blender动画** `<实体> <动画>` - 检查上述受管理动画是否匹配指定名称
 
 **阵营** —— 下列所有阵营参数都是下拉列表，列出工作区中已注册的 ECA 阵营元素，无需手动输入 ID：
 
@@ -536,7 +546,7 @@ MIT License - See [LICENSE](LICENSE) file for details.
 - **Boss血条数值文本** — 可选地在血条中央绘制“当前值 / 最大值”，并可使用独立的客户端显示值覆盖
 - **自定义填充比例** — 覆盖用于计算Boss血条填充比例的血量/最大血量值（填充比例 = 当前血量 / 最大血量）
 - **实体图层** — 额外渲染图层，支持3种模式：纯贴图、纯着色器或混合（贴图+着色器双层叠加）。同时支持发光、受伤叠加和透明度设置
-- **Blender模型** — 使用 glTF 2.0 二进制（`.glb`）模型附加或替换实体模型，支持按实体渲染条件、默认动画、动画速度、缩放和局部偏移
+- **Blender模型** — 使用原生 Blender（`.blend`）或 glTF 2.0 二进制（`.glb`）模型附加或替换实体模型，支持按实体渲染条件、默认动画、动画速度、缩放和局部偏移
 - **全局迷雾** — 自定义迷雾颜色/距离，全局或半径模式，可配置形状
 - **全局天空盒** — 自定义天空盒纹理和/或着色器（12种内置预设 + 自定义着色器预设元素），支持透明度、大小和贴图色彩调制（UV缩放 + RGB通道）
 - **战斗音乐** — 自定义战斗音乐，支持音源、音量、音调、循环和严格锁定选项
@@ -570,9 +580,9 @@ MIT License - See [LICENSE](LICENSE) file for details.
 <mod 项目>/src/main/resources/data/<modid>/eca/bossshow/<id>.json
 ```
 
-### Blender GLB 模型资源
+### Blender 模型资源
 
-ECA 可以直接加载 glTF 2.0 二进制模型。每个模型必须放在 Blender 唯一的规范资源目录中：
+ECA 可以直接加载原生 Blender（`.blend`）文件和 glTF 2.0 二进制（`.glb`）模型。每个模型必须放在 Blender 唯一的规范资源目录中：
 
 ```text
 assets/<modid>/eca/blender/<路径>/model.glb
@@ -581,7 +591,7 @@ assets/<modid>/eca/blender/<路径>/definition.json
 
 实体扩展中的模型 ID 为 `<modid>:<路径>`；省略命名空间时使用当前工作区 Mod ID。Blender 模型系统没有旧资源目录回退。
 
-`definition.json` 选择 GLB 文件并控制模型整体变换：
+`definition.json` 选择模型文件并控制模型整体变换。以下示例使用 GLB：
 
 ```json
 {
@@ -595,20 +605,20 @@ assets/<modid>/eca/blender/<路径>/definition.json
 }
 ```
 
-- `model` 是同目录下的 GLB 文件名，默认值为 `model.glb`。
+- `model` 选择模型目录中的 `.blend` 或 `.glb` 文件，默认值为 `model.glb`。使用原生 Blender 文件时，将文件放入同一目录，并显式设置 `"model": "model.blend"`（或实际文件名）。
 - `scale` 是统一缩放倍率；建议约定 Blender 中一米对应游戏中的一格。
 - `translation` 是模型局部偏移，`rotation` 按 X/Y/Z 角度声明。
-- `default_animation` 在没有显式播放、实体扩展也未选择动画时生效。
+- `default_animation` 是受管理播放与实体扩展均未选择动画时的资源默认动作。
 - `loop` 控制默认动画是否循环；非循环动画会保持最后一帧。
 - `hidden_nodes` 隐藏指定节点及其全部子节点。
 
-从 Blender 导出时请选择 **glTF Binary (.glb)**。应应用预期的对象变换，导出法线和第一套 UV，尽量嵌入 PNG/JPEG 贴图，排除摄像机、灯光和展示场景，并为每个动作设置稳定且唯一的名称。动画名称区分大小写。
+使用 GLB 时，从 Blender 导出请选择 **glTF Binary (.glb)**。应应用预期的对象变换，导出法线和第一套 UV，尽量嵌入 PNG/JPEG 贴图，排除摄像机、灯光和展示场景，并为每个动作设置稳定且唯一的名称。动画名称区分大小写。
 
-`ADDITIVE` 会在原实体模型之外附加绘制 GLB。`REPLACE` 会替换实体主体及其原有渲染层，但保留名称、阴影、发光轮廓、实体光照、深度和光影渲染通道。ECA 支持索引三角形网格、节点层级、基础颜色与贴图、透明材质、`STEP`/`LINEAR` 位移、旋转和缩放动画，以及使用 `JOINTS_0`/`WEIGHTS_0` 的每顶点四权重骨骼蒙皮。
+`ADDITIVE` 会在原实体模型之外附加绘制 Blender 模型。`REPLACE` 会替换实体主体及其原有渲染层，但保留名称、阴影、发光轮廓、实体光照、深度和光影渲染通道。ECA 支持索引三角形网格、节点层级、基础颜色与贴图、透明材质、`STEP`/`LINEAR` 位移、旋转和缩放动画，以及使用 `JOINTS_0`/`WEIGHTS_0` 的每顶点四权重骨骼蒙皮。
 
-Blender 动画流程块必须在逻辑服务端调用。重复播放同名动画会从头开始；暂停或已经播完的非循环动画仍属于活跃显式状态，直到停止或被替换。该状态是临时状态，不会写入实体 NBT；实体离开服务端世界后再次加入时，调用方需要重新播放。停止后依次回退到实体扩展动画、`definition.json` 的 `default_animation`、模型未播放动画时的原始姿态。ECA 只同步动画表现；技能、冷却、命中帧、伤害和时间线仍由调用模组负责。
+Blender 动画流程块必须在逻辑服务端调用。手动播放成功后会从头播放指定动画、接管控制器并取消当前技能。停止会释放手动接管或取消技能；控制器在下一次更新时选择动作，否则回退到扩展或资源默认动画。暂停也会暂停技能计时，但生命周期决策仍可能替换动作。死亡锁定状态下拒绝停止和暂停操作。播放状态查询包括控制器动作、暂停和末尾姿态保持，不能用来判断技能是否正在执行。
 
-骨骼蒙皮在 CPU 侧计算，大量高面数实体需要实际评估性能。目前不支持稀疏访问器、`JOINTS_1`/`WEIGHTS_1`、Morph Target 和 `CUBICSPLINE` 动画。Blender 几何节点必须在导出前应用或烘焙为普通网格；ECA 不会在游戏内执行节点图。
+骨骼蒙皮在 CPU 侧计算，大量高面数实体需要实际评估性能。目前不支持稀疏访问器、`JOINTS_1`/`WEIGHTS_1`、Morph Target 和 `CUBICSPLINE` 动画。导出 GLB 时，几何节点应先应用或烘焙为普通网格。原生 `.blend` 加载支持在运行时执行部分几何和材质节点，并非支持所有 Blender 节点或修改器；具体范围以核心 ECA Blender Model 文档为准。
 
 ### ECA物品扩展（模组元素）
 

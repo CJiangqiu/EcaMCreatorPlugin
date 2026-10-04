@@ -13,7 +13,7 @@ forge-1.20.1:
     }
     dependencies {
       def libDir = new File(System.getProperty("user.home"), ".mcreator/lib")
-      def ecaJarPattern = ~/^epic-core-api-(\d+(?:\.\d+)*)(?:-|_)dev\.jar$/
+      def ecaJarPattern = ~/^epic-core-api-(\d+(?:\.\d+)*)((?:-fix)*)(?:-|_)dev\.jar$/
       def ecaJars = fileTree(
           dir: libDir,
           includes: ['epic-core-api-*-dev.jar', 'epic-core-api-*_dev.jar']
@@ -35,10 +35,15 @@ forge-1.20.1:
               return leftPart <=> rightPart
             }
           }
-          return left.name <=> right.name
+          def leftMatch = left.name =~ ecaJarPattern
+          def rightMatch = right.name =~ ecaJarPattern
+          leftMatch.matches()
+          rightMatch.matches()
+          def fixOrder = leftMatch.group(2).count('-fix') <=> rightMatch.group(2).count('-fix')
+          return fixOrder != 0 ? fixOrder : left.name <=> right.name
         }
         implementation files(latestEca)
       } else {
-        implementation fg.deobf("maven.modrinth:epic-core-api:1.1.8:dev")
+        implementation fg.deobf("maven.modrinth:epic-core-api:1.1.8-fix-fix:dev")
       }
     }

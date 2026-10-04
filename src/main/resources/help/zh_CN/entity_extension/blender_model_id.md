@@ -1,1 +1,1 @@
-模型目录的资源 ID。`example:aircraft` 会加载 `assets/example/eca/blender/aircraft/definition.json`，以及其中 `model` 字段选择的 GLB（默认为 `model.glb`）。不写命名空间时使用当前工作区的 Mod ID。这是 Blender 模型唯一的资源目录，不兼容其他旧目录。
+模型目录的资源 ID。`example:aircraft` 会加载 `assets/example/eca/blender/aircraft/definition.json`，以及其中 `model` 字段选择的 `.blend` 或 `.glb` 文件。默认文件名为 `model.glb`；使用原生 Blender 文件时需显式设置，例如 `"model": "model.blend"`。不写命名空间时使用当前工作区的 Mod ID。这是 Blender 模型唯一的资源目录，不兼容其他旧目录。
